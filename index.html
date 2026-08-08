@@ -170,22 +170,22 @@
               <summary style="cursor:pointer; font-weight:700; color: var(--primary);">Connexion Firebase</summary>
               <div style="padding-top:12px;" class="config">
                 <label>apiKey
-                  <input id="fbApiKey" placeholder="AIza..." />
+                  <input id="fbApiKey" placeholder="AIza..." value="AIzaSyDsNEGaBaq9JhTxSTvIeAQKbhRKNPecXgw" />
                 </label>
                 <div class="two">
                   <label>authDomain
-                    <input id="fbAuthDomain" placeholder="mon-projet.firebaseapp.com" />
+                    <input id="fbAuthDomain" placeholder="mon-projet.firebaseapp.com" value="myfreezer-b488a.firebaseapp.com" />
                   </label>
                   <label>databaseURL
-                    <input id="fbDatabaseURL" placeholder="https://mon-projet-default-rtdb.europe-west1.firebasedatabase.app" />
+                    <input id="fbDatabaseURL" placeholder="https://mon-projet-default-rtdb.europe-west1.firebasedatabase.app" value="https://myfreezer-b488a-default-rtdb.europe-west1.firebasedatabase.app" />
                   </label>
                 </div>
                 <div class="two">
                   <label>projectId
-                    <input id="fbProjectId" placeholder="mon-projet" />
+                    <input id="fbProjectId" placeholder="mon-projet" value="myfreezer-b488a" />
                   </label>
                   <label>appId
-                    <input id="fbAppId" placeholder="1:123:web:abc" />
+                    <input id="fbAppId" placeholder="1:123:web:abc" value="1:893959065266:web:c3bc8222855358927b43ab" />
                   </label>
                 </div>
                 <div class="pill-row">
@@ -195,6 +195,9 @@
                 </div>
                 <div class="sync-note">
                   Les deux iPhone doivent utiliser le même code de partage et le même projet Firebase. Le contenu est privé par le code de partage, donc garde-le confidentiel.
+                </div>
+                <div class="sync-note" style="background:rgba(37,99,235,.06); border:1px solid rgba(37,99,235,.12); padding:10px 12px; border-radius:14px;">
+                  <strong>Firebase détecté :</strong> <span class="sync-key">myfreezer-b488a</span>
                 </div>
               </div>
             </details>
@@ -280,6 +283,13 @@
     const SETTINGS_KEY = 'freezer-sync-settings-v1';
     const DEVICE_KEY = 'freezer-device-id-v1';
     const CATEGORY_ORDER = ['Viande', 'Poisson', 'Légumes', 'Plats cuisinés', 'Fruits', 'Produits laitiers', 'Autre'];
+    const DEFAULT_FIREBASE_CONFIG = {
+      apiKey: "AIzaSyDsNEGaBaq9JhTxSTvIeAQKbhRKNPecXgw",
+      authDomain: "myfreezer-b488a.firebaseapp.com",
+      databaseURL: "https://myfreezer-b488a-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "myfreezer-b488a",
+      appId: "1:893959065266:web:c3bc8222855358927b43ab"
+    };
 
     const state = {
       items: loadItems(),
@@ -390,9 +400,15 @@
     function loadSettings() {
       try {
         const raw = localStorage.getItem(SETTINGS_KEY);
-        return raw ? JSON.parse(raw) : {};
+        const saved = raw ? JSON.parse(raw) : {};
+        const savedFb = saved.fb || {};
+        const fb = Object.fromEntries(Object.entries(DEFAULT_FIREBASE_CONFIG).map(([key, value]) => {
+          const candidate = typeof savedFb[key] === 'string' ? savedFb[key].trim() : '';
+          return [key, candidate || value];
+        }));
+        return { ...saved, fb };
       } catch {
-        return {};
+        return { fb: { ...DEFAULT_FIREBASE_CONFIG } };
       }
     }
 
