@@ -1,0 +1,807 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="theme-color" content="#2563eb" />
+  <title>Mon congélateur</title>
+  <style>
+    :root {
+      --bg: #f6fbff;
+      --panel: rgba(255,255,255,.92);
+      --text: #10223d;
+      --muted: #607087;
+      --primary: #2563eb;
+      --primary-2: #1d4ed8;
+      --danger: #dc2626;
+      --ok: #059669;
+      --warn: #d97706;
+      --border: rgba(16,34,61,.12);
+      --shadow: 0 18px 40px rgba(15, 23, 42, .08);
+      --radius: 22px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background:
+        radial-gradient(1200px 800px at 20% 0%, rgba(37,99,235,.10), transparent 55%),
+        radial-gradient(900px 700px at 100% 10%, rgba(14,165,233,.12), transparent 40%),
+        var(--bg);
+      color: var(--text);
+    }
+    .app { max-width: 1100px; margin: 0 auto; padding: 18px 14px 32px; }
+    .hero { display: grid; grid-template-columns: 1.15fr .85fr; gap: 14px; align-items: stretch; margin-bottom: 14px; }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+    .hero-main { padding: 18px; }
+    .eyebrow { color: var(--primary); font-weight: 700; font-size: .82rem; letter-spacing: .02em; text-transform: uppercase; }
+    h1 { margin: 8px 0 8px; font-size: clamp(1.7rem, 3vw, 2.8rem); line-height: 1.05; }
+    .sub { color: var(--muted); line-height: 1.55; margin: 0; }
+    .side-grid { display: grid; gap: 14px; }
+    .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .stat { padding: 16px; }
+    .stat .label { color: var(--muted); font-size: .9rem; }
+    .stat .value { font-size: 1.7rem; font-weight: 800; margin-top: 4px; }
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1.35fr .9fr .8fr auto;
+      gap: 10px;
+      margin: 16px 0;
+      align-items: center;
+    }
+    input, select, button, textarea {
+      font: inherit;
+      border-radius: 16px;
+      border: 1px solid rgba(16,34,61,.15);
+      background: white;
+      color: var(--text);
+      padding: 13px 14px;
+      width: 100%;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: 3px solid rgba(37,99,235,.18);
+      border-color: rgba(37,99,235,.5);
+    }
+    .btn { border: none; cursor: pointer; font-weight: 700; transition: transform .08s ease, box-shadow .2s ease, opacity .2s ease; }
+    .btn:active { transform: translateY(1px); }
+    .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-2)); color: white; box-shadow: 0 12px 25px rgba(37,99,235,.18); }
+    .btn-secondary { background: white; }
+    .btn-danger { background: #fff1f2; color: var(--danger); }
+    .btn-ghost { background: transparent; border: 1px dashed rgba(16,34,61,.18); }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .section-title { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 18px 0 10px; }
+    .section-title h2 { margin: 0; font-size: 1.1rem; }
+    .list { display: grid; gap: 10px; }
+    .item { padding: 14px; display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: start; }
+    .item.overdue { border-left: 6px solid var(--danger); }
+    .item.soon { border-left: 6px solid var(--warn); }
+    .item.fresh { border-left: 6px solid var(--ok); }
+    .title-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .name { font-size: 1.05rem; font-weight: 800; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px; font-size: .78rem;
+      padding: 6px 10px; border-radius: 999px; background: rgba(16,34,61,.06); color: var(--muted); white-space: nowrap;
+    }
+    .meta { color: var(--muted); font-size: .92rem; line-height: 1.45; margin-top: 4px; }
+    .actions { display: grid; gap: 8px; min-width: 136px; }
+    .qty { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+    .qty strong { min-width: 34px; text-align: center; }
+    .icon-btn { width: 38px; height: 38px; padding: 0; border-radius: 12px; display: grid; place-items: center; font-size: 1.05rem; line-height: 1; }
+    .empty { padding: 24px; text-align: center; color: var(--muted); }
+    .panel-title { display:flex; justify-content:space-between; align-items:center; gap:10px; }
+    .panel { padding:16px; }
+    .small { font-size: .85rem; color: var(--muted); }
+    .pill-row { display:flex; flex-wrap: wrap; gap: 8px; }
+    .hint { margin-top: 10px; color: var(--muted); font-size: .9rem; line-height: 1.45; }
+    .status { display:inline-flex; align-items:center; gap:8px; font-size:.88rem; padding:8px 11px; border-radius:999px; background:rgba(16,34,61,.06); }
+    .dot { width:10px; height:10px; border-radius:999px; background:#94a3b8; }
+    .dot.online { background: var(--ok); }
+    .dot.offline { background: #94a3b8; }
+    .dot.error { background: var(--danger); }
+    .dot.connecting { background: var(--warn); }
+    .config { display:grid; gap:10px; }
+    .config label { display:grid; gap:7px; font-size:.92rem; color: var(--muted); }
+    .config .two { display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+    .sync-key { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9rem; word-break: break-all; }
+    .sync-note { font-size: .85rem; color: var(--muted); line-height: 1.45; }
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(15, 23, 42, .38); display: none; place-items: center; z-index: 40; padding: 14px; }
+    .modal { width: min(700px, 100%); max-height: 92vh; overflow: auto; padding: 16px; }
+    .modal header { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .modal h3 { margin: 0; font-size: 1.15rem; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .form-grid .full { grid-column: 1 / -1; }
+    label { display: grid; gap: 7px; font-size: .94rem; color: var(--muted); }
+    textarea { min-height: 90px; resize: vertical; }
+    .footer-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; margin-top: 14px; }
+    @media (max-width: 920px) {
+      .hero { grid-template-columns: 1fr; }
+      .toolbar { grid-template-columns: 1fr 1fr; }
+      .grid, .form-grid, .config .two { grid-template-columns: 1fr; }
+      .item { grid-template-columns: 1fr; }
+      .actions { min-width: 0; }
+      .qty { justify-content: flex-start; }
+    }
+    @media (max-width: 560px) {
+      .toolbar { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+  <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-database-compat.js"></script>
+</head>
+<body>
+  <div class="app">
+    <section class="hero">
+      <div class="card hero-main">
+        <div class="eyebrow">Gestion du congélateur</div>
+        <h1>Mon congélateur</h1>
+        <p class="sub">Lister, retrouver et faire tourner ce que tu as déjà. L’application marche hors ligne, puis se synchronise dès qu’elle est connectée au même espace partagé sur les deux iPhone.</p>
+      </div>
+      <div class="side-grid">
+        <div class="card stats">
+          <div class="stat"><div class="label">Articles</div><div class="value" id="statItems">0</div></div>
+          <div class="stat"><div class="label">Portions</div><div class="value" id="statQty">0</div></div>
+          <div class="stat"><div class="label">À consommer</div><div class="value" id="statSoon">0</div></div>
+          <div class="stat"><div class="label">Périmés</div><div class="value" id="statOverdue">0</div></div>
+        </div>
+        <div class="card panel">
+          <div class="panel-title">
+            <strong>Synchronisation</strong>
+            <span class="status"><span id="syncDot" class="dot offline"></span><span id="syncStatus">Hors ligne</span></span>
+          </div>
+          <div class="config" style="margin-top:12px;">
+            <div class="two">
+              <label>Code de partage
+                <input id="roomId" placeholder="ex. maison-dubois" />
+              </label>
+              <label>Nom de l’appareil
+                <input id="deviceName" placeholder="iPhone cuisine" />
+              </label>
+            </div>
+            <details>
+              <summary style="cursor:pointer; font-weight:700; color: var(--primary);">Connexion Firebase</summary>
+              <div style="padding-top:12px;" class="config">
+                <label>apiKey
+                  <input id="fbApiKey" placeholder="AIza..." />
+                </label>
+                <div class="two">
+                  <label>authDomain
+                    <input id="fbAuthDomain" placeholder="mon-projet.firebaseapp.com" />
+                  </label>
+                  <label>databaseURL
+                    <input id="fbDatabaseURL" placeholder="https://mon-projet-default-rtdb.europe-west1.firebasedatabase.app" />
+                  </label>
+                </div>
+                <div class="two">
+                  <label>projectId
+                    <input id="fbProjectId" placeholder="mon-projet" />
+                  </label>
+                  <label>appId
+                    <input id="fbAppId" placeholder="1:123:web:abc" />
+                  </label>
+                </div>
+                <div class="pill-row">
+                  <button class="btn btn-secondary" id="connectBtn" type="button">Connecter</button>
+                  <button class="btn btn-secondary" id="disconnectBtn" type="button">Déconnecter</button>
+                  <button class="btn btn-ghost" id="saveSettingsBtn" type="button">Sauver la config</button>
+                </div>
+                <div class="sync-note">
+                  Les deux iPhone doivent utiliser le même code de partage et le même projet Firebase. Le contenu est privé par le code de partage, donc garde-le confidentiel.
+                </div>
+              </div>
+            </details>
+            <div class="pill-row">
+              <button class="btn btn-secondary" id="exportBtn" type="button">Exporter</button>
+              <button class="btn btn-secondary" id="importBtn" type="button">Importer</button>
+              <button class="btn btn-danger" id="resetBtn" type="button">Vider</button>
+            </div>
+            <input type="file" id="fileInput" accept="application/json" hidden>
+            <div class="sync-note">En secours, tu peux toujours exporter une copie JSON. La synchronisation reste active entre les deux iPhone dès que Firebase est configuré.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="toolbar">
+      <input id="search" placeholder="Rechercher un aliment…" />
+      <select id="filterCategory"><option value="all">Toutes catégories</option></select>
+      <select id="sortBy">
+        <option value="due">Tri: date limite</option>
+        <option value="name">Tri: nom</option>
+        <option value="category">Tri: catégorie</option>
+      </select>
+      <button class="btn btn-primary" id="addBtn">+ Ajouter</button>
+    </div>
+
+    <div class="section-title">
+      <h2>Liste</h2>
+      <span class="small" id="listCount">0 article</span>
+    </div>
+    <div class="list" id="list"></div>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true">
+    <div class="card modal">
+      <header>
+        <h3 id="modalTitle">Ajouter un article</h3>
+        <button class="btn btn-secondary icon-btn" id="closeModal" aria-label="Fermer">✕</button>
+      </header>
+      <form id="itemForm">
+        <input type="hidden" id="itemId">
+        <div class="form-grid">
+          <label class="full">Nom
+            <input id="name" required placeholder="Ex. Poulet, haricots verts, soupe…" />
+          </label>
+          <label>Catégorie
+            <select id="category">
+              <option>Viande</option>
+              <option>Poisson</option>
+              <option>Légumes</option>
+              <option>Plats cuisinés</option>
+              <option>Fruits</option>
+              <option>Produits laitiers</option>
+              <option>Autre</option>
+            </select>
+          </label>
+          <label>Quantité
+            <input id="quantity" type="number" min="1" step="1" value="1" />
+          </label>
+          <label>Unité
+            <input id="unit" placeholder="portions, sachets, pièces…" value="portion" />
+          </label>
+          <label>Date de congélation
+            <input id="frozenAt" type="date" />
+          </label>
+          <label>Durée (mois)
+            <input id="months" type="number" min="1" step="1" value="3" />
+          </label>
+          <label class="full">Notes
+            <textarea id="notes" placeholder="Ex. soupe maison, 2 portions restantes, déjà cuit…"></textarea>
+          </label>
+        </div>
+        <div class="footer-actions">
+          <button type="button" class="btn btn-secondary" id="cancelBtn">Annuler</button>
+          <button type="submit" class="btn btn-primary" id="saveBtn">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'freezer-inventory-v2';
+    const SETTINGS_KEY = 'freezer-sync-settings-v1';
+    const DEVICE_KEY = 'freezer-device-id-v1';
+    const CATEGORY_ORDER = ['Viande', 'Poisson', 'Légumes', 'Plats cuisinés', 'Fruits', 'Produits laitiers', 'Autre'];
+
+    const state = {
+      items: loadItems(),
+      syncing: false,
+      firebaseReady: false,
+      db: null,
+      itemsRef: null,
+      itemsListener: null,
+      roomId: '',
+      deviceId: getOrCreateDeviceId(),
+      deviceName: localStorage.getItem('freezer-device-name-v1') || defaultDeviceName(),
+      settings: loadSettings(),
+      remoteVersion: 0,
+      suppressLocalSync: false,
+    };
+
+    const els = {
+      list: document.getElementById('list'),
+      listCount: document.getElementById('listCount'),
+      search: document.getElementById('search'),
+      filterCategory: document.getElementById('filterCategory'),
+      sortBy: document.getElementById('sortBy'),
+      statItems: document.getElementById('statItems'),
+      statQty: document.getElementById('statQty'),
+      statSoon: document.getElementById('statSoon'),
+      statOverdue: document.getElementById('statOverdue'),
+      modalBackdrop: document.getElementById('modalBackdrop'),
+      modalTitle: document.getElementById('modalTitle'),
+      form: document.getElementById('itemForm'),
+      itemId: document.getElementById('itemId'),
+      name: document.getElementById('name'),
+      category: document.getElementById('category'),
+      quantity: document.getElementById('quantity'),
+      unit: document.getElementById('unit'),
+      frozenAt: document.getElementById('frozenAt'),
+      months: document.getElementById('months'),
+      notes: document.getElementById('notes'),
+      fileInput: document.getElementById('fileInput'),
+      roomId: document.getElementById('roomId'),
+      deviceName: document.getElementById('deviceName'),
+      fbApiKey: document.getElementById('fbApiKey'),
+      fbAuthDomain: document.getElementById('fbAuthDomain'),
+      fbDatabaseURL: document.getElementById('fbDatabaseURL'),
+      fbProjectId: document.getElementById('fbProjectId'),
+      fbAppId: document.getElementById('fbAppId'),
+      connectBtn: document.getElementById('connectBtn'),
+      disconnectBtn: document.getElementById('disconnectBtn'),
+      saveSettingsBtn: document.getElementById('saveSettingsBtn'),
+      syncDot: document.getElementById('syncDot'),
+      syncStatus: document.getElementById('syncStatus'),
+    };
+
+    document.getElementById('addBtn').addEventListener('click', () => openModal());
+    document.getElementById('closeModal').addEventListener('click', closeModal);
+    document.getElementById('cancelBtn').addEventListener('click', closeModal);
+    els.modalBackdrop.addEventListener('click', (e) => { if (e.target === els.modalBackdrop) closeModal(); });
+    els.form.addEventListener('submit', onSave);
+    els.search.addEventListener('input', render);
+    els.filterCategory.addEventListener('change', render);
+    els.sortBy.addEventListener('change', render);
+    document.getElementById('exportBtn').addEventListener('click', exportData);
+    document.getElementById('importBtn').addEventListener('click', () => els.fileInput.click());
+    document.getElementById('resetBtn').addEventListener('click', clearAll);
+    els.fileInput.addEventListener('change', importData);
+    els.connectBtn.addEventListener('click', connectSync);
+    els.disconnectBtn.addEventListener('click', disconnectSync);
+    els.saveSettingsBtn.addEventListener('click', saveSettingsFromUI);
+    els.deviceName.addEventListener('change', () => {
+      state.deviceName = (els.deviceName.value || '').trim() || defaultDeviceName();
+      localStorage.setItem('freezer-device-name-v1', state.deviceName);
+    });
+
+    populateCategoryFilter();
+    populateSettingsUI();
+    render();
+    autoConnectIfConfigured();
+
+    function getOrCreateDeviceId() {
+      let id = localStorage.getItem(DEVICE_KEY);
+      if (!id) {
+        id = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
+        localStorage.setItem(DEVICE_KEY, id);
+      }
+      return id;
+    }
+
+    function defaultDeviceName() {
+      const suffix = (localStorage.getItem(DEVICE_KEY) || 'iPhone').slice(-4).toUpperCase();
+      return `iPhone ${suffix}`;
+    }
+
+    function loadItems() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const arr = raw ? JSON.parse(raw) : [];
+        return Array.isArray(arr) ? arr.map(normalizeItem).filter(Boolean) : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveItems() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
+      render();
+      if (!state.suppressLocalSync) pushToFirebase();
+    }
+
+    function loadSettings() {
+      try {
+        const raw = localStorage.getItem(SETTINGS_KEY);
+        return raw ? JSON.parse(raw) : {};
+      } catch {
+        return {};
+      }
+    }
+
+    function saveSettingsFromUI() {
+      const settings = gatherSettingsFromUI();
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+      state.settings = settings;
+      state.roomId = settings.roomId;
+      state.deviceName = settings.deviceName || defaultDeviceName();
+      localStorage.setItem('freezer-device-name-v1', state.deviceName);
+      setSyncStatus('Config sauvegardée', 'offline');
+      alert('Configuration enregistrée sur cet iPhone.');
+    }
+
+    function populateSettingsUI() {
+      els.roomId.value = state.settings.roomId || '';
+      els.deviceName.value = state.settings.deviceName || state.deviceName;
+      els.fbApiKey.value = state.settings.fb?.apiKey || '';
+      els.fbAuthDomain.value = state.settings.fb?.authDomain || '';
+      els.fbDatabaseURL.value = state.settings.fb?.databaseURL || '';
+      els.fbProjectId.value = state.settings.fb?.projectId || '';
+      els.fbAppId.value = state.settings.fb?.appId || '';
+    }
+
+    function gatherSettingsFromUI() {
+      return {
+        roomId: sanitizeRoomId(els.roomId.value || ''),
+        deviceName: (els.deviceName.value || '').trim(),
+        fb: {
+          apiKey: (els.fbApiKey.value || '').trim(),
+          authDomain: (els.fbAuthDomain.value || '').trim(),
+          databaseURL: (els.fbDatabaseURL.value || '').trim(),
+          projectId: (els.fbProjectId.value || '').trim(),
+          appId: (els.fbAppId.value || '').trim(),
+        },
+      };
+    }
+
+    function autoConnectIfConfigured() {
+      const settings = state.settings;
+      if (!settings || !settings.roomId || !settings.fb || !settings.fb.apiKey || !settings.fb.databaseURL) {
+        setSyncStatus('Hors ligne', 'offline');
+        return;
+      }
+      connectSync();
+    }
+
+    function sanitizeRoomId(value) {
+      return String(value || '')
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9-_]+/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/(^-|-$)/g, '')
+        .slice(0, 48);
+    }
+
+    function uid() {
+      return crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2);
+    }
+
+    function openModal(item = null) {
+      els.modalTitle.textContent = item ? 'Modifier l’article' : 'Ajouter un article';
+      els.itemId.value = item?.id || '';
+      els.name.value = item?.name || '';
+      els.category.value = item?.category || 'Autre';
+      els.quantity.value = item?.quantity ?? 1;
+      els.unit.value = item?.unit || 'portion';
+      els.frozenAt.value = item?.frozenAt || todayISO();
+      els.months.value = item?.months ?? 3;
+      els.notes.value = item?.notes || '';
+      els.modalBackdrop.style.display = 'grid';
+      els.modalBackdrop.setAttribute('aria-hidden', 'false');
+      setTimeout(() => els.name.focus(), 50);
+    }
+
+    function closeModal() {
+      els.modalBackdrop.style.display = 'none';
+      els.modalBackdrop.setAttribute('aria-hidden', 'true');
+      els.form.reset();
+      els.itemId.value = '';
+    }
+
+    function onSave(ev) {
+      ev.preventDefault();
+      const item = {
+        id: els.itemId.value || uid(),
+        name: els.name.value.trim(),
+        category: els.category.value,
+        quantity: Math.max(0, Number(els.quantity.value) || 1),
+        unit: els.unit.value.trim() || 'portion',
+        frozenAt: els.frozenAt.value || todayISO(),
+        months: Math.max(1, Number(els.months.value) || 3),
+        notes: els.notes.value.trim(),
+        updatedAt: new Date().toISOString(),
+        updatedBy: state.deviceId,
+        updatedByName: state.deviceName,
+      };
+      if (!item.name) return;
+      const idx = state.items.findIndex(x => x.id === item.id);
+      if (idx >= 0) state.items[idx] = { ...state.items[idx], ...item };
+      else state.items.unshift({ ...item, createdAt: new Date().toISOString() });
+      persistAndClose();
+    }
+
+    function persistAndClose() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
+      closeModal();
+      render();
+      if (!state.suppressLocalSync) pushToFirebase();
+    }
+
+    function deleteItem(id) {
+      state.items = state.items.filter(x => x.id !== id);
+      saveItems();
+    }
+
+    function adjustQty(id, delta) {
+      const item = state.items.find(x => x.id === id);
+      if (!item) return;
+      const next = Math.max(0, (Number(item.quantity) || 0) + delta);
+      if (next === 0) {
+        if (confirm(`Supprimer définitivement « ${item.name} » ?`)) {
+          deleteItem(id);
+          return;
+        }
+        item.quantity = 1;
+      } else {
+        item.quantity = next;
+      }
+      item.updatedAt = new Date().toISOString();
+      item.updatedBy = state.deviceId;
+      item.updatedByName = state.deviceName;
+      saveItems();
+    }
+
+    function exportData() {
+      const blob = new Blob([JSON.stringify({ version: 2, exportedAt: new Date().toISOString(), items: state.items }, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `mon-congelateur-backup-${todayISO()}.json`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 250);
+    }
+
+    async function importData(e) {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+        const items = Array.isArray(parsed) ? parsed : parsed.items;
+        if (!Array.isArray(items)) throw new Error('Format invalide');
+        state.items = items.map(normalizeItem).filter(Boolean);
+        saveItems();
+      } catch (err) {
+        alert('Import impossible. Vérifie le fichier JSON.');
+      } finally {
+        e.target.value = '';
+      }
+    }
+
+    function normalizeItem(it) {
+      if (!it || !it.name) return null;
+      return {
+        id: it.id || uid(),
+        name: String(it.name),
+        category: CATEGORY_ORDER.includes(it.category) ? it.category : 'Autre',
+        quantity: Math.max(0, Number(it.quantity) || 1),
+        unit: String(it.unit || 'portion'),
+        frozenAt: validDate(it.frozenAt) ? it.frozenAt : todayISO(),
+        months: Math.max(1, Number(it.months) || 3),
+        notes: String(it.notes || ''),
+        createdAt: it.createdAt || new Date().toISOString(),
+        updatedAt: it.updatedAt || new Date().toISOString(),
+        updatedBy: it.updatedBy || '',
+        updatedByName: it.updatedByName || '',
+      };
+    }
+
+    function clearAll() {
+      if (!state.items.length) return;
+      if (confirm('Vider toute la liste ?')) {
+        state.items = [];
+        saveItems();
+      }
+    }
+
+    function populateCategoryFilter() {
+      els.filterCategory.innerHTML = '<option value="all">Toutes catégories</option>' + CATEGORY_ORDER.map(c => `<option value="${c}">${c}</option>`).join('');
+    }
+
+    function render() {
+      const q = els.search.value.trim().toLowerCase();
+      const cat = els.filterCategory.value;
+      let items = [...state.items];
+      if (q) items = items.filter(it => [it.name, it.category, it.notes, it.unit, it.updatedByName].join(' ').toLowerCase().includes(q));
+      if (cat !== 'all') items = items.filter(it => it.category === cat);
+
+      items.sort((a, b) => {
+        if (els.sortBy.value === 'name') return a.name.localeCompare(b.name, 'fr');
+        if (els.sortBy.value === 'category') return a.category.localeCompare(b.category, 'fr') || a.name.localeCompare(b.name, 'fr');
+        return daysLeft(a) - daysLeft(b) || a.name.localeCompare(b.name, 'fr');
+      });
+
+      const totalQty = state.items.reduce((s, it) => s + (Number(it.quantity) || 0), 0);
+      const soon = state.items.filter(it => daysLeft(it) <= 30 && daysLeft(it) >= 0).length;
+      const overdue = state.items.filter(it => daysLeft(it) < 0).length;
+      els.statItems.textContent = state.items.length;
+      els.statQty.textContent = totalQty;
+      els.statSoon.textContent = soon;
+      els.statOverdue.textContent = overdue;
+      els.listCount.textContent = `${items.length} article${items.length > 1 ? 's' : ''}`;
+
+      if (!items.length) {
+        els.list.innerHTML = `<div class="card empty">Aucun article trouvé. Ajoute ton premier aliment avec <strong>+ Ajouter</strong>.</div>`;
+        return;
+      }
+
+      els.list.innerHTML = items.map(item => {
+        const dl = daysLeft(item);
+        const status = dl < 0 ? 'overdue' : dl <= 30 ? 'soon' : 'fresh';
+        const dateText = validDate(item.frozenAt) ? prettyDate(item.frozenAt) : 'date inconnue';
+        const expire = addMonthsISO(item.frozenAt, item.months);
+        const expireText = validDate(expire) ? prettyDate(expire) : '—';
+        const deviceMeta = item.updatedByName ? ` • mis à jour sur ${escapeHtml(item.updatedByName)}` : '';
+        return `
+          <article class="card item ${status}">
+            <div>
+              <div class="title-row">
+                <div class="name">${escapeHtml(item.name)}</div>
+                <span class="badge">${escapeHtml(item.category)}</span>
+                <span class="badge">${escapeHtml(String(item.quantity))} ${escapeHtml(item.unit || 'portion')}${Number(item.quantity) > 1 ? 's' : ''}</span>
+                <span class="badge">${statusLabel(dl)}</span>
+              </div>
+              <div class="meta">Congelé le ${dateText} • à consommer idéalement avant ${expireText}${deviceMeta}${item.notes ? `<br>${escapeHtml(item.notes)}` : ''}</div>
+            </div>
+            <div class="actions">
+              <div class="qty">
+                <button class="btn btn-secondary icon-btn" data-action="minus" data-id="${item.id}">−</button>
+                <strong>${escapeHtml(String(item.quantity))}</strong>
+                <button class="btn btn-secondary icon-btn" data-action="plus" data-id="${item.id}">+</button>
+              </div>
+              <div class="qty" style="justify-content:flex-end; flex-wrap:wrap;">
+                <button class="btn btn-secondary" data-action="edit" data-id="${item.id}">Modifier</button>
+                <button class="btn btn-danger" data-action="delete" data-id="${item.id}">Supprimer</button>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      document.querySelectorAll('[data-action]').forEach(btn => btn.addEventListener('click', handleAction));
+    }
+
+    function handleAction(e) {
+      const action = e.currentTarget.dataset.action;
+      const id = e.currentTarget.dataset.id;
+      const item = state.items.find(x => x.id === id);
+      if (!item) return;
+      if (action === 'plus') adjustQty(id, 1);
+      if (action === 'minus') adjustQty(id, -1);
+      if (action === 'edit') openModal(item);
+      if (action === 'delete' && confirm(`Supprimer « ${item.name} » ?`)) deleteItem(id);
+    }
+
+    function daysLeft(item) {
+      const expire = addMonthsISO(item.frozenAt, item.months);
+      if (!validDate(expire)) return Number.POSITIVE_INFINITY;
+      const diff = new Date(expire + 'T23:59:59') - new Date();
+      return Math.ceil(diff / 86400000);
+    }
+
+    function statusLabel(dl) {
+      if (dl < 0) return 'Périmé';
+      if (dl <= 30) return `${dl} j restants`;
+      return `${dl} j restants`;
+    }
+
+    function addMonthsISO(dateStr, months) {
+      if (!validDate(dateStr)) return '';
+      const d = new Date(dateStr + 'T12:00:00');
+      d.setMonth(d.getMonth() + Number(months || 0));
+      return d.toISOString().slice(0, 10);
+    }
+
+    function todayISO() { return new Date().toISOString().slice(0, 10); }
+    function validDate(s) { return /^\d{4}-\d{2}-\d{2}$/.test(String(s || '')); }
+    function prettyDate(iso) {
+      try { return new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(iso + 'T12:00:00')); }
+      catch { return iso; }
+    }
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function fbConfigFromSettings() {
+      const fb = state.settings?.fb || {};
+      const required = ['apiKey', 'authDomain', 'databaseURL', 'projectId', 'appId'];
+      if (!required.every(k => (fb[k] || '').trim())) return null;
+      return {
+        apiKey: fb.apiKey.trim(),
+        authDomain: fb.authDomain.trim(),
+        databaseURL: fb.databaseURL.trim(),
+        projectId: fb.projectId.trim(),
+        appId: fb.appId.trim(),
+      };
+    }
+
+    async function connectSync() {
+      const settings = gatherSettingsFromUI();
+      settings.roomId = sanitizeRoomId(settings.roomId);
+      if (!settings.roomId) {
+        alert('Ajoute un code de partage.');
+        return;
+      }
+      if (!settings.fb.apiKey || !settings.fb.databaseURL || !settings.fb.projectId || !settings.fb.authDomain || !settings.fb.appId) {
+        alert('Complète la configuration Firebase.');
+        return;
+      }
+
+      state.settings = settings;
+      state.roomId = settings.roomId;
+      state.deviceName = settings.deviceName || defaultDeviceName();
+      localStorage.setItem('freezer-device-name-v1', state.deviceName);
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+
+      if (typeof firebase === 'undefined') {
+        setSyncStatus('Firebase non chargé', 'error');
+        alert('Les bibliothèques Firebase n’ont pas pu être chargées. Vérifie ta connexion réseau.');
+        return;
+      }
+
+      try {
+        setSyncStatus('Connexion…', 'connecting');
+        if (!firebase.apps.length) firebase.initializeApp(fbConfigFromSettings());
+        if (state.itemsListener && state.itemsRef) {
+          firebase.database().ref(state.itemsRef).off('value', state.itemsListener);
+        }
+        state.db = firebase.database();
+        state.itemsRef = `freezerRooms/${state.roomId}/items`;
+        const ref = state.db.ref(state.itemsRef);
+        state.syncing = true;
+        state.firebaseReady = true;
+        state.remoteVersion = 0;
+        state.itemsListener = (snapshot) => {
+          const payload = snapshot.val() || {};
+          const nextItems = Object.values(payload)
+            .map(normalizeItem)
+            .filter(Boolean)
+            .sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
+          state.suppressLocalSync = true;
+          state.items = nextItems;
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
+          state.suppressLocalSync = false;
+          render();
+          setSyncStatus(`Synchronisé: ${state.roomId}`, 'online');
+        };
+        ref.on('value', state.itemsListener, (err) => {
+          console.error(err);
+          setSyncStatus('Erreur de sync', 'error');
+        });
+        setSyncStatus(`Synchronisé: ${state.roomId}`, 'online');
+        await pushToFirebase(true);
+      } catch (err) {
+        console.error(err);
+        setSyncStatus('Erreur de connexion', 'error');
+        alert('Connexion Firebase impossible. Vérifie le projet et le code de partage.');
+      }
+    }
+
+    function disconnectSync() {
+      try {
+        if (state.itemsListener && state.db && state.itemsRef) {
+          state.db.ref(state.itemsRef).off('value', state.itemsListener);
+        }
+      } catch (err) {
+        console.warn(err);
+      }
+      state.syncing = false;
+      state.firebaseReady = false;
+      state.itemsListener = null;
+      setSyncStatus('Hors ligne', 'offline');
+    }
+
+    async function pushToFirebase(force = false) {
+      if (!state.syncing || !state.db || !state.roomId) return;
+      try {
+        const ref = state.db.ref(state.itemsRef);
+        const payload = {};
+        for (const item of state.items) payload[item.id] = normalizeItem(item);
+        await ref.set(payload);
+        if (force) setSyncStatus(`Synchronisé: ${state.roomId}`, 'online');
+      } catch (err) {
+        console.error(err);
+        setSyncStatus('Sync en erreur', 'error');
+      }
+    }
+
+    function setSyncStatus(text, mode) {
+      els.syncStatus.textContent = text;
+      els.syncDot.className = `dot ${mode}`;
+    }
+  </script>
+</body>
+</html>
