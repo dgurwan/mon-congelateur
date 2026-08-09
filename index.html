@@ -55,7 +55,7 @@
       padding: 10px 12px;
       border-radius: 24px;
       background: rgba(242,242,247,.78);
-      backdrop-filter: blur(18px);
+      backdrop-filter: none;
       border: 1px solid rgba(17,24,39,.08);
       box-shadow: 0 10px 26px rgba(15,23,42,.05);
     }
@@ -186,7 +186,7 @@
       background: rgba(15,23,42,.22);
       display: none;
       z-index: 2600;
-      backdrop-filter: blur(1px);
+      backdrop-filter: none;
     }
     .shell { padding: 8px 0 22px; display: grid; gap: 12px; }
     .hero {
@@ -424,7 +424,7 @@
       background: #fff;
       border: 1px solid rgba(17,24,39,.08);
     }
-    .sheet.open { display: block; }
+    .sheet.open, .sheet:target { display: block; }
     .sheet-header {
       position: sticky;
       top: 0;
@@ -435,8 +435,8 @@
       gap: 12px;
       margin: -14px -14px 12px;
       padding: 14px;
-      background: rgba(255,255,255,.96);
-      backdrop-filter: blur(12px);
+      background: #fff;
+      backdrop-filter: none;
       border-bottom: 1px solid rgba(17,24,39,.06);
       border-radius: 28px 28px 0 0;
     }
@@ -574,7 +574,7 @@
       padding-top: 10px;
       padding-bottom: calc(10px + env(safe-area-inset-bottom));
       background: linear-gradient(180deg, rgba(255,255,255,.65), rgba(255,255,255,.96));
-      backdrop-filter: blur(10px);
+      backdrop-filter: none;
       border-top: 1px solid rgba(17,24,39,.06);
       z-index: 5;
       display: flex;
@@ -731,7 +731,7 @@
             <button class="icon-btn mini-btn" id="menuBtn" type="button" aria-label="Menu">☰</button>
             <div class="menu-popover" id="menuPopover" aria-hidden="true">
               <div class="menu-title">Menu</div>
-              <button class="menu-item" id="menuSettingsBtn" type="button" onclick="window.__freezerApp && window.__freezerApp.openSettings()">⚙️ <span>Paramètres</span></button>
+              <a class="menu-item" id="menuSettingsBtn" href="#settingsSheet" role="button" onclick="if (window.__freezerApp && window.__freezerApp.openSettings) window.__freezerApp.openSettings(); return false;">⚙️ <span>Paramètres</span></a>
               <button class="menu-item danger" id="menuDisconnectBtn" type="button" onclick="window.__freezerApp && window.__freezerApp.disconnectSync()">⎋ <span>Déconnexion</span></button>
             </div>
           </div>
@@ -1635,6 +1635,8 @@
       }
 
       window.__freezerApp = { openSettings, closeSettings, connectSync, disconnectSync, openItemModal, closeItemModal };
+      window.openSettings = openSettings;
+      window.closeSettings = closeSettings;
 
       // Fix toggles on filter cards
       els.scopeAll.addEventListener('click', () => setScope('all'));
