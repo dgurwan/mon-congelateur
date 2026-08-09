@@ -3,622 +3,253 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="theme-color" content="#f2f2f7" />
-  <title>Mon Congelateur</title>
+  <title>Mon Congélateur MVP</title>
   <style>
     :root {
-      --bg: #f2f2f7;
-      --panel: rgba(255,255,255,.94);
-      --panel-solid: #fff;
-      --text: #111827;
-      --muted: #6b7280;
-      --line: rgba(17,24,39,.10);
-      --blue: #007aff;
-      --blue2: #0a84ff;
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --line: rgba(15, 23, 42, .08);
+      --text: #0f172a;
+      --muted: #64748b;
+      --blue: #0a84ff;
+      --blue2: #3b82f6;
       --green: #22c55e;
       --orange: #f59e0b;
       --red: #ef4444;
-      --cat-viande: #ef4444;
-      --cat-poisson: #0ea5e9;
-      --cat-legumes: #22c55e;
-      --cat-plats: #8b5cf6;
-      --cat-dessert: #f59e0b;
-      --cat-laitiers: #14b8a6;
-      --shadow: 0 12px 40px rgba(15,23,42,.10);
-      --app-width: 980px;
+      --shadow: 0 18px 40px rgba(15, 23, 42, .08);
+      --radius: 22px;
+      --header-h: 64px;
     }
     * { box-sizing: border-box; }
     html, body { height: 100%; }
     body {
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background: var(--bg);
       color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
     }
-    button, input, select, textarea { font: inherit; }
-    body.modal-open { overflow: hidden; }
+    button, input, textarea, select { font: inherit; }
     button { -webkit-tap-highlight-color: transparent; }
+
     .app {
-      width: min(var(--app-width), calc(100vw - 16px));
+      min-height: 100vh;
+      padding: calc(env(safe-area-inset-top) + 10px) 10px calc(env(safe-area-inset-bottom) + 14px);
+      max-width: 980px;
       margin: 0 auto;
-      padding: 10px 0 24px;
     }
     .topbar {
       position: sticky;
       top: 0;
-      z-index: 20;
-      margin: 0 0 10px;
-      padding: 10px 12px;
-      border-radius: 24px;
-      background: rgba(242,242,247,.78);
-      backdrop-filter: blur(18px);
-      border: 1px solid rgba(17,24,39,.08);
-      box-shadow: 0 10px 26px rgba(15,23,42,.05);
-    }
-    .topbar-row {
+      z-index: 50;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      flex-wrap: wrap;
       gap: 10px;
+      padding: 10px 0 12px;
+      background: linear-gradient(180deg, rgba(245,247,251,.98), rgba(245,247,251,.92));
+      backdrop-filter: none;
     }
+    .top-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
     .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
       min-width: 0;
-    }
-    .brand-mark {
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
       display: grid;
-      place-items: center;
-      color: white;
-      font-weight: 900;
-      background: linear-gradient(135deg, var(--blue), var(--blue2));
-      box-shadow: 0 8px 18px rgba(0,122,255,.24);
-      flex: 0 0 auto;
+      gap: 2px;
     }
-    .brand-text { min-width: 0; }
-    .brand-text h1 {
+    .brand h1 {
       margin: 0;
-      font-size: 1.04rem;
-      line-height: 1.1;
-      letter-spacing: -.02em;
-    }
-    .brand-text p {
-      margin: 3px 0 0;
-      font-size: .82rem;
-      color: var(--muted);
+      font-size: 1.12rem;
+      line-height: 1.05;
+      letter-spacing: -.03em;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 360px;
     }
-    .actions-top {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex: 0 0 auto;
-      margin-left: auto;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-    .chip-status {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 8px 11px;
-      border-radius: 999px;
-      background: rgba(17,24,39,.05);
+    .brand .sub {
       color: var(--muted);
-      font-size: .81rem;
+      font-size: .78rem;
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    .version-badge {
+    .version {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-width: 44px;
+      min-width: 48px;
       padding: 8px 10px;
       border-radius: 999px;
-      background: rgba(0,122,255,.12);
+      background: rgba(10,132,255,.12);
       color: var(--blue);
       font-weight: 900;
-      font-size: .8rem;
+      font-size: .78rem;
       letter-spacing: .04em;
+      flex: 0 0 auto;
       white-space: nowrap;
     }
-    .dot { width: 10px; height: 10px; border-radius: 999px; background: #94a3b8; }
-    .dot.online { background: var(--green); }
-    .dot.connecting { background: var(--orange); }
-    .dot.error { background: var(--red); }
-    .icon-btn, .btn, .summary-card, .menu-item, .category-btn, .filter-chip {
-      border: 0;
-      cursor: pointer;
-      transition: transform .08s ease, opacity .2s ease, box-shadow .2s ease, background .2s ease;
-    }
-    .icon-btn:active, .btn:active, .summary-card:active, .menu-item:active, .category-btn:active, .filter-chip:active { transform: translateY(1px); }
-    .mini-btn {
+    .top-right { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+    .icon-btn {
       width: 42px;
       height: 42px;
+      border: 0;
       border-radius: 14px;
+      background: rgba(10,132,255,.10);
+      color: var(--blue);
       display: grid;
       place-items: center;
-      background: rgba(0,122,255,.10);
-      color: var(--blue);
-      flex: 0 0 auto;
-      position: relative;
+      box-shadow: none;
     }
-    .mini-btn svg { width: 20px; height: 20px; }
-    .menu-wrap { position: relative; }
-    .menu-popover {
+    .icon-btn svg { width: 21px; height: 21px; }
+    .icon-btn:active, .btn:active, .chip:active, .menu-item:active, .cat-btn:active, .item-action:active { transform: translateY(1px); }
+
+    .menu {
       position: fixed;
-      top: calc(64px + env(safe-area-inset-top));
-      right: 12px;
-      width: min(280px, calc(100vw - 24px));
-      padding: 10px;
-      border-radius: 22px;
-      background: var(--panel-solid);
+      top: calc(env(safe-area-inset-top) + 58px);
+      right: 10px;
+      width: min(300px, calc(100vw - 20px));
+      background: #fff;
       border: 1px solid var(--line);
+      border-radius: 20px;
       box-shadow: var(--shadow);
+      z-index: 4000;
+      padding: 10px;
       display: none;
-      z-index: 2800;
     }
-    .menu-popover.open { display: grid; gap: 8px; }
-    .menu-title {
+    .menu.open { display: grid; gap: 8px; }
+    .menu .title {
       padding: 4px 6px 2px;
-      font-size: .76rem;
-      letter-spacing: .12em;
-      text-transform: uppercase;
+      font-size: .74rem;
       color: var(--muted);
       font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .12em;
     }
     .menu-item {
       width: 100%;
-      text-align: left;
-      border: 1px solid rgba(17,24,39,.08);
+      border: 1px solid rgba(15,23,42,.08);
+      border-radius: 14px;
       background: #fff;
-      border-radius: 16px;
-      padding: 13px 12px;
-      font-weight: 800;
       color: var(--text);
+      padding: 12px;
       display: flex;
       align-items: center;
       gap: 10px;
+      font-weight: 800;
+      text-align: left;
     }
-    .menu-item svg { width: 18px; height: 18px; }
     .menu-item.danger { color: var(--red); background: #fff5f5; }
+
     .backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(15,23,42,.18);
+      background: rgba(15, 23, 42, .18);
+      z-index: 3000;
       display: none;
-      z-index: 2500;
     }
-    .shell { padding: 8px 0 22px; display: grid; gap: 12px; }
+    .backdrop.show { display: block; }
+
     .hero {
-      padding: 16px;
-      border-radius: 28px;
-      background:
-        radial-gradient(900px 300px at 0% 0%, rgba(0,122,255,.12), transparent 42%),
-        linear-gradient(180deg, #fff, #fdfdff);
+      margin-top: 10px;
+      background: linear-gradient(180deg, #fff, #fdfdff);
       border: 1px solid var(--line);
+      border-radius: 28px;
       box-shadow: var(--shadow);
-    }
-    .eyebrow {
-      color: var(--blue);
-      font-weight: 800;
-      font-size: .76rem;
-      text-transform: uppercase;
-      letter-spacing: .12em;
-    }
-    .hero h2 {
-      margin: 7px 0 0;
-      font-size: 1.56rem;
-      line-height: 1.05;
-      letter-spacing: -.03em;
+      padding: 16px;
     }
     .summary-grid {
+      margin-top: 10px;
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 8px;
     }
-    .summary-card {
-      position: relative;
-      text-align: left;
-      padding: 14px 12px 16px;
-      border-radius: 24px;
-      background: var(--panel-solid);
+    .summary {
       border: 1px solid var(--line);
+      background: var(--card);
+      border-radius: 20px;
+      padding: 14px 12px;
+      min-height: 100px;
+      text-align: left;
       box-shadow: 0 8px 24px rgba(15,23,42,.05);
-      overflow: hidden;
-      min-height: 106px;
-    }
-    .summary-card.active {
-      outline: 2px solid rgba(0,122,255,.22);
-      box-shadow: 0 10px 28px rgba(0,122,255,.12);
-    }
-    .summary-label { font-size: .8rem; color: var(--muted); font-weight: 800; }
-    .summary-value { margin-top: 8px; font-size: 1.85rem; font-weight: 900; letter-spacing: -.05em; }
-    .summary-hint { margin-top: 4px; font-size: .78rem; color: var(--muted); line-height: 1.2; }
-    .summary-accent {
-      position: absolute;
-      inset: auto 12px 10px auto;
-      width: 40px;
-      height: 6px;
-      border-radius: 999px;
-      background: rgba(0,122,255,.16);
-    }
-    .actions-row {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+    }
+    .summary.active { outline: 2px solid rgba(10,132,255,.20); }
+    .summary-label { color: var(--muted); font-size: .78rem; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
+    .summary-value { font-size: 1.7rem; font-weight: 900; letter-spacing: -.03em; }
+    .summary-hint { color: var(--muted); font-size: .8rem; line-height: 1.2; }
+
+    .actions-row {
+      margin-top: 10px;
+      display: flex;
       gap: 10px;
     }
-    .action-btn {
-      border-radius: 20px;
-      padding: 15px 12px;
-      font-weight: 800;
-      font-size: 1rem;
-      background: linear-gradient(180deg, var(--blue2), var(--blue));
-      color: white;
-      display: flex;
+    .btn {
+      border: 0;
+      border-radius: 18px;
+      min-height: 48px;
+      padding: 12px 14px;
+      font-weight: 900;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      box-shadow: 0 12px 24px rgba(0,122,255,.16);
-    }
-    .action-btn.secondary {
-      background: #fff;
-      color: var(--text);
-      border: 1px solid rgba(17,24,39,.10);
-      box-shadow: 0 8px 18px rgba(15,23,42,.04);
-    }
-    .action-btn svg { width: 20px; height: 20px; }
-    .section-head {
-      display: flex;
-      align-items: end;
-      justify-content: space-between;
-      gap: 12px;
-      margin-top: 2px;
-    }
-    .section-head h3 {
-      margin: 0;
-      font-size: 1.04rem;
-      letter-spacing: -.02em;
-    }
-    .section-head .subtle { color: var(--muted); font-size: .84rem; }
-    .filters {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 8px;
+      box-shadow: none;
+      width: 100%;
     }
-    .filter-chip {
-      padding: 12px 10px;
-      border-radius: 18px;
-      border: 1px solid rgba(17,24,39,.10);
-      background: rgba(255,255,255,.88);
-      text-align: left;
-    }
-    .filter-chip.active {
-      background: rgba(0,122,255,.10);
-      border-color: rgba(0,122,255,.25);
-      box-shadow: 0 0 0 4px rgba(0,122,255,.08);
-    }
-    .filter-chip .label { font-size: .78rem; color: var(--muted); font-weight: 800; }
-    .filter-chip .count { font-size: 1.15rem; font-weight: 900; margin-top: 4px; }
-    .card {
-      background: var(--panel-solid);
-      border-radius: 24px;
+    .btn.primary { background: linear-gradient(180deg, var(--blue2), var(--blue)); color: #fff; }
+    .btn.secondary { background: #fff; color: var(--text); border: 1px solid rgba(15,23,42,.10); }
+    .btn.success { background: linear-gradient(180deg, #34d399, var(--green)); color: #fff; }
+    .btn.danger { background: #fff5f5; color: var(--red); border: 1px solid rgba(239,68,68,.15); }
+
+    .section {
+      margin-top: 10px;
+      background: #fff;
       border: 1px solid var(--line);
-      box-shadow: 0 8px 24px rgba(15,23,42,.05);
+      border-radius: 26px;
+      box-shadow: 0 8px 24px rgba(15,23,42,.04);
+      padding: 14px;
     }
-    .list-header {
+    .section-head {
       display: flex;
       align-items: baseline;
       justify-content: space-between;
-      gap: 12px;
-      padding: 2px 2px 0;
+      gap: 10px;
+      margin-bottom: 10px;
     }
-    .list-header h3 { margin: 0; font-size: 1.04rem; }
-    .list-header .small { color: var(--muted); font-size: .84rem; }
-    .list { display: grid; gap: 10px; }
+    .section-head h2, .section-head h3 { margin: 0; }
+    .section-head .small { color: var(--muted); font-size: .82rem; }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .filters::-webkit-scrollbar { display: none; }
+    .chip {
+      flex: 0 0 auto;
+      border: 1px solid rgba(15,23,42,.10);
+      background: #fff;
+      color: var(--text);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .chip.active { background: rgba(10,132,255,.12); color: var(--blue); border-color: rgba(10,132,255,.18); }
+
+    .list {
+      display: grid;
+      gap: 10px;
+    }
     .item {
       position: relative;
       padding: 14px 14px 14px 18px;
       border-radius: 22px;
       background: #fff;
-      border: 1px solid rgba(17,24,39,.08);
-      box-shadow: 0 8px 18px rgba(15,23,42,.04);
-      overflow: hidden;
-      border-left: 7px solid rgba(17,24,39,.12);
-    }
-    .age-pill {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      width: 12px;
-      height: 12px;
-      border-radius: 999px;
-      box-shadow: 0 0 0 3px rgba(255,255,255,.92);
-    }
-    .age-fresh { background: var(--green); }
-    .age-warn { background: var(--orange); }
-    .age-old { background: var(--red); }
-    .cat-viande { border-left-color: var(--cat-viande); }
-    .cat-poisson { border-left-color: var(--cat-poisson); }
-    .cat-legumes { border-left-color: var(--cat-legumes); }
-    .cat-plats-cuisines { border-left-color: var(--cat-plats); }
-    .cat-dessert { border-left-color: var(--cat-dessert); }
-    .cat-produits-laitiers { border-left-color: var(--cat-laitiers); }
-    .item-top {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      padding-right: 24px;
-    }
-    .item-title { min-width: 0; flex: 1 1 auto; }
-    .item-name {
-      margin: 0;
-      font-size: 1.03rem;
-      font-weight: 900;
-      letter-spacing: -.02em;
-    }
-    .item-sub {
-      margin-top: 5px;
-      font-size: .82rem;
-      color: var(--muted);
-      line-height: 1.35;
-    }
-    .chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 10px;
-    }
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: rgba(17,24,39,.05);
-      color: #334155;
-      font-size: .77rem;
-      font-weight: 700;
-    }
-    .item-actions {
-      margin-top: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .qty-stepper, .meta-actions { display: flex; align-items: center; gap: 8px; }
-    .circle-btn {
-      width: 38px;
-      height: 38px;
-      border-radius: 999px;
-      display: grid;
-      place-items: center;
-      background: rgba(17,24,39,.05);
-      color: var(--text);
-      border: 1px solid rgba(17,24,39,.06);
-    }
-    .circle-btn.primary { background: rgba(0,122,255,.10); color: var(--blue); }
-    .circle-btn.danger { background: rgba(239,68,68,.10); color: var(--red); }
-    .circle-btn svg { width: 18px; height: 18px; }
-    .qty-stepper strong { min-width: 28px; text-align: center; font-size: 1rem; }
-    .empty {
-      padding: 18px 14px;
-      text-align: center;
-      color: var(--muted);
-      border-radius: 18px;
-      background: rgba(17,24,39,.03);
-    }
-    .sheet {
-      position: fixed;
-      left: 50%;
-      transform: translateX(-50%);
-      top: 4px;
-      width: min(760px, calc(100vw - 8px));
-      height: calc(100vh - 8px);
-      max-height: none;
-      overflow: auto;
-      z-index: 3200;
-      display: none;
-      padding: 14px;
-      border-radius: 28px;
-      box-shadow: 0 26px 60px rgba(15,23,42,.18);
-      background: #fff;
-      border: 1px solid rgba(17,24,39,.08);
-      box-sizing: border-box;
-    }
-    .sheet.open { display: block; }
-    .sheet-header {
-      position: sticky;
-      top: 0;
-      z-index: 5;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin: -14px -14px 12px;
-      padding: 14px;
-      background: #fff;
-      border-bottom: 1px solid rgba(17,24,39,.06);
-      border-radius: 28px 28px 0 0;
-    }
-    .sheet-header h3 { margin: 0; font-size: 1.08rem; }
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-    .full { grid-column: 1 / -1; }
-    label {
-      display: grid;
-      gap: 6px;
-      color: var(--muted);
-      font-size: .82rem;
-      font-weight: 700;
-    }
-    input, select, textarea {
-      width: 100%;
-      border-radius: 16px;
-      border: 1px solid rgba(17,24,39,.12);
-      background: #fff;
-      padding: 12px 12px;
-      color: var(--text);
-      outline: none;
-    }
-    textarea { min-height: 92px; resize: vertical; }
-    input:focus, select:focus, textarea:focus {
-      border-color: rgba(0,122,255,.45);
-      box-shadow: 0 0 0 4px rgba(0,122,255,.10);
-    }
-    .sheet-actions, .pill-row, .search-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 12px;
-    }
-    .small-btn {
-      padding: 10px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(17,24,39,.10);
-      background: #fff;
-      color: var(--text);
-      font-weight: 800;
-    }
-    .small-btn.primary { background: linear-gradient(180deg, var(--blue2), var(--blue)); color: #fff; border-color: transparent; }
-    .small-btn.danger { background: #fff5f5; color: var(--red); border-color: rgba(239,68,68,.18); }
-    .sync-note {
-      margin-top: 10px;
-      padding: 10px 12px;
-      border-radius: 14px;
-      background: rgba(17,24,39,.04);
-      color: var(--muted);
-      font-size: .82rem;
-    }
-    .sync-key { font-weight: 900; color: var(--text); }
-    .section-label {
-      margin: 0 0 8px;
-      font-size: .78rem;
-      font-weight: 900;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-    .category-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-    }
-    .search-category-grid { margin-top: 2px; }
-    .category-btn {
-      border: 1px solid rgba(17,24,39,.10);
-      background: #fff;
-      color: var(--text);
-      border-radius: 16px;
-      padding: 11px 12px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 800;
-      text-align: left;
-    }
-    .category-btn .swatch {
-      width: 14px;
-      height: 14px;
-      border-radius: 999px;
-      flex: 0 0 auto;
-      box-shadow: inset 0 0 0 2px rgba(255,255,255,.6);
-    }
-    .category-btn.active {
-      border-color: rgba(0,122,255,.30);
-      box-shadow: 0 0 0 4px rgba(0,122,255,.10);
-      background: rgba(0,122,255,.06);
-    }
-    .category-btn.cat-viande .swatch { background: var(--cat-viande); }
-    .category-btn.cat-poisson .swatch { background: var(--cat-poisson); }
-    .category-btn.cat-legumes .swatch { background: var(--cat-legumes); }
-    .category-btn.cat-plats-cuisines .swatch { background: var(--cat-plats); }
-    .category-btn.cat-dessert .swatch { background: var(--cat-dessert); }
-    .category-btn.cat-produits-laitiers .swatch { background: var(--cat-laitiers); }
-    .qty-control {
-      display: grid;
-      gap: 12px;
-      padding: 8px 0 2px;
-    }
-    .qty-control strong {
-      text-align: center;
-      font-size: 1.5rem;
-      font-weight: 900;
-      letter-spacing: -.03em;
-    }
-    .qty-row {
-      display: flex;
-      width: 100%;
-      gap: 10px;
-    }
-    .qty-row .qty-btn {
-      flex: 1 1 0;
-      height: 50px;
-      border-radius: 16px;
-      border: 1px solid rgba(17,24,39,.10);
-      background: #fff;
-      color: var(--text);
-      font-size: 1.5rem;
-      font-weight: 900;
-    }
-    .qty-row .qty-btn.primary {
-      background: linear-gradient(180deg, var(--blue2), var(--blue));
-      color: #fff;
-      border-color: transparent;
-    }
-    .sheet-actions.sticky {
-      position: sticky;
-      bottom: 0;
-      margin-top: 12px;
-      padding-top: 10px;
-      padding-bottom: calc(10px + env(safe-area-inset-bottom));
-      background: linear-gradient(180deg, rgba(255,255,255,.82), #fff 24px);
-      border-top: 1px solid rgba(17,24,39,.06);
-      z-index: 5;
-      display: flex;
-      justify-content: center;
-    }
-    .sheet-actions.sticky .action-btn {
-      min-width: min(240px, 100%);
-    }
-    .toast {
-      position: fixed;
-      left: 50%;
-      transform: translateX(-50%);
-      bottom: 18px;
-      z-index: 1600;
-      min-width: min(360px, calc(100vw - 24px));
-      padding: 12px 14px;
-      border-radius: 16px;
-      background: rgba(17,24,39,.92);
-      color: #fff;
-      box-shadow: 0 18px 40px rgba(0,0,0,.18);
-      display: none;
-      text-align: center;
-      font-weight: 700;
-    }
-    .toast.show { display: block; }
-    .item {
-      position: relative;
-      padding: 14px 14px 14px 18px;
-      border-radius: 24px;
-      background: var(--panel-solid);
       border: 1px solid var(--line);
       box-shadow: 0 8px 24px rgba(15,23,42,.05);
       overflow: hidden;
@@ -630,229 +261,300 @@
       top: 0;
       bottom: 0;
       width: 7px;
-      border-radius: 24px 0 0 24px;
-      background: var(--cat-viande);
+      background: var(--blue);
     }
-    .item.cat-viande::before { background: var(--cat-viande); }
-    .item.cat-poisson::before { background: var(--cat-poisson); }
-    .item.cat-legumes::before { background: var(--cat-legumes); }
-    .item.cat-plats-cuisines::before { background: var(--cat-plats); }
-    .item.cat-dessert::before { background: var(--cat-dessert); }
-    .item.cat-produits-laitiers::before { background: var(--cat-laitiers); }
-    .item-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .item-category {
+    .item.cat-viande::before { background: #f97316; }
+    .item.cat-poisson::before { background: #14b8a6; }
+    .item.cat-legumes::before { background: #22c55e; }
+    .item.cat-plats-cuisines::before { background: #8b5cf6; }
+    .item.cat-dessert::before { background: #ec4899; }
+    .item.cat-produits-laitiers::before { background: #06b6d4; }
+
+    .item-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+    .item-main { min-width: 0; }
+    .item-name { font-size: 1.02rem; font-weight: 900; line-height: 1.15; margin: 0; }
+    .item-cat {
+      margin-top: 6px;
       display: inline-flex;
       align-items: center;
       gap: 6px;
       padding: 6px 10px;
       border-radius: 999px;
-      background: rgba(17,24,39,.05);
+      background: rgba(15,23,42,.05);
       color: var(--muted);
-      font-size: .78rem;
-      font-weight: 800;
+      font-size: .76rem;
+      font-weight: 900;
       text-transform: uppercase;
       letter-spacing: .04em;
-      margin-bottom: 6px;
     }
-    .item-sub {
-      margin-top: 6px;
-      color: var(--muted);
-      font-size: .84rem;
-      line-height: 1.35;
+    .item-meta { margin-top: 8px; color: var(--muted); font-size: .84rem; line-height: 1.35; }
+    .badge-age {
+      flex: 0 0 auto;
+      width: 13px; height: 13px; border-radius: 999px;
+      box-shadow: 0 0 0 4px rgba(255,255,255,.9);
+      margin-top: 3px;
     }
+    .fresh { background: var(--green); }
+    .warn { background: var(--orange); }
+    .old { background: var(--red); }
     .item-actions {
       margin-top: 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .qty-stepper, .meta-actions {
-      display: flex;
-      align-items: center;
       gap: 10px;
     }
-    .qty-stepper {
-      flex: 1 1 260px;
-      justify-content: flex-start;
+    .stepper, .meta-actions { display: flex; align-items: center; gap: 8px; }
+    .item-action {
+      width: 40px; height: 40px; border-radius: 14px; border: 1px solid rgba(15,23,42,.10);
+      background: #fff; display: grid; place-items: center; color: var(--text);
     }
-    .qty-stepper strong { min-width: 42px; text-align: center; font-size: 1.22rem; }
-    .meta-actions { margin-left: auto; }
-    .circle-btn {
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      border: 1px solid rgba(17,24,39,.10);
+    .item-action svg { width: 18px; height: 18px; }
+    .item-action.danger { color: var(--red); background: #fff5f5; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px; padding: 8px 10px; border-radius: 999px;
+      background: rgba(15,23,42,.05); color: var(--muted); font-size: .78rem; font-weight: 800;
+    }
+
+    .sheet {
+      position: fixed;
+      inset: 8px;
+      z-index: 5000;
       background: #fff;
+      border: 1px solid rgba(15,23,42,.08);
+      border-radius: 28px;
+      box-shadow: 0 26px 60px rgba(15,23,42,.18);
+      display: none;
+      overflow: auto;
+    }
+    .sheet.open { display: block; }
+    .sheet-header {
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px;
+      background: #fff;
+      border-bottom: 1px solid rgba(15,23,42,.06);
+    }
+    .sheet-header h3 { margin: 0; font-size: 1.08rem; }
+    .sheet-body { padding: 14px; }
+    .sheet-actions {
+      position: sticky;
+      bottom: 0;
+      z-index: 3;
+      background: linear-gradient(180deg, rgba(255,255,255,.82), #fff 26px);
+      border-top: 1px solid rgba(15,23,42,.06);
+      padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+      display: flex;
+      justify-content: center;
+    }
+    .sheet-actions .btn { width: min(260px, 100%); }
+    .grid { display: grid; gap: 10px; }
+    .form-grid { display: grid; gap: 10px; grid-template-columns: 1fr 1fr; }
+    .full { grid-column: 1 / -1; }
+    label { display: grid; gap: 6px; color: var(--muted); font-size: .82rem; font-weight: 800; }
+    input, textarea {
+      width: 100%; border-radius: 16px; border: 1px solid rgba(15,23,42,.12); background: #fff; padding: 12px 12px; color: var(--text);
+      outline: none;
+    }
+    textarea { min-height: 92px; resize: vertical; }
+    input:focus, textarea:focus { border-color: rgba(10,132,255,.4); box-shadow: 0 0 0 4px rgba(10,132,255,.10); }
+    .section-label { color: var(--muted); font-size: .82rem; font-weight: 800; margin-bottom: 8px; }
+    .cat-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .cat-btn {
+      border: 1px solid rgba(15,23,42,.10);
+      border-radius: 18px;
+      background: #fff;
+      padding: 12px;
+      min-height: 52px;
+      display: flex; align-items: center; gap: 10px; text-align: left; font-weight: 900;
+    }
+    .cat-btn.active { outline: 2px solid rgba(10,132,255,.20); }
+    .swatch { width: 14px; height: 14px; border-radius: 999px; background: var(--blue); flex: 0 0 auto; }
+    .cat-viande .swatch { background: #f97316; }
+    .cat-poisson .swatch { background: #14b8a6; }
+    .cat-legumes .swatch { background: #22c55e; }
+    .cat-plats-cuisines .swatch { background: #8b5cf6; }
+    .cat-dessert .swatch { background: #ec4899; }
+    .cat-produits-laitiers .swatch { background: #06b6d4; }
+    .cat-all .swatch { background: linear-gradient(135deg, var(--blue), var(--blue2)); }
+
+    .qty-box {
+      border: 1px solid rgba(15,23,42,.08);
+      border-radius: 22px;
+      padding: 12px;
+      background: #f8fafc;
       display: grid;
-      place-items: center;
-      font-weight: 900;
-      color: var(--text);
-      box-shadow: 0 6px 18px rgba(15,23,42,.04);
+      gap: 10px;
+      text-align: center;
     }
-    .circle-btn.primary {
-      background: linear-gradient(180deg, var(--blue2), var(--blue));
+    .qty-value { font-size: 1.7rem; font-weight: 900; letter-spacing: -.04em; }
+    .qty-row { display: flex; gap: 10px; width: 100%; }
+    .qty-btn { flex: 1 1 0; min-height: 52px; border-radius: 16px; border: 1px solid rgba(15,23,42,.10); background: #fff; font-size: 1.4rem; font-weight: 900; }
+    .qty-btn.primary { background: linear-gradient(180deg, var(--blue2), var(--blue)); color: #fff; border-color: transparent; }
+    .toast {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 18px;
+      z-index: 7000;
+      min-width: min(360px, calc(100vw - 24px));
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(15,23,42,.92);
       color: #fff;
-      border-color: transparent;
+      box-shadow: 0 18px 40px rgba(0,0,0,.18);
+      display: none;
+      text-align: center;
+      font-weight: 700;
     }
-    .circle-btn.danger {
-      background: #fff5f5;
-      color: var(--red);
-      border-color: rgba(239,68,68,.16);
-    }
-    .circle-btn svg {
-      width: 18px;
-      height: 18px;
-      display: block;
-    }
+    .toast.show { display: block; }
+    .empty { color: var(--muted); text-align: center; padding: 18px 10px; }
     .hidden { display: none !important; }
-    @media (max-width: 860px) {
-      .app { width: min(100vw, calc(100vw - 12px)); }
+
+    @media (min-width: 720px) {
+      .form-grid { grid-template-columns: 1fr 1fr; }
+      .cat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .sheet { inset: 18px; }
     }
-    @media (max-width: 640px) {
-      .topbar { margin: 0 6px 10px; }
-      .brand-text p { max-width: 100%; }
-      .summary-card { min-height: 96px; padding: 12px 10px 14px; }
-      .summary-value { font-size: 1.55rem; }
-      .actions-row { gap: 8px; }
+    @media (max-width: 719px) {
+      .app { padding-left: 8px; padding-right: 8px; }
+      .topbar { padding-top: 8px; }
+      .summary-grid { grid-template-columns: 1fr 1fr 1fr; }
+      .actions-row { flex-direction: row; }
+      .sheet { inset: 6px; }
       .form-grid { grid-template-columns: 1fr; }
-      .item-actions { flex-direction: column; align-items: flex-start; }
-      .qty-stepper, .meta-actions { width: 100%; justify-content: flex-start; }
-      .category-grid { grid-template-columns: 1fr; }
+      .full { grid-column: auto; }
     }
   </style>
 </head>
 <body>
   <div class="app">
     <header class="topbar">
-      <div class="topbar-row">
+      <div class="top-left">
         <div class="brand">
-          <div class="brand-mark">❄</div>
-          <div class="brand-text">
-            <h1>Mon congélateur</h1>
-            <p id="subtitle">Dashboard du congélateur</p>
-          </div>
+          <h1>Mon Congélateur</h1>
+          <div class="sub" id="statusLine">Hors ligne</div>
         </div>
-        <div class="actions-top">
-          <span class="chip-status"><span id="syncDot" class="dot"></span><span id="syncStatus">Hors ligne</span></span>
-          <span class="version-badge" id="versionBadge">v12</span>
-          <div class="menu-wrap">
-            <button class="icon-btn mini-btn" id="menuBtn" type="button" aria-label="Menu">☰</button>
-            <div class="menu-popover" id="menuPopover" aria-hidden="true">
-              <div class="menu-title">Menu</div>
-              <button class="menu-item" id="menuSettingsBtn" type="button" onclick="window.__freezerApp && window.__freezerApp.openSettings()">⚙️ <span>Paramètres</span></button>
-              <button class="menu-item danger" id="menuDisconnectBtn" type="button" onclick="window.__freezerApp && window.__freezerApp.disconnectSync()">⎋ <span>Déconnexion</span></button>
-            </div>
-          </div>
-          <button class="icon-btn mini-btn" id="homeBtn" type="button" aria-label="Dashboard">⌂</button>
-        </div>
+      </div>
+      <div class="top-right">
+        <span class="version" id="versionBadge">v1-mvp</span>
+        <button class="icon-btn" id="menuBtn" type="button" aria-label="Menu" onclick="window.app && window.app.toggleMenu()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg>
+        </button>
       </div>
     </header>
 
-    <main class="shell">
-      <section class="summary-grid" aria-label="Résumé du congélateur">
-        <button class="summary-card full active" id="scopeAll" type="button" data-scope="all">
-          <div class="summary-label">Articles</div>
-          <div class="summary-value" id="statItems">0</div>
-          <div class="summary-hint">Tous les articles</div>
-          <div class="summary-accent"></div>
-        </button>
-        <button class="summary-card" id="scopeSoon" type="button" data-scope="soon">
-          <div class="summary-label">À consommer</div>
-          <div class="summary-value" id="statSoon">0</div>
-          <div class="summary-hint">Passés 5 mois</div>
-          <div class="summary-accent"></div>
-        </button>
-        <button class="summary-card" id="scopeOverdue" type="button" data-scope="overdue">
-          <div class="summary-label">Date dépassée</div>
-          <div class="summary-value" id="statOverdue">0</div>
-          <div class="summary-hint">Plus de 6 mois</div>
-          <div class="summary-accent"></div>
-        </button>
-      </section>
+    <section class="hero">
+      <div class="summary-grid">
+        <button class="summary active" id="filterAll" type="button"><div class="summary-label">Articles</div><div class="summary-value" id="countAll">0</div><div class="summary-hint">Tous les articles</div></button>
+        <button class="summary" id="filterSoon" type="button"><div class="summary-label">À consommer</div><div class="summary-value" id="countSoon">0</div><div class="summary-hint">Entre 5 et 6 mois</div></button>
+        <button class="summary" id="filterOverdue" type="button"><div class="summary-label">Date dépassée</div><div class="summary-value" id="countOverdue">0</div><div class="summary-hint">Plus de 6 mois</div></button>
+      </div>
+    </section>
 
-      <section class="actions-row">
-        <button class="btn action-btn" id="addBtn" type="button">＋ Ajouter</button>
-        <button class="btn action-btn secondary" id="searchBtn" type="button">⌕ Rechercher</button>
-      </section>
+    <section class="section">
+      <div class="section-head">
+        <h2>Filtres</h2>
+        <div class="small" id="listLabel">Tous les articles</div>
+      </div>
+      <div class="filters" id="scopeChips">
+        <button class="chip active" type="button" data-scope="all">Tous</button>
+        <button class="chip" type="button" data-scope="soon">À consommer</button>
+        <button class="chip" type="button" data-scope="overdue">Date dépassée</button>
+      </div>
+    </section>
 
-      <section class="card" style="padding:14px;">
-        <div class="list-header">
-          <h3 id="listTitle">Tous les articles</h3>
-          <div class="small" id="listCount">0 article</div>
-        </div>
-        <div class="list" id="list" style="margin-top:10px;"></div>
-      </section>
-    </main>
+    <section class="actions-row">
+      <button class="btn success" id="addBtn" type="button" onclick="window.app && window.app.openItem()">＋ Ajouter</button>
+      <button class="btn secondary" id="searchBtn" type="button" onclick="window.app && window.app.openSearch()">⌕ Rechercher</button>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <h3 id="listTitle">Tous les articles</h3>
+        <div class="small" id="listCount">0 article</div>
+      </div>
+      <div class="list" id="list"></div>
+    </section>
   </div>
 
   <div class="backdrop" id="backdrop"></div>
 
+  <div class="menu" id="menuPopover" aria-hidden="true">
+    <div class="title">Menu</div>
+    <button class="menu-item" id="menuSettingsBtn" type="button" onclick="window.app && window.app.openSettings()">⚙️ <span>Paramètres</span></button>
+    <button class="menu-item danger" id="menuDisconnectBtn" type="button" onclick="window.app && window.app.disconnectSync()">⎋ <span>Déconnexion</span></button>
+  </div>
+
   <section class="sheet" id="settingsSheet" aria-hidden="true">
     <div class="sheet-header">
       <h3>Paramètres Firebase</h3>
-      <button class="icon-btn mini-btn" id="closeSettingsBtn" type="button" aria-label="Fermer">✕</button>
+      <button class="icon-btn" id="closeSettingsBtn" type="button" aria-label="Fermer" onclick="window.app && window.app.closeSettings()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg>
+      </button>
     </div>
-    <div class="form-grid">
-      <label class="full">Code de partage
-        <input id="roomId" placeholder="ex. maison-dubois" />
-      </label>
-      <label class="full">Nom de l’appareil
-        <input id="deviceName" placeholder="iPhone cuisine" />
-      </label>
-      <label>apiKey
-        <input id="fbApiKey" placeholder="AIza..." />
-      </label>
-      <label>authDomain
-        <input id="fbAuthDomain" placeholder="projet.firebaseapp.com" />
-      </label>
-      <label class="full">databaseURL
-        <input id="fbDatabaseURL" placeholder="https://...firebasedatabase.app" />
-      </label>
-      <label>projectId
-        <input id="fbProjectId" placeholder="myfreezer-b488a" />
-      </label>
-      <label>appId
-        <input id="fbAppId" placeholder="1:...:web:..." />
-      </label>
+    <div class="sheet-body">
+      <div class="form-grid">
+        <label class="full">Code de partage
+          <input id="roomId" placeholder="ex. maison-dubois" />
+        </label>
+        <label class="full">Nom de l’appareil
+          <input id="deviceName" placeholder="iPhone cuisine" />
+        </label>
+        <label>apiKey
+          <input id="fbApiKey" placeholder="AIza..." />
+        </label>
+        <label>authDomain
+          <input id="fbAuthDomain" placeholder="projet.firebaseapp.com" />
+        </label>
+        <label class="full">databaseURL
+          <input id="fbDatabaseURL" placeholder="https://...firebasedatabase.app" />
+        </label>
+        <label>projectId
+          <input id="fbProjectId" placeholder="myfreezer-b488a" />
+        </label>
+        <label>appId
+          <input id="fbAppId" placeholder="1:...:web:..." />
+        </label>
+      </div>
+      <div class="grid" style="margin-top:12px;">
+        <button class="btn primary" id="connectBtn" type="button" onclick="window.app && window.app.connectSync()">Connecter</button>
+        <button class="btn secondary" id="disconnectBtn" type="button" onclick="window.app && window.app.disconnectSync()">Déconnecter</button>
+        <button class="btn secondary" id="saveSettingsBtn" type="button" onclick="window.app && window.app.saveSettings()">Enregistrer</button>
+      </div>
+      <div class="section" style="margin-top:12px; padding:12px; border-radius:18px; box-shadow:none;">
+        <div class="small" id="firebaseSummary">Firebase prêt à être configuré.</div>
+        <div class="small" style="margin-top:6px;">Les champs sont préremplis avec ton projet.</div>
+      </div>
     </div>
-    <div class="pill-row">
-      <button class="btn small-btn primary" id="connectBtn" type="button">Connecter</button>
-      <button class="btn small-btn" id="disconnectBtn" type="button">Déconnecter</button>
-      <button class="btn small-btn" id="saveSettingsBtn" type="button">Enregistrer</button>
-    </div>
-    <div class="sync-note">Les champs Firebase sont pré-remplis. Le code de partage doit être identique sur les deux iPhone.</div>
-    <div class="sync-note">Projet détecté : <span class="sync-key">myfreezer-b488a</span></div>
-    <div class="sync-note" id="firebaseSummary">Firebase prêt à être configuré.</div>
+    <div class="sheet-actions"><button class="btn primary" type="button" onclick="window.app && window.app.saveSettings()">Fermer</button></div>
   </section>
 
   <section class="sheet" id="itemSheet" aria-hidden="true">
     <div class="sheet-header">
-      <h3 id="itemModalTitle">Ajouter un plat</h3>
-      <button class="icon-btn mini-btn" id="closeItemBtn" type="button" aria-label="Fermer">✕</button>
+      <h3 id="itemTitle">Ajouter un article</h3>
+      <button class="icon-btn" id="closeItemBtn" type="button" aria-label="Fermer" onclick="window.app && window.app.closeItem()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg>
+      </button>
     </div>
-    <form id="itemForm">
-      <input type="hidden" id="itemId" />
-      <input type="hidden" id="category" />
-      <input type="hidden" id="quantity" value="1" />
+    <div class="sheet-body">
       <div class="form-grid">
         <label class="full">Nom
-          <input id="name" required placeholder="Poulet, soupe, légumes..." />
+          <input id="itemName" placeholder="Poulet, soupe, légumes..." />
         </label>
         <div class="full">
           <div class="section-label">Catégorie</div>
-          <div class="category-grid" id="categoryGrid"></div>
+          <div class="cat-grid" id="categoryGrid"></div>
         </div>
         <div class="full">
           <div class="section-label">Quantité</div>
-          <div class="qty-control">
-            <strong id="qtyValue">1</strong>
+          <div class="qty-box">
+            <div class="qty-value" id="qtyValue">1</div>
             <div class="qty-row">
               <button class="qty-btn" type="button" id="qtyMinus" aria-label="Diminuer">−</button>
               <button class="qty-btn primary" type="button" id="qtyPlus" aria-label="Augmenter">+</button>
@@ -860,558 +562,608 @@
           </div>
         </div>
         <label class="full">Notes
-          <textarea id="notes" placeholder="Ex. déjà cuit, 2 portions restantes..."></textarea>
+          <textarea id="itemNotes" placeholder="Ex. déjà cuit, 2 portions restantes..."></textarea>
         </label>
-        <div class="full subtle">La date d’ajout est utilisée automatiquement pour calculer la durée. Durée fixe : 6 mois.</div>
+        <div class="full small" style="color:var(--muted);">La date d’ajout sert au calcul. Durée fixe : 6 mois.</div>
       </div>
-      <div class="sheet-actions sticky">
-        <button class="btn action-btn" type="submit" id="saveItemBtn">Ajouter</button>
-      </div>
-    </form>
+    </div>
+    <div class="sheet-actions">
+      <button class="btn success" id="saveItemBtn" type="button" onclick="window.app && window.app.saveItem()">Enregistrer</button>
+    </div>
   </section>
 
   <section class="sheet" id="searchSheet" aria-hidden="true">
     <div class="sheet-header">
       <h3>Rechercher</h3>
-      <button class="icon-btn mini-btn" id="closeSearchBtn" type="button" aria-label="Fermer">✕</button>
+      <button class="icon-btn" id="closeSearchBtn" type="button" aria-label="Fermer" onclick="window.app && window.app.closeSearch()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg>
+      </button>
     </div>
-    <div class="form-grid">
-      <label class="full">Recherche
-        <input id="searchQuery" placeholder="Nom, catégorie, notes..." />
-      </label>
-      <input id="searchCategory" type="hidden" value="all" />
-      <div class="full">
-        <div class="section-label">Catégorie</div>
-        <div class="category-grid search-category-grid" id="searchCategoryGrid"></div>
+    <div class="sheet-body">
+      <div class="form-grid">
+        <label class="full">Recherche
+          <input id="searchQuery" placeholder="Nom, catégorie, notes..." />
+        </label>
+        <div class="full">
+          <div class="section-label">Catégorie</div>
+          <div class="cat-grid" id="searchCategoryGrid"></div>
+        </div>
+        <div class="full small" id="searchCount" style="color:var(--muted);">0 résultat</div>
       </div>
-      <div class="subtle full" id="searchCount" style="padding-bottom: 11px;">0 résultat</div>
+      <div style="margin-top:12px;">
+        <button class="btn secondary" id="clearSearchBtn" type="button">Réinitialiser</button>
+      </div>
+      <div class="list" id="searchResults" style="margin-top:12px;"></div>
     </div>
-    <div class="search-meta">
-      <button class="btn small-btn" id="clearSearchBtn" type="button">Réinitialiser</button>
-    </div>
-    <div class="list" id="searchResults" style="margin-top:10px;"></div>
-    <div class="sheet-actions sticky">
-      <button class="btn action-btn secondary" id="searchToDashboardBtn" type="button">Retour au dashboard</button>
-    </div>
+    <div class="sheet-actions"><button class="btn secondary" type="button" onclick="window.app && window.app.closeSearch()">Fermer</button></div>
   </section>
 
   <div class="toast" id="toast"></div>
 
   <script>
-    (() => {
-      'use strict';
+  (() => {
+    'use strict';
 
-      const STORAGE_KEY = 'freezer-items-v1';
-      const SETTINGS_KEY = 'freezer-settings-v1';
-      const DEVICE_KEY = 'freezer-device-id-v1';
-      const DEVICE_NAME_KEY = 'freezer-device-name-v1';
-      const APP_VERSION = 'v12';
-      const SHELF_LIFE_DAYS = 180;
-      const SOON_DAYS = 150;
-      const CATEGORY_ORDER = ['Viande', 'Poisson', 'Légumes', 'Plats cuisinés', 'Dessert', 'Produits laitiers'];
-      const CATEGORY_META = {
-        'Viande': { cls: 'cat-viande' },
-        'Poisson': { cls: 'cat-poisson' },
-        'Légumes': { cls: 'cat-legumes' },
-        'Plats cuisinés': { cls: 'cat-plats-cuisines' },
-        'Dessert': { cls: 'cat-dessert' },
-        'Produits laitiers': { cls: 'cat-produits-laitiers' }
-      };
-      const DEFAULT_FIREBASE_CONFIG = {
-        apiKey: 'AIzaSyDsNEGaBaq9JhTxSTvIeAQKbhRKNPecXgw',
-        authDomain: 'myfreezer-b488a.firebaseapp.com',
-        databaseURL: 'https://myfreezer-b488a-default-rtdb.europe-west1.firebasedatabase.app',
-        projectId: 'myfreezer-b488a',
-        appId: '1:893959065266:web:c3bc8222855358927b43ab'
-      };
+    const APP_VERSION = 'v1-mvp';
+    const STORAGE_KEY = 'freezer-mvp-items-v1';
+    const SETTINGS_KEY = 'freezer-mvp-settings-v1';
+    const DEVICE_KEY = 'freezer-mvp-device-id-v1';
+    const DEVICE_NAME_KEY = 'freezer-mvp-device-name-v1';
+    const SHELF_LIFE_DAYS = 180;
+    const SOON_DAYS = 150;
+    const CATEGORY_ORDER = ['Viande', 'Poisson', 'Légumes', 'Plats cuisinés', 'Dessert', 'Produits laitiers'];
+    const CATEGORY_META = {
+      'Viande': { cls: 'cat-viande' },
+      'Poisson': { cls: 'cat-poisson' },
+      'Légumes': { cls: 'cat-legumes' },
+      'Plats cuisinés': { cls: 'cat-plats-cuisines' },
+      'Dessert': { cls: 'cat-dessert' },
+      'Produits laitiers': { cls: 'cat-produits-laitiers' }
+    };
+    const DEFAULT_FIREBASE_CONFIG = {
+      apiKey: 'AIzaSyDsNEGaBaq9JhTxSTvIeAQKbhRKNPecXgw',
+      authDomain: 'myfreezer-b488a.firebaseapp.com',
+      databaseURL: 'https://myfreezer-b488a-default-rtdb.europe-west1.firebasedatabase.app',
+      projectId: 'myfreezer-b488a',
+      appId: '1:893959065266:web:c3bc8222855358927b43ab'
+    };
 
-      const els = {
-        subtitle: document.getElementById('subtitle'),
-        syncDot: document.getElementById('syncDot'),
-        syncStatus: document.getElementById('syncStatus'),
-        versionBadge: document.getElementById('versionBadge'),
-        menuBtn: document.getElementById('menuBtn'),
-        menuPopover: document.getElementById('menuPopover'),
-        menuSettingsBtn: document.getElementById('menuSettingsBtn'),
-        menuDisconnectBtn: document.getElementById('menuDisconnectBtn'),
-        homeBtn: document.getElementById('homeBtn'),
-        backdrop: document.getElementById('backdrop'),
-        scopeAll: document.getElementById('scopeAll'),
-        scopeSoon: document.getElementById('scopeSoon'),
-        scopeOverdue: document.getElementById('scopeOverdue'),
-        statItems: document.getElementById('statItems'),
-        statSoon: document.getElementById('statSoon'),
-        statOverdue: document.getElementById('statOverdue'),
-        listTitle: document.getElementById('listTitle'),
-        listCount: document.getElementById('listCount'),
-        list: document.getElementById('list'),
-        addBtn: document.getElementById('addBtn'),
-        searchBtn: document.getElementById('searchBtn'),
-        settingsSheet: document.getElementById('settingsSheet'),
-        closeSettingsBtn: document.getElementById('closeSettingsBtn'),
-        roomId: document.getElementById('roomId'),
-        deviceName: document.getElementById('deviceName'),
-        fbApiKey: document.getElementById('fbApiKey'),
-        fbAuthDomain: document.getElementById('fbAuthDomain'),
-        fbDatabaseURL: document.getElementById('fbDatabaseURL'),
-        fbProjectId: document.getElementById('fbProjectId'),
-        fbAppId: document.getElementById('fbAppId'),
-        connectBtn: document.getElementById('connectBtn'),
-        disconnectBtn: document.getElementById('disconnectBtn'),
-        saveSettingsBtn: document.getElementById('saveSettingsBtn'),
-        firebaseSummary: document.getElementById('firebaseSummary'),
-        itemSheet: document.getElementById('itemSheet'),
-        closeItemBtn: document.getElementById('closeItemBtn'),
-        cancelItemBtn: document.getElementById('cancelItemBtn'),
-        itemForm: document.getElementById('itemForm'),
-        itemModalTitle: document.getElementById('itemModalTitle'),
-        itemId: document.getElementById('itemId'),
-        category: document.getElementById('category'),
-        categoryGrid: document.getElementById('categoryGrid'),
-        quantity: document.getElementById('quantity'),
-        qtyValue: document.getElementById('qtyValue'),
-        qtyMinus: document.getElementById('qtyMinus'),
-        qtyPlus: document.getElementById('qtyPlus'),
-        name: document.getElementById('name'),
-        notes: document.getElementById('notes'),
-        saveItemBtn: document.getElementById('saveItemBtn'),
-        searchSheet: document.getElementById('searchSheet'),
-        closeSearchBtn: document.getElementById('closeSearchBtn'),
-        searchToDashboardBtn: document.getElementById('searchToDashboardBtn'),
-        searchQuery: document.getElementById('searchQuery'),
-        searchCategory: document.getElementById('searchCategory'),
-        searchCategoryGrid: document.getElementById('searchCategoryGrid'),
-        searchCount: document.getElementById('searchCount'),
-        clearSearchBtn: document.getElementById('clearSearchBtn'),
-        searchResults: document.getElementById('searchResults'),
-        toast: document.getElementById('toast')
-      };
+    const els = {
+      statusLine: document.getElementById('statusLine'),
+      versionBadge: document.getElementById('versionBadge'),
+      menuBtn: document.getElementById('menuBtn'),
+      menuPopover: document.getElementById('menuPopover'),
+      backdrop: document.getElementById('backdrop'),
+      filterAll: document.getElementById('filterAll'),
+      filterSoon: document.getElementById('filterSoon'),
+      filterOverdue: document.getElementById('filterOverdue'),
+      scopeChips: document.getElementById('scopeChips'),
+      listTitle: document.getElementById('listTitle'),
+      listCount: document.getElementById('listCount'),
+      listLabel: document.getElementById('listLabel'),
+      countAll: document.getElementById('countAll'),
+      countSoon: document.getElementById('countSoon'),
+      countOverdue: document.getElementById('countOverdue'),
+      list: document.getElementById('list'),
+      addBtn: document.getElementById('addBtn'),
+      searchBtn: document.getElementById('searchBtn'),
+      settingsSheet: document.getElementById('settingsSheet'),
+      closeSettingsBtn: document.getElementById('closeSettingsBtn'),
+      roomId: document.getElementById('roomId'),
+      deviceName: document.getElementById('deviceName'),
+      fbApiKey: document.getElementById('fbApiKey'),
+      fbAuthDomain: document.getElementById('fbAuthDomain'),
+      fbDatabaseURL: document.getElementById('fbDatabaseURL'),
+      fbProjectId: document.getElementById('fbProjectId'),
+      fbAppId: document.getElementById('fbAppId'),
+      connectBtn: document.getElementById('connectBtn'),
+      disconnectBtn: document.getElementById('disconnectBtn'),
+      saveSettingsBtn: document.getElementById('saveSettingsBtn'),
+      firebaseSummary: document.getElementById('firebaseSummary'),
+      itemSheet: document.getElementById('itemSheet'),
+      itemTitle: document.getElementById('itemTitle'),
+      closeItemBtn: document.getElementById('closeItemBtn'),
+      itemName: document.getElementById('itemName'),
+      itemNotes: document.getElementById('itemNotes'),
+      categoryGrid: document.getElementById('categoryGrid'),
+      qtyValue: document.getElementById('qtyValue'),
+      qtyMinus: document.getElementById('qtyMinus'),
+      qtyPlus: document.getElementById('qtyPlus'),
+      saveItemBtn: document.getElementById('saveItemBtn'),
+      searchSheet: document.getElementById('searchSheet'),
+      closeSearchBtn: document.getElementById('closeSearchBtn'),
+      searchQuery: document.getElementById('searchQuery'),
+      searchCategoryGrid: document.getElementById('searchCategoryGrid'),
+      searchCount: document.getElementById('searchCount'),
+      clearSearchBtn: document.getElementById('clearSearchBtn'),
+      searchResults: document.getElementById('searchResults'),
+      toast: document.getElementById('toast')
+    };
 
-      const state = {
-        items: loadItems(),
-        settings: loadSettings(),
-        scope: 'all',
-        searchQuery: '',
-        searchCategory: 'all',
-        syncing: false,
-        db: null,
-        refPath: '',
-        listener: null,
-        firebaseLoadPromise: null,
-        suppressPush: false,
-        deviceId: getOrCreateDeviceId(),
-        deviceName: ''
-      };
-      state.deviceName = state.settings.deviceName || localStorage.getItem(DEVICE_NAME_KEY) || defaultDeviceName();
-      if (els.versionBadge) els.versionBadge.textContent = APP_VERSION;
+    const state = {
+      items: loadItems(),
+      settings: loadSettings(),
+      scope: 'all',
+      searchCategory: 'all',
+      syncing: false,
+      db: null,
+      refPath: '',
+      listener: null,
+      firebaseLoadPromise: null,
+      deviceId: getOrCreateDeviceId(),
+      deviceName: '',
+      modal: { mode: 'add', id: '', category: CATEGORY_ORDER[0], qty: 1 }
+    };
 
-      populateSearchSelect();
-      renderSearchCategoryGrid();
+    state.deviceName = state.settings.deviceName || localStorage.getItem(DEVICE_NAME_KEY) || defaultDeviceName();
+    if (els.versionBadge) els.versionBadge.textContent = APP_VERSION;
+
+    populateSettingsUI();
+    renderCategoryGrid();
+    renderSearchCategoryGrid();
+    renderAll();
+    setStatus('Hors ligne');
+    bindEvents();
+    if (shouldAutoConnect()) connectSync();
+
+    function toast(msg) {
+      els.toast.textContent = msg;
+      els.toast.classList.add('show');
+      clearTimeout(toast._timer);
+      toast._timer = setTimeout(() => els.toast.classList.remove('show'), 2200);
+    }
+
+    function setStatus(text) {
+      els.statusLine.textContent = text;
+      els.firebaseSummary.textContent = text;
+    }
+
+    function todayISO() { return new Date().toISOString().slice(0, 10); }
+    function isDateISO(v) { return /^\d{4}-\d{2}-\d{2}$/.test(String(v || '')); }
+    function daysSince(dateStr) {
+      if (!isDateISO(dateStr)) return 9999;
+      return Math.floor((Date.now() - new Date(dateStr + 'T12:00:00').getTime()) / 86400000);
+    }
+    function ageDays(item) { return daysSince(item.createdAt || item.frozenAt || todayISO()); }
+    function ageBucket(item) { const age = ageDays(item); return age < 30 ? 'fresh' : age < 120 ? 'warn' : 'old'; }
+    function statusText(item) {
+      const age = ageDays(item);
+      if (age >= SHELF_LIFE_DAYS) return 'Date dépassée';
+      if (age >= SOON_DAYS) return 'À consommer';
+      return (SHELF_LIFE_DAYS - age) + ' j restants';
+    }
+    function uid() { return 'id-' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36); }
+    function esc(v) { return String(v).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;'); }
+    function defaultDeviceName() { return (navigator.userAgent.includes('iPad') ? 'iPad' : 'iPhone') + ' ' + Math.floor(Math.random() * 90 + 10); }
+    function getOrCreateDeviceId() { let id = localStorage.getItem(DEVICE_KEY); if (!id) { id = 'dev-' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36); localStorage.setItem(DEVICE_KEY, id); } return id; }
+
+    function loadSettings() {
+      try {
+        const raw = localStorage.getItem(SETTINGS_KEY);
+        const saved = raw ? JSON.parse(raw) : {};
+        const savedFb = saved.fb || {};
+        const fb = {};
+        Object.keys(DEFAULT_FIREBASE_CONFIG).forEach(k => {
+          const candidate = typeof savedFb[k] === 'string' ? savedFb[k].trim() : '';
+          fb[k] = candidate || DEFAULT_FIREBASE_CONFIG[k];
+        });
+        const out = { roomId: sanitizeRoomId(saved.roomId || ''), deviceName: String(saved.deviceName || '').trim(), fb };
+        if (!raw) localStorage.setItem(SETTINGS_KEY, JSON.stringify(out));
+        return out;
+      } catch {
+        const out = { roomId: '', deviceName: '', fb: { ...DEFAULT_FIREBASE_CONFIG } };
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(out));
+        return out;
+      }
+    }
+
+    function loadItems() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const data = raw ? JSON.parse(raw) : [];
+        return Array.isArray(data) ? data.map(normalizeItem).filter(Boolean) : [];
+      } catch {
+        return []; 
+      }
+    }
+
+    function normalizeItem(item) {
+      if (!item || !item.name) return null;
+      const created = isDateISO(item.createdAt) ? item.createdAt : (isDateISO(item.frozenAt) ? item.frozenAt : todayISO());
+      return {
+        id: item.id || uid(),
+        name: String(item.name),
+        category: CATEGORY_ORDER.includes(item.category) ? item.category : CATEGORY_ORDER[0],
+        quantity: Math.max(1, Number(item.quantity) || 1),
+        createdAt: created,
+        frozenAt: isDateISO(item.frozenAt) ? item.frozenAt : created,
+        notes: String(item.notes || ''),
+        updatedAt: item.updatedAt || new Date().toISOString(),
+        updatedBy: item.updatedBy || '',
+        updatedByName: item.updatedByName || ''
+      };
+    }
+
+    function sanitizeRoomId(v) {
+      return String(v || '').trim().toLowerCase().replace(/[^a-z0-9_-]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    function populateSettingsUI() {
+      els.roomId.value = state.settings.roomId || '';
+      els.deviceName.value = state.settings.deviceName || state.deviceName;
+      els.fbApiKey.value = state.settings.fb.apiKey || '';
+      els.fbAuthDomain.value = state.settings.fb.authDomain || '';
+      els.fbDatabaseURL.value = state.settings.fb.databaseURL || '';
+      els.fbProjectId.value = state.settings.fb.projectId || '';
+      els.fbAppId.value = state.settings.fb.appId || '';
+    }
+
+    function collectSettings() {
+      const cur = state.settings || loadSettings();
+      const merge = (curVal, newVal, fallback='') => {
+        const v = String(newVal || '').trim(); if (v) return v;
+        const c = String(curVal || '').trim(); if (c) return c;
+        return fallback;
+      };
+      return {
+        roomId: sanitizeRoomId(merge(cur.roomId, els.roomId.value, '')),
+        deviceName: merge(cur.deviceName, els.deviceName.value, state.deviceName || defaultDeviceName()),
+        fb: {
+          apiKey: merge(cur.fb.apiKey, els.fbApiKey.value, DEFAULT_FIREBASE_CONFIG.apiKey),
+          authDomain: merge(cur.fb.authDomain, els.fbAuthDomain.value, DEFAULT_FIREBASE_CONFIG.authDomain),
+          databaseURL: merge(cur.fb.databaseURL, els.fbDatabaseURL.value, DEFAULT_FIREBASE_CONFIG.databaseURL),
+          projectId: merge(cur.fb.projectId, els.fbProjectId.value, DEFAULT_FIREBASE_CONFIG.projectId),
+          appId: merge(cur.fb.appId, els.fbAppId.value, DEFAULT_FIREBASE_CONFIG.appId)
+        }
+      };
+    }
+
+    function persistSettings() {
+      state.settings = collectSettings();
+      state.deviceName = state.settings.deviceName || defaultDeviceName();
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(state.settings));
+      localStorage.setItem(DEVICE_NAME_KEY, state.deviceName);
       populateSettingsUI();
+    }
+
+    function saveSettings() {
+      persistSettings();
+      setStatus('Configuration enregistrée');
+      toast('Configuration enregistrée');
+    }
+
+    function shouldAutoConnect() {
+      const s = state.settings || {}; const fb = s.fb || {};
+      return !!(s.roomId && fb.apiKey && fb.authDomain && fb.databaseURL && fb.projectId && fb.appId);
+    }
+
+    function fbConfigFromSettings() {
+      const fb = state.settings.fb || {};
+      const keys = ['apiKey', 'authDomain', 'databaseURL', 'projectId', 'appId'];
+      if (!keys.every(k => String(fb[k] || '').trim())) return null;
+      return { apiKey: fb.apiKey.trim(), authDomain: fb.authDomain.trim(), databaseURL: fb.databaseURL.trim(), projectId: fb.projectId.trim(), appId: fb.appId.trim() };
+    }
+
+    function renderCategoryGrid() {
+      const current = state.modal.category || CATEGORY_ORDER[0];
+      els.categoryGrid.innerHTML = CATEGORY_ORDER.map(c => {
+        const meta = CATEGORY_META[c] || { cls: '' };
+        const active = current === c ? ' active' : '';
+        return `<button type="button" class="cat-btn ${meta.cls}${active}" data-cat="${esc(c)}"><span class="swatch"></span><span>${esc(c)}</span></button>`;
+      }).join('');
+    }
+
+    function renderSearchCategoryGrid() {
+      const current = state.searchCategory || 'all';
+      els.searchCategoryGrid.innerHTML = [{ value:'all', label:'Toutes', cls:'cat-all' }, ...CATEGORY_ORDER.map(c => ({ value:c, label:c, cls:(CATEGORY_META[c] && CATEGORY_META[c].cls) || '' }))].map(({value,label,cls}) => {
+        const active = current === value ? ' active' : '';
+        return `<button type="button" class="cat-btn ${cls}${active}" data-search-cat="${esc(value)}"><span class="swatch"></span><span>${esc(label)}</span></button>`;
+      }).join('');
+    }
+
+    function openMenu() { els.menuPopover.classList.add('open'); els.backdrop.classList.add('show'); }
+    function closeMenu() { els.menuPopover.classList.remove('open'); if (![els.settingsSheet, els.itemSheet, els.searchSheet].some(s => s.classList.contains('open'))) els.backdrop.classList.remove('show'); }
+    function toggleMenu() { if (els.menuPopover.classList.contains('open')) closeMenu(); else openMenu(); }
+
+    function openSheet(sheet) {
+      closeMenu();
+      els.backdrop.classList.add('show');
+      sheet.classList.add('open');
+    }
+    function closeSheet(sheet) {
+      sheet.classList.remove('open');
+      if (![els.settingsSheet, els.itemSheet, els.searchSheet].some(s => s.classList.contains('open'))) els.backdrop.classList.remove('show');
+    }
+
+    function openSettings() { populateSettingsUI(); openSheet(els.settingsSheet); setTimeout(() => els.roomId.focus(), 50); }
+    function closeSettings() { closeSheet(els.settingsSheet); }
+
+    function openItem(item) {
+      state.modal.mode = item ? 'edit' : 'add';
+      state.modal.id = item ? item.id : '';
+      state.modal.category = item ? item.category : CATEGORY_ORDER[0];
+      state.modal.qty = item ? item.quantity : 1;
+      els.itemTitle.textContent = item ? 'Modifier l’article' : 'Ajouter un article';
+      els.itemName.value = item ? item.name : '';
+      els.itemNotes.value = item ? item.notes : '';
+      els.qtyValue.textContent = String(state.modal.qty);
       renderCategoryGrid();
+      openSheet(els.itemSheet);
+      setTimeout(() => els.itemName.focus(), 50);
+    }
+    function closeItem() { closeSheet(els.itemSheet); }
+    function adjustQty(delta) { state.modal.qty = Math.max(1, (state.modal.qty || 1) + delta); els.qtyValue.textContent = String(state.modal.qty); }
+    function selectCategory(cat) { if (CATEGORY_ORDER.includes(cat)) { state.modal.category = cat; renderCategoryGrid(); } }
+
+    function openSearch() {
+      renderSearchCategoryGrid();
+      openSheet(els.searchSheet);
+      setTimeout(() => els.searchQuery.focus(), 50);
+    }
+    function closeSearch() { closeSheet(els.searchSheet); }
+
+    function scopeTitle(scope) { return scope === 'soon' ? 'À consommer' : scope === 'overdue' ? 'Date dépassée' : 'Tous les articles'; }
+    function sortItems(a, b) { return (b.createdAt || '').localeCompare(a.createdAt || '') || (b.updatedAt || '').localeCompare(a.updatedAt || ''); }
+    function getScopedItems() {
+      if (state.scope === 'soon') return state.items.filter(it => { const a = ageDays(it); return a >= SOON_DAYS && a < SHELF_LIFE_DAYS; }).sort(sortItems);
+      if (state.scope === 'overdue') return state.items.filter(it => ageDays(it) >= SHELF_LIFE_DAYS).sort(sortItems);
+      return state.items.slice().sort(sortItems);
+    }
+
+    function renderItem(item) {
+      const bucket = ageBucket(item);
+      const meta = CATEGORY_META[item.category] || { cls: '' };
+      return `
+        <article class="item ${meta.cls || ''}">
+          <div class="item-top">
+            <div class="item-main">
+              <h4 class="item-name">${esc(item.name)}</h4>
+              <div class="item-cat"><span class="swatch"></span>${esc(item.category)}</div>
+              <div class="item-meta">Ajouté le ${prettyDate(item.createdAt)} · ${esc(statusText(item))}</div>
+            </div>
+            <span class="badge-age ${bucket}" title="Ancienneté"></span>
+          </div>
+          ${item.notes ? `<div class="item-meta">${esc(item.notes)}</div>` : ''}
+          <div class="item-actions">
+            <div class="pill">Quantité ×${esc(item.quantity)}</div>
+            <div class="meta-actions">
+              <button class="item-action" type="button" data-edit="${esc(item.id)}" aria-label="Modifier">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+              </button>
+              <button class="item-action danger" type="button" data-delete="${esc(item.id)}" aria-label="Supprimer">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+              </button>
+            </div>
+          </div>
+        </article>`;
+    }
+
+    function bindListActions(container) {
+      container.querySelectorAll('[data-edit]').forEach(btn => btn.onclick = () => {
+        const item = state.items.find(it => it.id === btn.dataset.edit);
+        if (item) openItem(item);
+      });
+      container.querySelectorAll('[data-delete]').forEach(btn => btn.onclick = () => {
+        const item = state.items.find(it => it.id === btn.dataset.delete);
+        if (!item) return;
+        if (!confirm('Supprimer cet article ?')) return;
+        state.items = state.items.filter(it => it.id !== item.id);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
+        renderAll();
+        pushToFirebase();
+        toast('Article supprimé');
+      });
+    }
+
+    function renderAll() {
+      const all = state.items.slice();
+      const counts = {
+        all: all.length,
+        soon: all.filter(it => { const a = ageDays(it); return a >= SOON_DAYS && a < SHELF_LIFE_DAYS; }).length,
+        overdue: all.filter(it => ageDays(it) >= SHELF_LIFE_DAYS).length
+      };
+      els.countAll.textContent = counts.all;
+      els.countSoon.textContent = counts.soon;
+      els.countOverdue.textContent = counts.overdue;
+      els.listTitle.textContent = scopeTitle(state.scope);
+      els.listLabel.textContent = scopeTitle(state.scope);
+      const scoped = getScopedItems();
+      els.listCount.textContent = scoped.length + ' article' + (scoped.length > 1 ? 's' : '');
+      els.list.innerHTML = scoped.length ? scoped.map(renderItem).join('') : '<div class="empty">Aucun article. Appuie sur <strong>Ajouter</strong>.</div>';
+      bindListActions(els.list);
+      renderSearchResults();
+    }
+
+    function renderSearchResults() {
+      let items = state.items.slice();
+      const q = (els.searchQuery.value || '').trim().toLowerCase();
+      if (q) items = items.filter(it => [it.name, it.category, it.notes].join(' ').toLowerCase().includes(q));
+      if (state.searchCategory !== 'all') items = items.filter(it => it.category === state.searchCategory);
+      items.sort(sortItems);
+      els.searchCount.textContent = items.length + ' résultat' + (items.length > 1 ? 's' : '');
+      els.searchResults.innerHTML = items.length ? items.map(renderItem).join('') : '<div class="empty">Aucun résultat.</div>';
+      bindListActions(els.searchResults);
+    }
+
+    function loadScript(src) {
+      return new Promise((resolve, reject) => {
+        const existing = Array.from(document.scripts).find(s => s.src === src);
+        if (existing && typeof firebase !== 'undefined') return resolve();
+        const s = document.createElement('script');
+        s.src = src;
+        s.async = false;
+        s.onload = () => resolve();
+        s.onerror = () => reject(new Error('Impossible de charger ' + src));
+        document.head.appendChild(s);
+      });
+    }
+
+    function loadFirebaseCompat() {
+      if (typeof firebase !== 'undefined') return Promise.resolve();
+      if (!state.firebaseLoadPromise) {
+        state.firebaseLoadPromise = ['https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js', 'https://www.gstatic.com/firebasejs/10.13.2/firebase-database-compat.js'].reduce((p, src) => p.then(() => loadScript(src)), Promise.resolve());
+      }
+      return state.firebaseLoadPromise;
+    }
+
+    function ensureFirebaseApp(cfg) {
+      const existing = firebase.apps && firebase.apps.length ? firebase.apps[0] : null;
+      if (!existing) { firebase.initializeApp(cfg); return Promise.resolve(firebase.app()); }
+      const current = existing.options || {};
+      const same = ['apiKey','authDomain','databaseURL','projectId','appId'].every(k => String(current[k] || '') === String(cfg[k] || ''));
+      if (same) return Promise.resolve(existing);
+      return existing.delete().then(() => { firebase.initializeApp(cfg); return firebase.app(); });
+    }
+
+    function connectSync() {
+      persistSettings();
+      const cfg = fbConfigFromSettings();
+      if (!state.settings.roomId) { toast('Ajoute un code de partage'); return; }
+      if (!cfg) { setStatus('Config incomplète'); toast('Complète les champs Firebase'); return; }
+      setStatus('Connexion...');
+      loadFirebaseCompat().then(() => ensureFirebaseApp(cfg)).then(() => {
+        if (state.listener && state.db && state.refPath) state.db.ref(state.refPath).off('value', state.listener);
+        state.db = firebase.database();
+        state.refPath = 'freezerRooms/' + state.settings.roomId + '/items';
+        const ref = state.db.ref(state.refPath);
+        state.listener = snap => {
+          const payload = snap.val() || {};
+          const remote = Object.keys(payload).map(k => normalizeItem(payload[k])).filter(Boolean).sort(sortItems);
+          if (remote.length) {
+            state.items = remote;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
+          } else if (state.items.length) {
+            pushToFirebase(true);
+          }
+          renderAll();
+          setStatus('Synchronisé : ' + state.settings.roomId);
+        };
+        ref.on('value', state.listener, () => setStatus('Erreur de sync'));
+        state.syncing = true;
+        pushToFirebase(true);
+        toast('Connexion Firebase active');
+        setStatus('Synchronisé : ' + state.settings.roomId);
+      }).catch(err => {
+        console.error(err);
+        setStatus('Erreur de connexion');
+        toast('Connexion Firebase impossible');
+      });
+    }
+
+    function disconnectSync() {
+      try { if (state.listener && state.db && state.refPath) state.db.ref(state.refPath).off('value', state.listener); } catch {}
+      state.listener = null; state.db = null; state.refPath = ''; state.syncing = false;
+      setStatus('Hors ligne');
+      toast('Déconnecté de Firebase');
+    }
+
+    function pushToFirebase(force) {
+      if (!state.syncing || !state.db || !state.refPath) return Promise.resolve();
+      const payload = {};
+      state.items.forEach(item => payload[item.id] = normalizeItem(item));
+      return state.db.ref(state.refPath).set(payload).then(() => { if (force) setStatus('Synchronisé : ' + state.settings.roomId); }).catch(err => { console.error(err); setStatus('Sync en erreur'); });
+    }
+
+    function saveItem() {
+      const name = (els.itemName.value || '').trim();
+      if (!name) { toast('Ajoute un nom'); return; }
+      const existing = state.items.find(it => it.id === state.modal.id);
+      const item = {
+        id: state.modal.id || uid(),
+        name,
+        category: state.modal.category || CATEGORY_ORDER[0],
+        quantity: Math.max(1, Number(state.modal.qty) || 1),
+        createdAt: existing ? existing.createdAt : todayISO(),
+        frozenAt: existing ? existing.frozenAt : todayISO(),
+        notes: (els.itemNotes.value || '').trim(),
+        updatedAt: new Date().toISOString(),
+        updatedBy: state.deviceId,
+        updatedByName: state.deviceName
+      };
+      const idx = state.items.findIndex(it => it.id === item.id);
+      if (idx >= 0) state.items[idx] = normalizeItem(item); else state.items.unshift(normalizeItem(item));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
       renderAll();
-      setStatus('Hors ligne', 'offline');
-      bindEvents();
+      pushToFirebase(true);
+      closeItem();
+      toast(existing ? 'Article mis à jour' : 'Article ajouté');
+    }
 
-      if (shouldAutoConnect()) {
-        connectSync();
-      }
-
-      function defaultDeviceName() {
-        const n = navigator.userAgent.includes('iPad') ? 'iPad' : 'iPhone';
-        return n + ' ' + String(Math.floor(Math.random() * 90) + 10);
-      }
-
-      function getOrCreateDeviceId() {
-        let id = localStorage.getItem(DEVICE_KEY);
-        if (!id) {
-          id = 'dev-' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
-          localStorage.setItem(DEVICE_KEY, id);
-        }
-        return id;
-      }
-
-      function uid() {
-        return 'id-' + Math.random().toString(36).slice(2, 11) + Date.now().toString(36);
-      }
-
-      function todayISO() {
-        return new Date().toISOString().slice(0, 10);
-      }
-
-      function isDateISO(v) {
-        return /^\d{4}-\d{2}-\d{2}$/.test(String(v || ''));
-      }
-
-      function prettyDate(dateStr) {
-        if (!isDateISO(dateStr)) return 'date inconnue';
-        const d = new Date(dateStr + 'T12:00:00');
-        return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
-      }
-
-      function daysSince(dateStr) {
-        if (!isDateISO(dateStr)) return 9999;
-        return Math.floor((Date.now() - new Date(dateStr + 'T12:00:00').getTime()) / 86400000);
-      }
-
-      function ageDays(item) {
-        return daysSince(item.createdAt || item.frozenAt || todayISO());
-      }
-
-      function daysLeft(item) {
-        return SHELF_LIFE_DAYS - ageDays(item);
-      }
-
-      function addMonthsISO(dateStr, months) {
-        if (!isDateISO(dateStr)) return '';
-        const d = new Date(dateStr + 'T12:00:00');
-        d.setMonth(d.getMonth() + Number(months || 0));
-        return d.toISOString().slice(0, 10);
-      }
-
-      function ageBucket(item) {
-        const age = ageDays(item);
-        if (age < 30) return 'fresh';
-        if (age < 120) return 'warn';
-        return 'old';
-      }
-
-      function statusText(item) {
-        const age = ageDays(item);
-        if (age >= SHELF_LIFE_DAYS) return 'Date dépassée';
-        if (age >= SOON_DAYS) return 'À consommer';
-        return (SHELF_LIFE_DAYS - age) + ' j restants';
-      }
-
-      function esc(v) {
-        return String(v)
-          .replaceAll('&', '&amp;')
-          .replaceAll('<', '&lt;')
-          .replaceAll('>', '&gt;')
-          .replaceAll('"', '&quot;')
-          .replaceAll("'", '&#39;');
-      }
-
-      function showToast(msg) {
-        els.toast.textContent = msg;
-        els.toast.classList.add('show');
-        clearTimeout(showToast._timer);
-        showToast._timer = setTimeout(() => els.toast.classList.remove('show'), 2200);
-      }
-
-      function loadSettings() {
-        try {
-          const raw = localStorage.getItem(SETTINGS_KEY);
-          const saved = raw ? JSON.parse(raw) : {};
-          const savedFb = saved.fb || {};
-          const fb = {};
-          Object.keys(DEFAULT_FIREBASE_CONFIG).forEach(key => {
-            const candidate = typeof savedFb[key] === 'string' ? savedFb[key].trim() : '';
-            fb[key] = candidate || DEFAULT_FIREBASE_CONFIG[key];
-          });
-          const settings = {
-            roomId: sanitizeRoomId(saved.roomId || ''),
-            deviceName: String(saved.deviceName || '').trim(),
-            fb
-          };
-          if (!raw) localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-          return settings;
-        } catch (err) {
-          const fallback = { roomId: '', deviceName: '', fb: { ...DEFAULT_FIREBASE_CONFIG } };
-          localStorage.setItem(SETTINGS_KEY, JSON.stringify(fallback));
-          return fallback;
-        }
-      }
-
-      function loadItems() {
-        try {
-          const raw = localStorage.getItem(STORAGE_KEY);
-          const data = raw ? JSON.parse(raw) : [];
-          return Array.isArray(data) ? data.map(normalizeItem).filter(Boolean) : [];
-        } catch {
-          return [];
-        }
-      }
-
-      function normalizeItem(item) {
-        if (!item || !item.name) return null;
-        const created = item.createdAt || item.frozenAt || new Date().toISOString();
-        return {
-          id: item.id || uid(),
-          name: String(item.name),
-          category: CATEGORY_ORDER.includes(item.category) ? item.category : CATEGORY_ORDER[0],
-          quantity: Math.max(1, Number(item.quantity) || 1),
-          createdAt: isDateISO(created) ? created : new Date().toISOString(),
-          frozenAt: isDateISO(item.frozenAt) ? item.frozenAt : (isDateISO(created) ? created.slice(0, 10) : todayISO()),
-          months: 6,
-          notes: String(item.notes || ''),
-          updatedAt: item.updatedAt || new Date().toISOString(),
-          updatedBy: item.updatedBy || '',
-          updatedByName: item.updatedByName || ''
-        };
-      }
-
-      function sanitizeRoomId(v) {
-        return String(v || '').trim().toLowerCase().replace(/[^a-z0-9_-]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
-      }
-
-      function persistSettingsAndMaybeReconnect() {
-        const next = collectSettings();
-        state.settings = next;
-        state.deviceName = next.deviceName;
-        localStorage.setItem(SETTINGS_KEY, JSON.stringify(next));
-        localStorage.setItem(DEVICE_NAME_KEY, state.deviceName);
-        populateSettingsUI();
-        setSubtitle();
-      }
-
-      function shouldAutoConnect() {
-        const s = state.settings || {};
-        const fb = s.fb || {};
-        return !!(s.roomId && fb.apiKey && fb.authDomain && fb.databaseURL && fb.projectId && fb.appId);
-      }
-
-      function fbConfigFromSettings() {
-        const fb = state.settings.fb || {};
-        const keys = ['apiKey', 'authDomain', 'databaseURL', 'projectId', 'appId'];
-        if (!keys.every(k => String(fb[k] || '').trim())) return null;
-        return {
-          apiKey: String(fb.apiKey).trim(),
-          authDomain: String(fb.authDomain).trim(),
-          databaseURL: String(fb.databaseURL).trim(),
-          projectId: String(fb.projectId).trim(),
-          appId: String(fb.appId).trim()
-        };
-      }
-
-      function loadScript(src) {
-        return new Promise((resolve, reject) => {
-          const existing = Array.from(document.scripts).find(s => s.src === src);
-          if (existing && typeof firebase !== 'undefined') return resolve();
-          const s = document.createElement('script');
-          s.src = src;
-          s.async = false;
-          s.onload = () => resolve();
-          s.onerror = () => reject(new Error('Impossible de charger ' + src));
-          document.head.appendChild(s);
-        });
-      }
-
-      function loadFirebaseCompat() {
-        if (typeof firebase !== 'undefined') return Promise.resolve();
-        if (!state.firebaseLoadPromise) {
-          const urls = [
-            'https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js',
-            'https://www.gstatic.com/firebasejs/10.13.2/firebase-database-compat.js'
-          ];
-          state.firebaseLoadPromise = urls.reduce((p, src) => p.then(() => loadScript(src)), Promise.resolve());
-        }
-        return state.firebaseLoadPromise;
-      }
-
-      function ensureFirebaseApp(cfg) {
-        const existing = firebase.apps && firebase.apps.length ? firebase.apps[0] : null;
-        if (!existing) {
-          firebase.initializeApp(cfg);
-          return Promise.resolve(firebase.app());
-        }
-        const current = existing.options || {};
-        const same = ['apiKey', 'authDomain', 'databaseURL', 'projectId', 'appId'].every(key => String(current[key] || '') === String(cfg[key] || ''));
-        if (same) return Promise.resolve(existing);
-        return existing.delete().then(() => { firebase.initializeApp(cfg); return firebase.app(); });
-      }
-
-      async function connectSync() {
-        persistSettingsAndMaybeReconnect();
-        const settings = state.settings;
-        const cfg = fbConfigFromSettings();
-        if (!settings.roomId) { showToast('Ajoute un code de partage'); return; }
-        if (!cfg) { setStatus('Config incomplète', 'error'); showToast('Complète les champs Firebase'); return; }
-        try {
-          setStatus('Connexion...', 'connecting');
-          await loadFirebaseCompat();
-          if (typeof firebase === 'undefined') throw new Error('Firebase non chargé');
-          await ensureFirebaseApp(cfg);
-          if (state.listener && state.db && state.refPath) state.db.ref(state.refPath).off('value', state.listener);
-          state.db = firebase.database();
-          state.refPath = 'freezerRooms/' + settings.roomId + '/items';
-          const ref = state.db.ref(state.refPath);
-          state.listener = snapshot => {
-            const payload = snapshot.val() || {};
-            const remote = Object.keys(payload).map(k => normalizeItem(payload[k])).filter(Boolean).sort(sortItems);
-            if (remote.length) {
-              state.items = remote;
-              localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
-            } else if (state.items.length) {
-              pushToFirebase(true);
-            }
-            renderAll();
-            setStatus('Synchronisé : ' + settings.roomId, 'online');
-          };
-          ref.on('value', state.listener, () => setStatus('Erreur de sync', 'error'));
-          state.syncing = true;
-          setStatus('Synchronisé : ' + settings.roomId, 'online');
-          await pushToFirebase(true);
-          showToast('Connexion Firebase active');
-        } catch (err) {
-          console.error(err);
-          state.syncing = false;
-          setStatus('Erreur de connexion', 'error');
-          showToast('Connexion Firebase impossible');
-        }
-      }
-
-      function disconnectSync() {
-        try {
-          if (state.listener && state.db && state.refPath) state.db.ref(state.refPath).off('value', state.listener);
-        } catch (err) {}
-        state.listener = null;
-        state.syncing = false;
-        setStatus('Hors ligne', 'offline');
-        showToast('Déconnecté de Firebase');
-      }
-
-      function pushToFirebase(force) {
-        if (!state.syncing || !state.db || !state.refPath) return Promise.resolve();
-        const payload = {};
-        state.items.forEach(item => { payload[item.id] = normalizeItem(item); });
-        return state.db.ref(state.refPath).set(payload).then(() => {
-          if (force) setStatus('Synchronisé : ' + state.settings.roomId, 'online');
-        }).catch(err => {
-          console.error(err);
-          setStatus('Sync en erreur', 'error');
-        });
-      }
-
-      function saveSettingsFromUI() {
-        persistSettingsAndMaybeReconnect();
-        setStatus('Config enregistrée', 'offline');
-        showToast('Configuration enregistrée sur cet iPhone');
-      }
-
-      function bindEvents() {
-        els.menuBtn.addEventListener('click', toggleMenu);
-        els.menuSettingsBtn.addEventListener('click', () => { closeMenu(); openSettings(); });
-        els.menuDisconnectBtn.addEventListener('click', () => { closeMenu(); disconnectSync(); });
-        els.homeBtn.addEventListener('click', () => { closeAllSheets(); goHome(); });
-        els.addBtn.addEventListener('click', () => openItemModal());
-        els.searchBtn.addEventListener('click', () => openSearch());
-        els.closeSettingsBtn.addEventListener('click', closeSettings);
-        els.connectBtn.addEventListener('click', connectSync);
-        els.disconnectBtn.addEventListener('click', disconnectSync);
-        els.saveSettingsBtn.addEventListener('click', saveSettingsFromUI);
-        els.closeItemBtn.addEventListener('click', closeItemModal);
-        if (els.cancelItemBtn) els.cancelItemBtn.addEventListener('click', closeItemModal);
-        els.qtyMinus.addEventListener('click', () => adjustModalQty(-1));
-        els.qtyPlus.addEventListener('click', () => adjustModalQty(1));
-        els.closeSearchBtn.addEventListener('click', closeSearchModal);
-        els.searchToDashboardBtn.addEventListener('click', closeSearchModal);
-        els.clearSearchBtn.addEventListener('click', () => {
-          els.searchQuery.value = '';
-          if (els.searchCategory) els.searchCategory.value = 'all';
-          state.searchCategory = 'all';
-          renderSearchCategoryGrid();
-          renderSearchResults();
-        });
-        els.itemForm.addEventListener('submit', saveItemFromForm);
-        els.searchQuery.addEventListener('input', renderSearchResults);
-        if (els.searchCategory) els.searchCategory.addEventListener('change', () => {
-          state.searchCategory = els.searchCategory.value || 'all';
-          renderSearchCategoryGrid();
-          renderSearchResults();
-        });
-        if (els.searchCategoryGrid) els.searchCategoryGrid.addEventListener('click', ev => {
-          const btn = ev.target.closest('[data-search-category]');
-          if (!btn) return;
-          const value = btn.dataset.searchCategory || 'all';
-          const next = value === state.searchCategory ? 'all' : value;
-          state.searchCategory = next;
-          if (els.searchCategory) els.searchCategory.value = next;
-          renderSearchCategoryGrid();
-          renderSearchResults();
-        });
-        [els.fbApiKey, els.fbAuthDomain, els.fbDatabaseURL, els.fbProjectId, els.fbAppId].forEach(input => input.addEventListener('change', persistSettingsDraft));
-        els.roomId.addEventListener('change', persistSettingsDraft);
-        els.deviceName.addEventListener('change', () => { state.deviceName = (els.deviceName.value || '').trim() || defaultDeviceName(); localStorage.setItem(DEVICE_NAME_KEY, state.deviceName); persistSettingsDraft(); });
-        els.categoryGrid.addEventListener('click', e => {
-          const btn = e.target.closest('[data-category]');
-          if (!btn) return;
-          selectCategory(btn.dataset.category);
-        });
-        document.addEventListener('keydown', e => {
-          if (e.key === 'Escape') closeAllSheets();
-        });
-        document.addEventListener('click', e => {
-          if (!els.menuPopover.contains(e.target) && !els.menuBtn.contains(e.target)) closeMenu();
-        });
-        els.backdrop.addEventListener('click', closeAllSheets);
-      }
-
-      function closeAllSheets() {
-        closeMenu();
-        closeSettings();
-        closeItemModal();
-        closeSearchModal();
-      }
-
-      function populateSearchSelect() {
-        if (!els.searchCategory) return;
-        els.searchCategory.innerHTML = '<option value="all">Toutes catégories</option>' + CATEGORY_ORDER.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
-      }
-
-      function renderSearchCategoryGrid() {
-        if (!els.searchCategoryGrid) return;
-        const current = state.searchCategory || 'all';
-        const btns = [
-          { value: 'all', label: 'Toutes', cls: 'cat-all' },
-          ...CATEGORY_ORDER.map(c => ({ value: c, label: c, cls: (CATEGORY_META[c] && CATEGORY_META[c].cls) || '' }))
-        ];
-        els.searchCategoryGrid.innerHTML = btns.map(({ value, label, cls }) => {
-          const active = current === value ? ' active' : '';
-          const swatch = value === 'all' ? '<span class="swatch" style="background: linear-gradient(135deg, var(--blue), var(--blue2));"></span>' : '<span class="swatch"></span>';
-          return `<button type="button" class="category-btn ${cls}${active}" data-search-category="${esc(value)}">${swatch}<span>${esc(label)}</span></button>`;
-        }).join('');
-      }
-
-      function renderAll() {
-        const counts = {
-          all: state.items.length,
-          soon: state.items.filter(it => { const a = ageDays(it); return a >= SOON_DAYS && a < SHELF_LIFE_DAYS; }).length,
-          overdue: state.items.filter(it => ageDays(it) >= SHELF_LIFE_DAYS).length
-        };
-        els.statItems.textContent = String(counts.all);
-        els.statSoon.textContent = String(counts.soon);
-        els.statOverdue.textContent = String(counts.overdue);
-        els.listTitle.textContent = scopeTitle(state.scope);
-        const scoped = getScopedItems();
-        els.listCount.textContent = scoped.length + ' article' + (scoped.length > 1 ? 's' : '');
-        els.list.innerHTML = scoped.length ? scoped.map(renderItemCard).join('') : '<div class="empty">Aucun article dans cette vue. Appuie sur <strong>Ajouter</strong>.</div>';
-        bindItemActions(els.list);
+    function bindEvents() {
+      els.menuBtn.addEventListener('click', toggleMenu);
+      els.backdrop.addEventListener('click', closeAllSheets);
+      els.filterAll.addEventListener('click', () => setScope('all'));
+      els.filterSoon.addEventListener('click', () => setScope('soon'));
+      els.filterOverdue.addEventListener('click', () => setScope('overdue'));
+      els.scopeChips.addEventListener('click', e => {
+        const chip = e.target.closest('[data-scope]'); if (!chip) return;
+        const next = chip.dataset.scope === state.scope ? 'all' : chip.dataset.scope;
+        setScope(next);
+      });
+      els.addBtn.addEventListener('click', () => openItem(null));
+      els.searchBtn.addEventListener('click', () => openSearch());
+      els.closeSettingsBtn.addEventListener('click', closeSettings);
+      els.closeItemBtn.addEventListener('click', closeItem);
+      els.closeSearchBtn.addEventListener('click', closeSearch);
+      els.saveSettingsBtn.addEventListener('click', saveSettings);
+      els.connectBtn.addEventListener('click', connectSync);
+      els.disconnectBtn.addEventListener('click', disconnectSync);
+      els.qtyMinus.addEventListener('click', () => adjustQty(-1));
+      els.qtyPlus.addEventListener('click', () => adjustQty(1));
+      els.saveItemBtn.addEventListener('click', saveItem);
+      els.clearSearchBtn.addEventListener('click', () => { els.searchQuery.value = ''; state.searchCategory = 'all'; renderSearchCategoryGrid(); renderSearchResults(); });
+      els.searchQuery.addEventListener('input', renderSearchResults);
+      els.searchCategoryGrid.addEventListener('click', e => {
+        const btn = e.target.closest('[data-search-cat]'); if (!btn) return;
+        const next = btn.dataset.searchCat === state.searchCategory ? 'all' : btn.dataset.searchCat;
+        state.searchCategory = next;
+        renderSearchCategoryGrid();
         renderSearchResults();
-      }
+      });
+      els.categoryGrid.addEventListener('click', e => {
+        const btn = e.target.closest('[data-cat]'); if (!btn) return;
+        selectCategory(btn.dataset.cat);
+      });
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAllSheets(); });
+    }
 
-      function renderSearchResults() {
-        state.searchQuery = els.searchQuery.value || '';
-        if (els.searchCategory) state.searchCategory = els.searchCategory.value || state.searchCategory || 'all';
-        let items = state.items.slice();
-        const q = state.searchQuery.trim().toLowerCase();
-        if (q) items = items.filter(it => [it.name, it.category, it.notes].join(' ').toLowerCase().includes(q));
-        if (state.searchCategory !== 'all') items = items.filter(it => it.category === state.searchCategory);
-        items.sort(sortItems);
-        els.searchCount.textContent = items.length + ' résultat' + (items.length > 1 ? 's' : '');
-        els.searchResults.innerHTML = items.length ? items.map(renderItemCard).join('') : '<div class="empty">Aucun résultat.</div>';
-        bindItemActions(els.searchResults);
-      }
+    function setScope(scope) {
+      state.scope = scope;
+      document.querySelectorAll('.chip[data-scope]').forEach(ch => ch.classList.toggle('active', ch.dataset.scope === scope));
+      els.filterAll.classList.toggle('active', scope === 'all');
+      els.filterSoon.classList.toggle('active', scope === 'soon');
+      els.filterOverdue.classList.toggle('active', scope === 'overdue');
+      renderAll();
+    }
 
-      window.__freezerApp = { openSettings, closeSettings, connectSync, disconnectSync, openItemModal, closeItemModal };
+    function closeAllSheets() {
+      closeMenu();
+      closeSettings();
+      closeItem();
+      closeSearch();
+    }
 
-      // Fix toggles on filter cards
-      els.scopeAll.addEventListener('click', () => setScope('all'));
-      els.scopeSoon.addEventListener('click', () => setScope('soon'));
-      els.scopeOverdue.addEventListener('click', () => setScope('overdue'));
+    window.app = {
+      toggleMenu,
+      openSettings,
+      closeSettings,
+      connectSync,
+      disconnectSync,
+      saveSettings,
+      openItem,
+      closeItem,
+      openSearch,
+      closeSearch,
+      saveItem
+    };
 
-      // init alert on backdrop click? handled via closeAllSheets
-    })();
-  </script>
+    // extra robust hooks
+    els.menuBtn.onclick = () => toggleMenu();
+    document.getElementById('menuSettingsBtn').onclick = () => openSettings();
+    document.getElementById('menuDisconnectBtn').onclick = () => disconnectSync();
+
+    if (shouldAutoConnect()) connectSync();
+  })();
+</script>
 </body>
 </html>
