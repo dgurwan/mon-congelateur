@@ -189,13 +189,13 @@
 
   <div class="backdrop" id="backdrop"></div>
 
-  <div class="menu" id="menuPopover" aria-hidden="true">
+  <div class="menu" id="menuPopover">
     <div class="menu-title">Menu</div>
     <button class="menu-item" id="menuSettingsBtn" type="button">⚙️ <span>Paramètres</span></button>
     <button class="menu-item danger" id="menuDisconnectBtn" type="button">⎋ <span>Déconnexion</span></button>
   </div>
 
-  <section class="sheet" id="settingsSheet" aria-hidden="true">
+  <section class="sheet" id="settingsSheet">
     <div class="sheet-inner">
       <div class="sheet-header">
         <h3>Paramètres Firebase</h3>
@@ -236,7 +236,7 @@
     </div>
   </section>
 
-  <section class="sheet" id="itemSheet" aria-hidden="true">
+  <section class="sheet" id="itemSheet">
     <div class="sheet-inner">
       <div class="sheet-header">
         <h3 id="itemTitle">Ajouter un article</h3>
@@ -273,7 +273,7 @@
     </div>
   </section>
 
-  <section class="sheet" id="searchSheet" aria-hidden="true">
+  <section class="sheet" id="searchSheet">
     <div class="sheet-inner">
       <div class="sheet-header">
         <h3>Rechercher</h3>
@@ -307,7 +307,7 @@
   (() => {
     'use strict';
 
-    const APP_VERSION = 'v2';
+    const APP_VERSION = 'v3';
     const STORAGE_KEY = 'freezer-items-v2';
     const SETTINGS_KEY = 'freezer-settings-v2';
     const DEVICE_KEY = 'freezer-device-id-v2';
@@ -589,19 +589,24 @@
       els.menuPopover.classList.remove('open');
       if (![els.settingsSheet, els.itemSheet, els.searchSheet].some(s => s.classList.contains('open'))) els.backdrop.classList.remove('show');
     }
-    function toggleMenu() { if (els.menuPopover.classList.contains('open')) closeMenu(); else openMenu(); }
+    function toggleMenu() {
+      if (els.menuPopover.classList.contains('open')) closeMenu(); else openMenu();
+    }
 
-    function openSheet(sheet) {
+    function openSheet(sheet, focusEl) {
+      const active = document.activeElement;
+      if (active && els.menuPopover.contains(active)) active.blur();
       closeMenu();
       els.backdrop.classList.add('show');
       sheet.classList.add('open');
+      if (focusEl) setTimeout(() => focusEl.focus(), 50);
     }
     function closeSheet(sheet) {
       sheet.classList.remove('open');
       if (![els.settingsSheet, els.itemSheet, els.searchSheet].some(s => s.classList.contains('open'))) els.backdrop.classList.remove('show');
     }
 
-    function openSettings() { populateSettingsUI(); openSheet(els.settingsSheet); setTimeout(() => els.roomId.focus(), 50); }
+    function openSettings() { populateSettingsUI(); openSheet(els.settingsSheet, els.roomId); }
     function closeSettings() { closeSheet(els.settingsSheet); }
 
     function openItem(item) {
@@ -614,8 +619,7 @@
       els.itemNotes.value = item ? item.notes : '';
       els.qtyValue.textContent = String(state.modal.qty);
       renderCategoryGrid();
-      openSheet(els.itemSheet);
-      setTimeout(() => els.itemName.focus(), 50);
+      openSheet(els.itemSheet, els.itemName);
     }
     function closeItem() { closeSheet(els.itemSheet); }
     function adjustQty(delta) { state.modal.qty = Math.max(1, (state.modal.qty || 1) + delta); els.qtyValue.textContent = String(state.modal.qty); }
@@ -626,8 +630,7 @@
       els.searchQuery.value = '';
       renderSearchCategoryGrid();
       renderSearchResults();
-      openSheet(els.searchSheet);
-      setTimeout(() => els.searchQuery.focus(), 50);
+      openSheet(els.searchSheet, els.searchQuery);
     }
     function closeSearch() { closeSheet(els.searchSheet); }
 
