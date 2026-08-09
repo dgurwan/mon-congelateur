@@ -28,7 +28,7 @@
     html, body { margin: 0; padding: 0; min-height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
     button, input, textarea { font: inherit; }
     button { cursor: pointer; }
-    .app { width: min(100%, 1080px); margin: 0 auto; padding: calc(10px + var(--safe-top)) 10px calc(18px + var(--safe-bottom)); }
+    .app { width: min(100%, 1080px); margin: 0 auto; padding: calc(10px + var(--safe-top)) 10px calc(104px + var(--safe-bottom)); }
     .topbar {
       display:flex; align-items:center; justify-content:space-between; gap:12px;
       padding: 12px 10px 10px; position: sticky; top: 0; z-index: 1000;
@@ -89,11 +89,46 @@
     .qty-stepper { display:flex; align-items:center; gap:8px; }
     .qty-pill { min-width:38px; text-align:center; font-weight:900; }
     .qty-btn { width:42px; height:42px; border-radius:14px; border:1px solid var(--line); background:#fff; display:grid; place-items:center; font-weight:900; }
-    .menu { position:fixed; top: calc(62px + var(--safe-top)); right:10px; width:min(280px, calc(100vw - 20px)); z-index:2600; background: var(--panel-solid); border:1px solid var(--line); border-radius:20px; box-shadow: var(--shadow); padding:10px; display:none; }
+.swatch { width:10px; height:10px; border-radius:999px; background: var(--blue); flex:0 0 auto; }
+.cat-viande .swatch, .cat-btn.cat-viande .swatch { background:#ef4444; }
+.cat-poisson .swatch, .cat-btn.cat-poisson .swatch { background:#38bdf8; }
+.cat-legumes .swatch, .cat-btn.cat-legumes .swatch { background:#22c55e; }
+.cat-plats-cuisines .swatch, .cat-btn.cat-plats-cuisines .swatch { background:#a855f7; }
+.cat-dessert .swatch, .cat-btn.cat-dessert .swatch { background:#f97316; }
+.cat-produits-laitiers .swatch, .cat-btn.cat-produits-laitiers .swatch { background:#14b8a6; }
+.category-grid .cat-btn { justify-content:flex-start; text-align:left; padding-left:12px; }
+.category-grid .cat-btn.active { outline-color: rgba(10,132,255,.26); }
+.bottom-tabs {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: calc(10px + var(--safe-bottom));
+      width: min(100%, 1080px);
+      z-index: 3500;
+      padding: 0 10px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      pointer-events: none;
+    }
+    .bottom-tab {
+      pointer-events: auto;
+      min-height: 56px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.96);
+      border-radius: 18px;
+      box-shadow: 0 12px 28px rgba(15,23,42,.10);
+      font-weight: 900;
+      color: var(--muted);
+    }
+    .bottom-tab.active { color: var(--text); outline: 2px solid rgba(10,132,255,.18); }
+    .menu { position:fixed; top: calc(62px + var(--safe-top)); left:10px; width:min(280px, calc(100vw - 20px)); z-index:2600; background: var(--panel-solid); border:1px solid var(--line); border-radius:20px; box-shadow: var(--shadow); padding:10px; display:none; }
     .menu.open { display:grid; gap:8px; }
     .menu-title { color:var(--muted); text-transform:uppercase; letter-spacing:.12em; font-size:.75rem; font-weight:900; padding:2px 6px 0; }
     .menu-item { width:100%; text-align:left; border:1px solid var(--line); background:#fff; border-radius:16px; padding:12px; font-weight:800; display:flex; align-items:center; gap:10px; }
     .menu-item.danger { color: var(--red); background:#fff5f5; }
+    .menu-item.version { color: var(--muted); background: #f8fafc; justify-content: space-between; }
+    .menu-item.version strong { color: var(--text); }
     .backdrop { position:fixed; inset:0; background: rgba(15,23,42,.18); z-index:2500; display:none; }
     .backdrop.show { display:block; }
     .sheet { position:fixed; inset:0; z-index:3000; display:none; background:#fff; overflow:auto; -webkit-overflow-scrolling: touch; }
@@ -117,6 +152,14 @@
     .qty-row .qty-btn { flex:1 1 0; height:48px; font-size:1.4rem; background:#fff; }
     .qty-row .qty-btn.add { background: linear-gradient(180deg, #22c55e, #16a34a); color:#fff; border-color: transparent; }
     .search-top { margin-top:10px; }
+
+    .cat-btn.cat-viande { background:#fff5f5; }
+    .cat-btn.cat-poisson { background:#eff8ff; }
+    .cat-btn.cat-legumes { background:#f0fdf4; }
+    .cat-btn.cat-plats-cuisines { background:#faf5ff; }
+    .cat-btn.cat-dessert { background:#fff7ed; }
+    .cat-btn.cat-produits-laitiers { background:#f0fdfa; }
+    .cat-btn .swatch { background: var(--blue); }
     .toast { position:fixed; left:50%; transform: translateX(-50%); bottom:16px; z-index:4000; min-width:min(360px, calc(100vw - 20px)); background: rgba(15,23,42,.94); color:#fff; border-radius:16px; padding:12px 14px; text-align:center; box-shadow:0 18px 40px rgba(0,0,0,.2); display:none; }
     .toast.show { display:block; }
     .empty { padding:16px; text-align:center; color:var(--muted); border:1px dashed rgba(15,23,42,.14); border-radius:18px; background:#fff; }
@@ -124,23 +167,86 @@
       .app { padding-left:8px; padding-right:8px; }
       .summary-grid, .filters, .category-grid, .form-grid, .actions-row { grid-template-columns: 1fr; }
       .item-actions { align-items:flex-start; }
-      .menu { right:8px; left:8px; width:auto; }
+      .menu { left:8px; right:8px; width:auto; }
+      .bottom-tabs { left:8px; right:8px; width:auto; }
+    }
+
+    /* v9 - mobile app layout */
+    .app { max-width: 1180px; padding: calc(8px + var(--safe-top)) 12px calc(104px + var(--safe-bottom)); }
+    .topbar { display:grid; grid-template-columns:48px minmax(0,1fr) 48px; align-items:center; padding:8px 4px 12px; background:rgba(243,246,251,.96); }
+    .brand { text-align:center; min-width:0; }
+    .brand h1 { font-size:clamp(1.25rem,3vw,1.7rem); }
+    .brand .sub { display:flex; justify-content:center; align-items:center; gap:6px; font-weight:700; }
+    .status-dot { width:8px; height:8px; border-radius:50%; background:#94a3b8; display:inline-block; }
+    .status-dot.online { background:var(--green); }
+    .status-dot.pending { background:var(--orange); }
+    .top-menu-btn, .top-settings-btn { box-shadow:none; background:transparent; border-color:transparent; }
+    .summary-grid, .section:has(#scopeChips), .actions-row { display:none; }
+    #categorySection { display:none; }
+    body.categories-view #categorySection { display:block; }
+    .section { margin-top:8px; padding:0; border:0; background:transparent; box-shadow:none; }
+    .section > .section-head { padding:4px 2px 8px; }
+    .list { gap:10px; }
+    .item { display:grid; grid-template-columns:minmax(0,1fr) 72px; padding:0 0 0 7px; border-radius:20px; min-height:156px; }
+    .item::before { width:7px; }
+    .item-top { display:contents; }
+    .item-top > div:first-child { padding:16px 14px 4px 16px; min-width:0; }
+    .item-title { font-size:1.05rem; }
+    .item-meta { gap:7px; }
+    .badge { padding:5px 9px; }
+    .badge.cat { color:#475569; }
+    .cat-viande .badge.cat { background:#fee2e2; color:#b91c1c; }
+    .cat-poisson .badge.cat { background:#e0f2fe; color:#0369a1; }
+    .cat-legumes .badge.cat { background:#dcfce7; color:#15803d; }
+    .cat-plats-cuisines .badge.cat { background:#f3e8ff; color:#7e22ce; }
+    .cat-dessert .badge.cat { background:#ffedd5; color:#c2410c; }
+    .cat-produits-laitiers .badge.cat { background:#ccfbf1; color:#0f766e; }
+    .meta-actions { grid-column:2; grid-row:1 / span 3; height:100%; border-left:1px solid var(--line); padding:12px 10px; display:grid; grid-template-rows:1fr 1fr; gap:10px; align-items:stretch; }
+    .meta-actions .mini { width:100%; height:100%; min-height:54px; border:0; color:#fff; border-radius:16px; }
+    .meta-actions .mini svg { width:22px; height:22px; }
+    .action-edit { background:linear-gradient(180deg,#168bff,#0878e8) !important; }
+    .action-delete { background:linear-gradient(180deg,#ff3131,#e91620) !important; }
+    .item-sub { grid-column:1; padding:0 14px 4px 16px; margin:0; }
+    .item-actions { grid-column:1; padding:4px 14px 14px 16px; margin:0; }
+    .qty-stepper { gap:10px; }
+    .qty-btn { width:44px; height:44px; }
+    .qty-pill { min-width:34px; font-size:1rem; }
+    .bottom-tabs { bottom:calc(8px + var(--safe-bottom)); padding:8px 10px; gap:0; background:rgba(255,255,255,.97); border:1px solid var(--line); border-radius:24px; box-shadow:0 12px 32px rgba(15,23,42,.12); }
+    .bottom-tab { min-height:58px; border:0; box-shadow:none; background:transparent; border-radius:16px; display:flex; flex-direction:column; gap:3px; align-items:center; justify-content:center; font-size:.74rem; }
+    .bottom-tab.active { color:var(--blue); outline:0; }
+    .tab-icon { font-size:1.2rem; line-height:1; }
+    .fab { position:fixed; right:max(18px, calc((100vw - 1180px)/2 + 18px)); bottom:calc(82px + var(--safe-bottom)); z-index:3600; width:58px; height:58px; border:0; border-radius:50%; background:linear-gradient(180deg,#168bff,#0878e8); color:#fff; font-size:2rem; line-height:1; box-shadow:0 14px 30px rgba(10,132,255,.30); }
+    .menu { left:max(12px, calc((100vw - 1180px)/2 + 12px)); right:auto; }
+    @media (min-width: 760px) {
+      .list { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .item { min-height:170px; }
+      .category-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+      .sheet { inset:5vh 8vw; border-radius:26px; box-shadow:0 28px 70px rgba(15,23,42,.24); }
+    }
+    @media (min-width: 1100px) { .list { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+    @media (max-width: 430px) {
+      .app { padding-left:8px; padding-right:8px; }
+      .item { grid-template-columns:minmax(0,1fr) 64px; }
+      .item-top > div:first-child { padding-left:13px; padding-right:10px; }
+      .item-sub, .item-actions { padding-left:13px; padding-right:10px; }
+      .meta-actions { padding:10px 8px; }
+      .badge { font-size:.7rem; padding:5px 7px; }
     }
   </style>
 </head>
 <body>
   <div class="app">
     <header class="topbar">
+      <button class="icon-btn top-menu-btn" id="menuBtn" type="button" aria-label="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg>
+      </button>
       <div class="brand">
-        <h1>Mon Congélateur</h1>
-        <div class="sub" id="statusLine">Hors ligne</div>
+        <h1>Mon congélateur</h1>
+        <div class="sub"><span class="status-dot" id="statusDot"></span><span id="statusLine">Hors ligne</span></div>
       </div>
-      <div class="top-right">
-        <span class="version-badge" id="versionBadge">v4</span>
-        <button class="icon-btn" id="menuBtn" type="button" aria-label="Menu">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg>
-        </button>
-      </div>
+      <button class="icon-btn top-settings-btn" id="topSettingsBtn" type="button" aria-label="Paramètres">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21h-4v-.1A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3v-4h.1A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.1A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.18.37.47.7.83.92.34.2.73.31 1.12.31H21v4h-.1c-.4 0-.78.11-1.12.31-.36.22-.65.55-.83.92Z"/></svg>
+      </button>
     </header>
 
     <section class="summary-grid">
@@ -178,6 +284,22 @@
       <button class="btn secondary" id="searchBtn" type="button">⌕ Rechercher</button>
     </section>
 
+    <section class="section" id="categorySection">
+      <div class="section-head">
+        <h2>Catégories</h2>
+        <div class="small" id="categoryLabel">Toutes les catégories</div>
+      </div>
+      <div class="category-grid" id="categoryButtons"></div>
+    </section>
+
+    <button class="fab" id="fabAddBtn" type="button" aria-label="Ajouter un article">＋</button>
+
+    <nav class="bottom-tabs" id="bottomTabs" aria-label="Navigation principale">
+      <button class="bottom-tab active" type="button" data-tab="inventory"><span class="tab-icon">▣</span><span>Inventaire</span></button>
+      <button class="bottom-tab" type="button" data-tab="soon"><span class="tab-icon">◷</span><span>À consommer</span></button>
+      <button class="bottom-tab" type="button" data-tab="categories"><span class="tab-icon">☷</span><span>Catégories</span></button>
+    </nav>
+
     <section class="section">
       <div class="section-head">
         <h3 id="listTitle">Tous les articles</h3>
@@ -191,7 +313,7 @@
 
   <div class="menu" id="menuPopover">
     <div class="menu-title">Menu</div>
-    <button class="menu-item" id="menuSettingsBtn" type="button">⚙️ <span>Paramètres</span></button>
+    <div class="menu-item version" id="menuVersionItem">Version <strong>v9</strong></div>
     <button class="menu-item danger" id="menuDisconnectBtn" type="button">⎋ <span>Déconnexion</span></button>
   </div>
 
@@ -307,7 +429,7 @@
   (() => {
     'use strict';
 
-    const APP_VERSION = 'v4';
+    const APP_VERSION = 'v9';
     const STORAGE_KEY = 'freezer-items-v2';
     const SETTINGS_KEY = 'freezer-settings-v2';
     const DEVICE_KEY = 'freezer-device-id-v2';
@@ -333,10 +455,11 @@
 
     const els = {
       statusLine: document.getElementById('statusLine'),
-      versionBadge: document.getElementById('versionBadge'),
       menuBtn: document.getElementById('menuBtn'),
+      topSettingsBtn: document.getElementById('topSettingsBtn'),
+      fabAddBtn: document.getElementById('fabAddBtn'),
+      statusDot: document.getElementById('statusDot'),
       menuPopover: document.getElementById('menuPopover'),
-      menuSettingsBtn: document.getElementById('menuSettingsBtn'),
       menuDisconnectBtn: document.getElementById('menuDisconnectBtn'),
       backdrop: document.getElementById('backdrop'),
       filterAll: document.getElementById('filterAll'),
@@ -350,6 +473,10 @@
       countSoon: document.getElementById('countSoon'),
       countOverdue: document.getElementById('countOverdue'),
       list: document.getElementById('list'),
+      categorySection: document.getElementById('categorySection'),
+      categoryLabel: document.getElementById('categoryLabel'),
+      categoryButtons: document.getElementById('categoryButtons'),
+      bottomTabs: document.getElementById('bottomTabs'),
       addBtn: document.getElementById('addBtn'),
       searchBtn: document.getElementById('searchBtn'),
       settingsSheet: document.getElementById('settingsSheet'),
@@ -402,11 +529,11 @@
     };
 
     state.deviceName = state.settings.deviceName || localStorage.getItem(DEVICE_NAME_KEY) || defaultDeviceName();
-    els.versionBadge.textContent = APP_VERSION;
 
     populateSettingsUI();
     renderCategoryGrid();
     renderSearchCategoryGrid();
+    renderCategoryButtons();
     renderAll();
     setStatus('Hors ligne');
     bindEvents();
@@ -445,6 +572,11 @@
     function setStatus(text) {
       els.statusLine.textContent = text;
       els.firebaseSummary.textContent = text;
+      if (els.statusDot) {
+        const online = /^Synchronisé/.test(text);
+        const pending = /Connexion/.test(text);
+        els.statusDot.className = 'status-dot' + (online ? ' online' : pending ? ' pending' : '');
+      }
     }
 
     function todayISO() { return new Date().toISOString().slice(0, 10); }
@@ -575,6 +707,18 @@
       }).join('');
     }
 
+    function renderCategoryButtons() {
+      const current = state.categoryFilter || 'all';
+      const items = [{ value: 'all', label: 'Toutes', cls: 'cat-all' }, ...CATEGORY_ORDER.map(c => ({ value: c, label: c, cls: (CATEGORY_META[c] && CATEGORY_META[c].cls) || '' }))];
+      if (!els.categoryButtons) return;
+      els.categoryButtons.innerHTML = items.map(({ value, label, cls }) => {
+        const active = current === value ? ' active' : '';
+        const colorClass = value === 'all' ? '' : cls;
+        return `<button type="button" class="cat-btn ${colorClass}${active}" data-filter-cat="${esc(value)}"><span class="swatch"></span><span>${esc(label)}</span></button>`;
+      }).join('');
+      if (els.categoryLabel) els.categoryLabel.textContent = current === 'all' ? 'Toutes les catégories' : current;
+    }
+
     function renderSearchCategoryGrid() {
       const current = state.searchCategory || 'all';
       els.searchCategoryGrid.innerHTML = [{ value: 'all', label: 'Toutes', cls: 'cat-all' }, ...CATEGORY_ORDER.map(c => ({ value: c, label: c, cls: (CATEGORY_META[c] && CATEGORY_META[c].cls) || '' }))].map(({ value, label, cls }) => {
@@ -609,10 +753,10 @@
     }
 
     function openSettings() {
-      console.log('[Freezer v4] openSettings()');
+      console.log('[Freezer v9] openSettings()');
       populateSettingsUI();
       openSheet(els.settingsSheet, els.roomId);
-      console.log('[Freezer v4] settingsSheet ouvert');
+      console.log('[Freezer v9] settingsSheet ouvert');
     }
     function closeSettings() { closeSheet(els.settingsSheet); }
 
@@ -654,6 +798,8 @@
       const scoped = getScopedItems();
       els.listCount.textContent = scoped.length + ' article' + (scoped.length > 1 ? 's' : '');
       els.listLabel.textContent = scopeTitle(state.scope);
+      renderCategoryButtons();
+      updateBottomTabs();
       els.list.innerHTML = scoped.length ? scoped.map(renderItemCard).join('') : '<div class="empty">Aucun article dans cette vue. Appuie sur <strong>Ajouter</strong>.</div>';
       bindItemActions(els.list);
       renderSearchResults();
@@ -672,12 +818,25 @@
 
     function sortItems(a, b) { return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(); }
     function getScopedItems() {
-      const items = state.items.slice();
-      if (state.scope === 'soon') return items.filter(it => { const a = ageDays(it); return a >= SOON_DAYS && a < SHELF_LIFE_DAYS; }).sort(sortItems);
-      if (state.scope === 'overdue') return items.filter(it => ageDays(it) >= SHELF_LIFE_DAYS).sort(sortItems);
+      let items = state.items.slice();
+      if (state.scope === 'soon') items = items.filter(it => { const a = ageDays(it); return a >= SOON_DAYS && a < SHELF_LIFE_DAYS; });
+      if (state.scope === 'overdue') items = items.filter(it => ageDays(it) >= SHELF_LIFE_DAYS);
+      if (state.categoryFilter !== 'all') items = items.filter(it => it.category === state.categoryFilter);
       return items.sort(sortItems);
     }
     function scopeTitle(scope) { return scope === 'soon' ? 'À consommer' : scope === 'overdue' ? 'Date dépassée' : 'Tous les articles'; }
+
+    function updateBottomTabs() {
+      const active = state.navTab || 'inventory';
+      document.querySelectorAll('.bottom-tab[data-tab]').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === active));
+    }
+
+    function setCategoryFilter(cat) {
+      state.categoryFilter = CATEGORY_ORDER.includes(cat) ? cat : 'all';
+      state.navTab = 'categories';
+      renderCategoryButtons();
+      renderAll();
+    }
 
     function renderItemCard(item) {
       const meta = CATEGORY_META[item.category] || { cls: '' };
@@ -702,7 +861,7 @@
               </button>
             </div>
           </div>
-          <div class="item-sub">Quantité : <strong>${item.quantity}</strong> · ${esc(item.notes || 'Aucune note')}</div>
+          <div class="item-sub">${esc(item.notes || 'Aucune note')}</div>
           <div class="item-actions">
             <div class="qty-stepper">
               <button class="qty-btn action-qty-minus" type="button" data-id="${esc(item.id)}">−</button>
@@ -770,16 +929,11 @@
 
     function bindEvents() {
       els.menuBtn.addEventListener('click', toggleMenu);
-      if (els.menuSettingsBtn) {
-        els.menuSettingsBtn.addEventListener('click', () => {
-          console.log('[Freezer v4] click Paramètres');
-          closeMenu();
-          openSettings();
-        });
-      }
+      if (els.topSettingsBtn) els.topSettingsBtn.addEventListener('click', openSettings);
+      if (els.fabAddBtn) els.fabAddBtn.addEventListener('click', () => openItem(null));
       if (els.menuDisconnectBtn) {
         els.menuDisconnectBtn.addEventListener('click', () => {
-          console.log('[Freezer v4] click Déconnexion');
+          console.log('[Freezer v9] click Déconnexion');
           closeMenu();
           disconnectSync();
         });
@@ -817,11 +971,24 @@
         const btn = e.target.closest('[data-cat]'); if (!btn) return;
         selectCategory(btn.dataset.cat);
       });
+      els.categoryButtons.addEventListener('click', e => {
+        const btn = e.target.closest('[data-filter-cat]'); if (!btn) return;
+        setCategoryFilter(btn.dataset.filterCat);
+      });
+      els.bottomTabs.addEventListener('click', e => {
+        const btn = e.target.closest('[data-tab]'); if (!btn) return;
+        const tab = btn.dataset.tab;
+        state.navTab = tab;
+        if (tab === 'inventory') { document.body.classList.remove('categories-view'); state.scope = 'all'; renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        else if (tab === 'soon') { document.body.classList.remove('categories-view'); state.scope = 'soon'; renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        else if (tab === 'categories') { document.body.classList.add('categories-view'); renderAll(); document.getElementById('categorySection')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+      });
       document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAllSheets(); });
     }
 
     function setScope(scope) {
       state.scope = scope;
+      state.navTab = scope === 'soon' ? 'soon' : 'inventory';
       document.querySelectorAll('.chip[data-scope]').forEach(ch => ch.classList.toggle('active', ch.dataset.scope === scope));
       els.filterAll.classList.toggle('active', scope === 'all');
       els.filterSoon.classList.toggle('active', scope === 'soon');
@@ -895,7 +1062,6 @@
         ref.on('value', state.listener, () => setStatus('Erreur de sync'));
         state.syncing = true;
         setStatus('Synchronisé : ' + settings.roomId);
-        await pushToFirebase(true);
         toast('Connexion Firebase active');
       } catch (err) {
         console.error(err);
@@ -911,6 +1077,11 @@
       } catch (err) {}
       state.listener = null;
       state.syncing = false;
+      state.db = null;
+      state.refPath = '';
+      state.items = [];
+      try { localStorage.removeItem(STORAGE_KEY); } catch (err) {}
+      renderAll();
       setStatus('Hors ligne');
       toast('Déconnecté de Firebase');
     }
@@ -929,7 +1100,11 @@
 
     function saveSettings() {
       persistSettingsDraft();
-      setStatus('Config enregistrée');
+      if (state.syncing && state.settings.roomId) {
+        setStatus('Synchronisé : ' + state.settings.roomId);
+      } else {
+        setStatus('Prêt pour Firebase');
+      }
       toast('Configuration enregistrée sur cet iPhone');
     }
 
