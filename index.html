@@ -55,7 +55,7 @@
       padding: 10px 12px;
       border-radius: 24px;
       background: rgba(242,242,247,.78);
-      backdrop-filter: none;
+      backdrop-filter: blur(18px);
       border: 1px solid rgba(17,24,39,.08);
       box-shadow: 0 10px 26px rgba(15,23,42,.05);
     }
@@ -120,6 +120,20 @@
       font-size: .81rem;
       white-space: nowrap;
     }
+    .version-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 44px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(0,122,255,.12);
+      color: var(--blue);
+      font-weight: 900;
+      font-size: .8rem;
+      letter-spacing: .04em;
+      white-space: nowrap;
+    }
     .dot { width: 10px; height: 10px; border-radius: 999px; background: #94a3b8; }
     .dot.online { background: var(--green); }
     .dot.connecting { background: var(--orange); }
@@ -154,7 +168,7 @@
       border: 1px solid var(--line);
       box-shadow: var(--shadow);
       display: none;
-      z-index: 2900;
+      z-index: 2800;
     }
     .menu-popover.open { display: grid; gap: 8px; }
     .menu-title {
@@ -183,10 +197,9 @@
     .backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(15,23,42,.22);
+      background: rgba(15,23,42,.18);
       display: none;
       z-index: 2500;
-      backdrop-filter: none;
     }
     .shell { padding: 8px 0 22px; display: grid; gap: 12px; }
     .hero {
@@ -412,19 +425,21 @@
       position: fixed;
       left: 50%;
       transform: translateX(-50%);
-      top: 12px;
-      width: min(var(--app-width), calc(100vw - 16px));
-      max-height: calc(100vh - 24px);
+      top: 4px;
+      width: min(760px, calc(100vw - 8px));
+      height: calc(100vh - 8px);
+      max-height: none;
       overflow: auto;
-      z-index: 3000;
+      z-index: 3200;
       display: none;
       padding: 14px;
       border-radius: 28px;
       box-shadow: 0 26px 60px rgba(15,23,42,.18);
       background: #fff;
       border: 1px solid rgba(17,24,39,.08);
+      box-sizing: border-box;
     }
-    .sheet.open, .sheet:target { display: block; }
+    .sheet.open { display: block; }
     .sheet-header {
       position: sticky;
       top: 0;
@@ -436,7 +451,6 @@
       margin: -14px -14px 12px;
       padding: 14px;
       background: #fff;
-      backdrop-filter: none;
       border-bottom: 1px solid rgba(17,24,39,.06);
       border-radius: 28px 28px 0 0;
     }
@@ -506,6 +520,7 @@
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 8px;
     }
+    .search-category-grid { margin-top: 2px; }
     .category-btn {
       border: 1px solid rgba(17,24,39,.10);
       background: #fff;
@@ -573,8 +588,7 @@
       margin-top: 12px;
       padding-top: 10px;
       padding-bottom: calc(10px + env(safe-area-inset-bottom));
-      background: linear-gradient(180deg, rgba(255,255,255,.65), rgba(255,255,255,.96));
-      backdrop-filter: none;
+      background: linear-gradient(180deg, rgba(255,255,255,.82), #fff 24px);
       border-top: 1px solid rgba(17,24,39,.06);
       z-index: 5;
       display: flex;
@@ -727,11 +741,12 @@
         </div>
         <div class="actions-top">
           <span class="chip-status"><span id="syncDot" class="dot"></span><span id="syncStatus">Hors ligne</span></span>
+          <span class="version-badge" id="versionBadge">v12</span>
           <div class="menu-wrap">
             <button class="icon-btn mini-btn" id="menuBtn" type="button" aria-label="Menu">☰</button>
             <div class="menu-popover" id="menuPopover" aria-hidden="true">
               <div class="menu-title">Menu</div>
-              <button class="menu-item" id="menuSettingsBtn" type="button">⚙️ <span>Paramètres</span></button>
+              <button class="menu-item" id="menuSettingsBtn" type="button" onclick="window.__freezerApp && window.__freezerApp.openSettings()">⚙️ <span>Paramètres</span></button>
               <button class="menu-item danger" id="menuDisconnectBtn" type="button" onclick="window.__freezerApp && window.__freezerApp.disconnectSync()">⎋ <span>Déconnexion</span></button>
             </div>
           </div>
@@ -864,10 +879,12 @@
       <label class="full">Recherche
         <input id="searchQuery" placeholder="Nom, catégorie, notes..." />
       </label>
-      <label>Catégorie
-        <select id="searchCategory"></select>
-      </label>
-      <div class="subtle" id="searchCount" style="align-self:end; padding-bottom: 11px;">0 résultat</div>
+      <input id="searchCategory" type="hidden" value="all" />
+      <div class="full">
+        <div class="section-label">Catégorie</div>
+        <div class="category-grid search-category-grid" id="searchCategoryGrid"></div>
+      </div>
+      <div class="subtle full" id="searchCount" style="padding-bottom: 11px;">0 résultat</div>
     </div>
     <div class="search-meta">
       <button class="btn small-btn" id="clearSearchBtn" type="button">Réinitialiser</button>
@@ -888,6 +905,7 @@
       const SETTINGS_KEY = 'freezer-settings-v1';
       const DEVICE_KEY = 'freezer-device-id-v1';
       const DEVICE_NAME_KEY = 'freezer-device-name-v1';
+      const APP_VERSION = 'v12';
       const SHELF_LIFE_DAYS = 180;
       const SOON_DAYS = 150;
       const CATEGORY_ORDER = ['Viande', 'Poisson', 'Légumes', 'Plats cuisinés', 'Dessert', 'Produits laitiers'];
@@ -911,6 +929,7 @@
         subtitle: document.getElementById('subtitle'),
         syncDot: document.getElementById('syncDot'),
         syncStatus: document.getElementById('syncStatus'),
+        versionBadge: document.getElementById('versionBadge'),
         menuBtn: document.getElementById('menuBtn'),
         menuPopover: document.getElementById('menuPopover'),
         menuSettingsBtn: document.getElementById('menuSettingsBtn'),
@@ -961,6 +980,7 @@
         searchToDashboardBtn: document.getElementById('searchToDashboardBtn'),
         searchQuery: document.getElementById('searchQuery'),
         searchCategory: document.getElementById('searchCategory'),
+        searchCategoryGrid: document.getElementById('searchCategoryGrid'),
         searchCount: document.getElementById('searchCount'),
         clearSearchBtn: document.getElementById('clearSearchBtn'),
         searchResults: document.getElementById('searchResults'),
@@ -983,8 +1003,10 @@
         deviceName: ''
       };
       state.deviceName = state.settings.deviceName || localStorage.getItem(DEVICE_NAME_KEY) || defaultDeviceName();
+      if (els.versionBadge) els.versionBadge.textContent = APP_VERSION;
 
       populateSearchSelect();
+      renderSearchCategoryGrid();
       populateSettingsUI();
       renderCategoryGrid();
       renderAll();
@@ -1133,294 +1155,6 @@
         return String(v || '').trim().toLowerCase().replace(/[^a-z0-9_-]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
       }
 
-      function populateSearchSelect() {
-        els.searchCategory.innerHTML = '<option value="all">Toutes catégories</option>' + CATEGORY_ORDER.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
-      }
-
-      function populateSettingsUI() {
-        els.roomId.value = state.settings.roomId || '';
-        els.deviceName.value = state.settings.deviceName || state.deviceName;
-        els.fbApiKey.value = state.settings.fb.apiKey || '';
-        els.fbAuthDomain.value = state.settings.fb.authDomain || '';
-        els.fbDatabaseURL.value = state.settings.fb.databaseURL || '';
-        els.fbProjectId.value = state.settings.fb.projectId || '';
-        els.fbAppId.value = state.settings.fb.appId || '';
-      }
-
-      function renderCategoryGrid() {
-        const current = els.category.value || CATEGORY_ORDER[0];
-        els.categoryGrid.innerHTML = CATEGORY_ORDER.map(c => {
-          const cls = CATEGORY_META[c].cls;
-          return `<button type="button" class="category-btn ${cls}${current === c ? ' active' : ''}" data-category="${esc(c)}"><span class="swatch"></span><span>${esc(c)}</span></button>`;
-        }).join('');
-      }
-
-      function selectCategory(value) {
-        const next = CATEGORY_ORDER.includes(value) ? value : CATEGORY_ORDER[0];
-        els.category.value = next;
-        renderCategoryGrid();
-      }
-
-      function adjustModalQty(delta) {
-        const next = Math.max(1, (Number(els.quantity.value) || 1) + Number(delta || 0));
-        els.quantity.value = String(next);
-        els.qtyValue.textContent = String(next);
-      }
-
-      function collectSettings() {
-        const current = state.settings || loadSettings();
-        function mergeField(currentValue, newValue, fallbackValue) {
-          const v = String(newValue || '').trim();
-          if (v) return v;
-          const c = String(currentValue || '').trim();
-          if (c) return c;
-          return fallbackValue || '';
-        }
-        return {
-          roomId: sanitizeRoomId(mergeField(current.roomId, els.roomId.value, '')),
-          deviceName: mergeField(current.deviceName, els.deviceName.value, state.deviceName || defaultDeviceName()),
-          fb: {
-            apiKey: mergeField(current.fb.apiKey, els.fbApiKey.value, DEFAULT_FIREBASE_CONFIG.apiKey),
-            authDomain: mergeField(current.fb.authDomain, els.fbAuthDomain.value, DEFAULT_FIREBASE_CONFIG.authDomain),
-            databaseURL: mergeField(current.fb.databaseURL, els.fbDatabaseURL.value, DEFAULT_FIREBASE_CONFIG.databaseURL),
-            projectId: mergeField(current.fb.projectId, els.fbProjectId.value, DEFAULT_FIREBASE_CONFIG.projectId),
-            appId: mergeField(current.fb.appId, els.fbAppId.value, DEFAULT_FIREBASE_CONFIG.appId)
-          }
-        };
-      }
-
-      function persistSettingsDraft() {
-        const next = collectSettings();
-        state.settings = next;
-        state.deviceName = next.deviceName || defaultDeviceName();
-        localStorage.setItem(SETTINGS_KEY, JSON.stringify(next));
-        localStorage.setItem(DEVICE_NAME_KEY, state.deviceName);
-        setSubtitle();
-      }
-
-      function setSubtitle() {
-        els.subtitle.textContent = state.syncing && state.settings.roomId ? ('Connecté à ' + state.settings.roomId) : 'Dashboard du congélateur';
-      }
-
-      function setStatus(text, mode) {
-        els.syncStatus.textContent = text;
-        els.syncDot.className = 'dot ' + mode;
-        if (mode === 'online') els.firebaseSummary.textContent = 'Firebase connecté sur ' + (state.settings.roomId || 'ce compte') + '.';
-        else if (mode === 'connecting') els.firebaseSummary.textContent = 'Connexion Firebase en cours...';
-        else if (mode === 'error') els.firebaseSummary.textContent = 'Connexion Firebase à vérifier.';
-        else els.firebaseSummary.textContent = 'Firebase prêt à être configuré.';
-        setSubtitle();
-      }
-
-      function openBackdrop() { els.backdrop.style.display = 'block'; document.body.classList.add('modal-open'); }
-      function closeBackdropIfIdle() {
-        if (![els.menuPopover, els.settingsSheet, els.itemSheet, els.searchSheet].some(el => el.classList.contains('open'))) {
-          els.backdrop.style.display = 'none';
-          document.body.classList.remove('modal-open');
-        }
-      }
-
-      function openMenu() { els.menuPopover.classList.add('open'); openBackdrop(); }
-      function closeMenu() { els.menuPopover.classList.remove('open'); closeBackdropIfIdle(); }
-      function toggleMenu() { if (els.menuPopover.classList.contains('open')) closeMenu(); else openMenu(); }
-      function openSettings() {
-        populateSettingsUI();
-        els.settingsSheet.classList.add('open');
-        els.settingsSheet.setAttribute('aria-hidden', 'false');
-        openBackdrop();
-        setTimeout(() => els.roomId.focus(), 30);
-      }
-      function closeSettings() { els.settingsSheet.classList.remove('open'); closeBackdropIfIdle(); }
-      function openItemModal(item) {
-        item = item || null;
-        els.itemModalTitle.textContent = item ? 'Modifier le plat' : 'Ajouter un plat';
-        els.saveItemBtn.textContent = item ? 'Enregistrer' : 'Ajouter';
-        els.itemId.value = item ? item.id : '';
-        els.name.value = item ? item.name : '';
-        els.notes.value = item ? item.notes : '';
-        els.category.value = item && CATEGORY_ORDER.includes(item.category) ? item.category : CATEGORY_ORDER[0];
-        els.quantity.value = item ? String(Math.max(1, Number(item.quantity) || 1)) : '1';
-        els.qtyValue.textContent = els.quantity.value;
-        renderCategoryGrid();
-        els.itemSheet.classList.add('open');
-        openBackdrop();
-        setTimeout(() => els.name.focus(), 30);
-      }
-      function closeItemModal() { els.itemSheet.classList.remove('open'); closeBackdropIfIdle(); els.itemForm.reset(); els.itemId.value = ''; els.quantity.value = '1'; els.qtyValue.textContent = '1'; }
-      function openSearch() { els.searchSheet.classList.add('open'); openBackdrop(); renderSearchResults(); setTimeout(() => els.searchQuery.focus(), 30); }
-      function closeSearchModal() { els.searchSheet.classList.remove('open'); closeBackdropIfIdle(); goHome(); }
-      function closeAllSheets() { closeMenu(); closeSettings(); closeItemModal(); closeSearchModal(); }
-      function goHome() { setScope('all'); els.searchQuery.value = ''; els.searchCategory.value = 'all'; state.searchQuery = ''; state.searchCategory = 'all'; renderAll(); }
-      function setScope(scope) {
-        if (state.scope === scope && scope !== 'all') scope = 'all';
-        state.scope = scope;
-        els.scopeAll.classList.toggle('active', scope === 'all');
-        els.scopeSoon.classList.toggle('active', scope === 'soon');
-        els.scopeOverdue.classList.toggle('active', scope === 'overdue');
-        renderAll();
-      }
-
-      function saveItemFromForm(ev) {
-        ev.preventDefault();
-        const name = (els.name.value || '').trim();
-        if (!name) return;
-        const existing = els.itemId.value ? state.items.find(x => x.id === els.itemId.value) : null;
-        const createdAt = existing && existing.createdAt ? existing.createdAt : new Date().toISOString();
-        const item = {
-          id: els.itemId.value || uid(),
-          name,
-          category: CATEGORY_ORDER.includes(els.category.value) ? els.category.value : CATEGORY_ORDER[0],
-          quantity: Math.max(1, Number(els.quantity.value) || 1),
-          createdAt,
-          frozenAt: createdAt.slice(0, 10),
-          months: 6,
-          notes: (els.notes.value || '').trim(),
-          updatedAt: new Date().toISOString(),
-          updatedBy: state.deviceId,
-          updatedByName: state.deviceName
-        };
-        const idx = state.items.findIndex(x => x.id === item.id);
-        if (idx >= 0) state.items[idx] = { ...state.items[idx], ...item };
-        else state.items.unshift(item);
-        persistItems();
-        closeItemModal();
-        renderAll();
-        showToast('Article enregistré');
-      }
-
-      function persistItems() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
-        if (!state.suppressPush) pushToFirebase();
-      }
-
-      function deleteItem(id) {
-        state.items = state.items.filter(x => x.id !== id);
-        persistItems();
-        renderAll();
-        showToast('Article supprimé');
-      }
-
-      function adjustQty(id, delta) {
-        const item = state.items.find(x => x.id === id);
-        if (!item) return;
-        const next = Math.max(0, (Number(item.quantity) || 0) + delta);
-        if (next === 0) {
-          if (confirm('Supprimer définitivement « ' + item.name + ' » ?')) deleteItem(id);
-          return;
-        }
-        item.quantity = next;
-        item.updatedAt = new Date().toISOString();
-        item.updatedBy = state.deviceId;
-        item.updatedByName = state.deviceName;
-        persistItems();
-        renderAll();
-      }
-
-      function exportData() { /* optional removed */ }
-
-      function getScopedItems() {
-        const items = state.items.slice();
-        if (state.scope === 'soon') return items.filter(it => { const a = ageDays(it); return a >= SOON_DAYS && a < SHELF_LIFE_DAYS; }).sort(sortItems);
-        if (state.scope === 'overdue') return items.filter(it => ageDays(it) >= SHELF_LIFE_DAYS).sort(sortItems);
-        return items.sort(sortItems);
-      }
-
-      function sortItems(a, b) {
-        return ageDays(a) - ageDays(b) || a.name.localeCompare(b.name, 'fr');
-      }
-
-      function scopeTitle(scope) {
-        if (scope === 'soon') return 'À consommer';
-        if (scope === 'overdue') return 'Date dépassée';
-        return 'Tous les articles';
-      }
-
-      function renderItemCard(item) {
-        const age = ageBucket(item);
-        const createdText = prettyDate(item.createdAt || item.frozenAt);
-        const expire = prettyDate(addMonthsISO(item.createdAt || item.frozenAt, 6));
-        const categoryClass = (CATEGORY_META[item.category] && CATEGORY_META[item.category].cls) || 'cat-viande';
-        const qtyLabel = item.quantity + ' portion' + (item.quantity > 1 ? 's' : '');
-        return `
-          <article class="item ${categoryClass}">
-            <div class="item-header">
-              <div>
-                <div class="item-category">${esc(item.category)}</div>
-                <p class="item-name">${esc(item.name)}</p>
-                <div class="item-sub">Ajouté le ${esc(createdText)} • À consommer avant ${esc(expire)}${item.notes ? '<br>' + esc(item.notes) : ''}</div>
-              </div>
-              <div class="age-pill age-${age}"></div>
-            </div>
-            <div class="chips">
-              <span class="chip">${esc(qtyLabel)}</span>
-              <span class="chip">${esc(statusText(item))}</span>
-            </div>
-            <div class="item-actions">
-              <div class="qty-stepper">
-                <button class="circle-btn" type="button" data-action="minus" data-id="${esc(item.id)}" aria-label="Diminuer">−</button>
-                <strong>${esc(item.quantity)}</strong>
-                <button class="circle-btn primary" type="button" data-action="plus" data-id="${esc(item.id)}" aria-label="Augmenter">+</button>
-              </div>
-              <div class="meta-actions">
-                <button class="circle-btn" type="button" data-action="edit" data-id="${esc(item.id)}" aria-label="Modifier">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-                </button>
-                <button class="circle-btn danger" type="button" data-action="delete" data-id="${esc(item.id)}" aria-label="Supprimer">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
-                </button>
-              </div>
-            </div>
-          </article>`;
-      }
-
-      function bindItemActions(root) {
-        root.querySelectorAll('[data-action]').forEach(btn => {
-          btn.addEventListener('click', () => {
-            const action = btn.dataset.action;
-            const id = btn.dataset.id;
-            const item = state.items.find(x => x.id === id);
-            if (!item) return;
-            if (action === 'plus') adjustQty(id, 1);
-            if (action === 'minus') adjustQty(id, -1);
-            if (action === 'edit') openItemModal(item);
-            if (action === 'delete' && confirm('Supprimer « ' + item.name + ' » ?')) deleteItem(id);
-          });
-        });
-      }
-
-      function renderAll() {
-        const counts = {
-          all: state.items.length,
-          soon: state.items.filter(it => { const a = ageDays(it); return a >= SOON_DAYS && a < SHELF_LIFE_DAYS; }).length,
-          overdue: state.items.filter(it => ageDays(it) >= SHELF_LIFE_DAYS).length
-        };
-        els.statItems.textContent = String(counts.all);
-        els.statSoon.textContent = String(counts.soon);
-        els.statOverdue.textContent = String(counts.overdue);
-        els.listTitle.textContent = scopeTitle(state.scope);
-        const scoped = getScopedItems();
-        els.listCount.textContent = scoped.length + ' article' + (scoped.length > 1 ? 's' : '');
-        els.list.innerHTML = scoped.length ? scoped.map(renderItemCard).join('') : '<div class="empty">Aucun article dans cette vue. Appuie sur <strong>Ajouter</strong>.</div>';
-        bindItemActions(els.list);
-        renderSearchResults();
-      }
-
-      function renderSearchResults() {
-        state.searchQuery = els.searchQuery.value || '';
-        state.searchCategory = els.searchCategory.value || 'all';
-        let items = state.items.slice();
-        const q = state.searchQuery.trim().toLowerCase();
-        const cat = state.searchCategory || 'all';
-        if (q) {
-          items = items.filter(it => [it.name, it.category, it.notes].join(' ').toLowerCase().includes(q));
-        }
-        if (cat !== 'all') items = items.filter(it => it.category === cat);
-        items.sort(sortItems);
-        els.searchCount.textContent = items.length + ' résultat' + (items.length > 1 ? 's' : '');
-        els.searchResults.innerHTML = items.length ? items.map(renderItemCard).join('') : '<div class="empty">Aucun résultat.</div>';
-        bindItemActions(els.searchResults);
-      }
-
       function persistSettingsAndMaybeReconnect() {
         const next = collectSettings();
         state.settings = next;
@@ -1557,8 +1291,7 @@
 
       function bindEvents() {
         els.menuBtn.addEventListener('click', toggleMenu);
-        els.menuSettingsBtn.addEventListener('pointerdown', (e) => e.stopPropagation());
-        els.menuSettingsBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); closeMenu(); openSettings(); });
+        els.menuSettingsBtn.addEventListener('click', () => { closeMenu(); openSettings(); });
         els.menuDisconnectBtn.addEventListener('click', () => { closeMenu(); disconnectSync(); });
         els.homeBtn.addEventListener('click', () => { closeAllSheets(); goHome(); });
         els.addBtn.addEventListener('click', () => openItemModal());
@@ -1575,12 +1308,28 @@
         els.searchToDashboardBtn.addEventListener('click', closeSearchModal);
         els.clearSearchBtn.addEventListener('click', () => {
           els.searchQuery.value = '';
-          els.searchCategory.value = 'all';
+          if (els.searchCategory) els.searchCategory.value = 'all';
+          state.searchCategory = 'all';
+          renderSearchCategoryGrid();
           renderSearchResults();
         });
         els.itemForm.addEventListener('submit', saveItemFromForm);
         els.searchQuery.addEventListener('input', renderSearchResults);
-        els.searchCategory.addEventListener('change', renderSearchResults);
+        if (els.searchCategory) els.searchCategory.addEventListener('change', () => {
+          state.searchCategory = els.searchCategory.value || 'all';
+          renderSearchCategoryGrid();
+          renderSearchResults();
+        });
+        if (els.searchCategoryGrid) els.searchCategoryGrid.addEventListener('click', ev => {
+          const btn = ev.target.closest('[data-search-category]');
+          if (!btn) return;
+          const value = btn.dataset.searchCategory || 'all';
+          const next = value === state.searchCategory ? 'all' : value;
+          state.searchCategory = next;
+          if (els.searchCategory) els.searchCategory.value = next;
+          renderSearchCategoryGrid();
+          renderSearchResults();
+        });
         [els.fbApiKey, els.fbAuthDomain, els.fbDatabaseURL, els.fbProjectId, els.fbAppId].forEach(input => input.addEventListener('change', persistSettingsDraft));
         els.roomId.addEventListener('change', persistSettingsDraft);
         els.deviceName.addEventListener('change', () => { state.deviceName = (els.deviceName.value || '').trim() || defaultDeviceName(); localStorage.setItem(DEVICE_NAME_KEY, state.deviceName); persistSettingsDraft(); });
@@ -1606,10 +1355,23 @@
       }
 
       function populateSearchSelect() {
+        if (!els.searchCategory) return;
         els.searchCategory.innerHTML = '<option value="all">Toutes catégories</option>' + CATEGORY_ORDER.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
       }
 
-      function renderSearchResults() { /* overwritten later */ }
+      function renderSearchCategoryGrid() {
+        if (!els.searchCategoryGrid) return;
+        const current = state.searchCategory || 'all';
+        const btns = [
+          { value: 'all', label: 'Toutes', cls: 'cat-all' },
+          ...CATEGORY_ORDER.map(c => ({ value: c, label: c, cls: (CATEGORY_META[c] && CATEGORY_META[c].cls) || '' }))
+        ];
+        els.searchCategoryGrid.innerHTML = btns.map(({ value, label, cls }) => {
+          const active = current === value ? ' active' : '';
+          const swatch = value === 'all' ? '<span class="swatch" style="background: linear-gradient(135deg, var(--blue), var(--blue2));"></span>' : '<span class="swatch"></span>';
+          return `<button type="button" class="category-btn ${cls}${active}" data-search-category="${esc(value)}">${swatch}<span>${esc(label)}</span></button>`;
+        }).join('');
+      }
 
       function renderAll() {
         const counts = {
@@ -1630,7 +1392,7 @@
 
       function renderSearchResults() {
         state.searchQuery = els.searchQuery.value || '';
-        state.searchCategory = els.searchCategory.value || 'all';
+        if (els.searchCategory) state.searchCategory = els.searchCategory.value || state.searchCategory || 'all';
         let items = state.items.slice();
         const q = state.searchQuery.trim().toLowerCase();
         if (q) items = items.filter(it => [it.name, it.category, it.notes].join(' ').toLowerCase().includes(q));
@@ -1642,8 +1404,6 @@
       }
 
       window.__freezerApp = { openSettings, closeSettings, connectSync, disconnectSync, openItemModal, closeItemModal };
-      window.openSettings = openSettings;
-      window.closeSettings = closeSettings;
 
       // Fix toggles on filter cards
       els.scopeAll.addEventListener('click', () => setScope('all'));
