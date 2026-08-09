@@ -202,7 +202,7 @@
       .chip-status { flex: 1 1 auto; min-width: 0; }
       .menu-popover { right: 0; left: auto; width: min(240px, calc(100vw - 20px)); }
     }
-    .shell { padding: 8px 10px 22px; display: grid; gap: 12px; }
+    .shell { padding: 8px clamp(10px, 2.8vw, 24px) 22px; display: grid; gap: 12px; max-width: 1200px; margin: 0 auto; width: 100%; }
     .hero {
       padding: 16px 16px 14px;
       border-radius: 28px;
@@ -227,8 +227,9 @@
     }
     .summary-grid {
       display: grid;
-      grid-template-columns: 1.5fr 1fr 1fr;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 10px;
+      width: 100%;
     }
     .summary-card {
       position: relative;
@@ -240,6 +241,7 @@
       box-shadow: 0 8px 24px rgba(15,23,42,.05);
       overflow: hidden;
       min-height: 110px;
+      width: 100%;
     }
     .summary-card.active {
       outline: 2px solid rgba(0,122,255,.22);
@@ -507,6 +509,47 @@
       gap: 8px;
       margin-top: 12px;
     }
+    .field-label {
+      font-size: .82rem;
+      font-weight: 800;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .category-picker {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .category-field, .qty-field { display: block; }
+    .sheet-stepper {
+      justify-content: space-between;
+      width: 100%;
+    }
+    .duration-badge {
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(0,122,255,.08);
+      color: var(--blue);
+      font-weight: 800;
+      line-height: 1.35;
+    }
+    .item-liseret {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 8px;
+      border-radius: 20px 0 0 20px;
+      background: var(--cat-color, var(--blue));
+    }
+    .item.item-dessert .chip-cat,
+    .item.item-viande .chip-cat,
+    .item.item-poisson .chip-cat,
+    .item.item-legumes .chip-cat,
+    .item.item-plats-cuisines .chip-cat,
+    .item.item-produits-laitiers .chip-cat { background: color-mix(in srgb, var(--cat-color) 14%, #fff); }
+    .item { position: relative; overflow: hidden; }
+    .item-top { padding-left: 12px; }
     .sheet-actions {
       position: sticky;
       bottom: 0;
@@ -569,12 +612,22 @@
     .settings-head strong { font-size: .96rem; }
     .hidden { display: none !important; }
     @media (max-width: 420px) {
-      .summary-grid { grid-template-columns: 1fr; }
-      .summary-card { min-height: auto; }
+      .summary-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+      .summary-card { min-height: auto; padding: 12px 10px 14px; }
+      .summary-label { font-size: .68rem; }
+      .summary-hint { font-size: .68rem; }
       .form-grid { grid-template-columns: 1fr; }
       .category-picker { grid-template-columns: 1fr 1fr; }
       .item-actions { flex-direction: column; align-items: flex-start; }
       .qty-stepper, .meta-actions { width: 100%; justify-content: flex-start; }
+      .brand-text h1 { font-size: 1.02rem; }
+      .chip-status { font-size: .78rem; }
+    }
+    @media (max-width: 360px) {
+      .summary-value { font-size: 1.55rem; }
+      .summary-grid { gap: 6px; }
+      .brand { flex-basis: 100%; }
+      .actions-top { width: 100%; justify-content: space-between; }
     }
   </style>
 </head>
@@ -621,7 +674,7 @@
       </section>
 
       <section class="summary-grid" aria-label="Resume du congelateur">
-        <button class="summary-card full active" id="scopeAll" type="button" data-scope="all">
+        <button class="summary-card active" id="scopeAll" type="button" data-scope="all">
           <div class="summary-label">Articles</div>
           <div class="summary-value" id="statItems">0</div>
           <div class="summary-hint">Tous les articles du congelateur</div>
@@ -634,9 +687,9 @@
           <div class="summary-accent"></div>
         </button>
         <button class="summary-card" id="scopeOverdue" type="button" data-scope="overdue">
-          <div class="summary-label">Perimes</div>
+          <div class="summary-label">Date depassee</div>
           <div class="summary-value" id="statOverdue">0</div>
-          <div class="summary-hint">Filtre des articles perimes</div>
+          <div class="summary-hint">Articles hors delai</div>
           <div class="summary-accent"></div>
         </button>
       </section>
@@ -723,24 +776,26 @@
     </div>
     <form id="itemForm">
       <input type="hidden" id="itemId" />
+      <input type="hidden" id="quantity" value="1" />
+      <input type="hidden" id="createdAt" />
       <div class="form-grid">
         <label class="full">Nom
           <input id="name" required placeholder="Poulet, soupe, legumes..." />
         </label>
         <div class="category-field full">
           <div class="field-label">Categorie</div>
-          <input type="hidden" id="category" value="Autre" />
+          <input type="hidden" id="category" value="Viande" />
           <div class="category-picker" id="categoryPicker"></div>
         </div>
-        <label>Quantite
-          <input id="quantity" type="number" min="1" step="1" value="1" />
-        </label>
-        <label>Date de congelation
-          <input id="frozenAt" type="date" />
-        </label>
-        <label>Duree (mois)
-          <input id="months" type="number" min="1" step="1" value="3" />
-        </label>
+        <div class="qty-field full">
+          <div class="field-label">Quantite</div>
+          <div class="qty-stepper sheet-stepper">
+            <button class="circle-btn" type="button" id="qtyMinus" aria-label="Diminuer">−</button>
+            <strong id="qtyDisplay">1</strong>
+            <button class="circle-btn primary" type="button" id="qtyPlus" aria-label="Augmenter">+</button>
+          </div>
+        </div>
+        <div class="full duration-badge">Conservation automatique : 6 mois a partir de la date d'ajout.</div>
         <label class="full">Notes
           <textarea id="notes" placeholder="Ex. deja cuit, 2 portions restantes..."></textarea>
         </label>
@@ -792,14 +847,16 @@
         { value: 'Poisson', label: 'Poisson', color: '#0ea5e9', hint: 'saumon, colin...' },
         { value: 'Legumes', label: 'Legumes', color: '#22c55e', hint: 'brocoli, poivron...' },
         { value: 'Plats cuisinés', label: 'Plats cuisinés', color: '#8b5cf6', hint: 'gratin, lasagne...' },
-        { value: 'Fruits', label: 'Fruits', color: '#f97316', hint: 'framboise, mangue...' },
-        { value: 'Produits laitiers', label: 'Produits laitiers', color: '#14b8a6', hint: 'fromage, beurre...' },
-        { value: 'Autre', label: 'Autres', color: '#64748b', hint: 'divers' }
+        { value: 'Dessert', label: 'Dessert', color: '#f97316', hint: 'glace, mousse...' },
+        { value: 'Produits laitiers', label: 'Produits laitiers', color: '#14b8a6', hint: 'fromage, beurre...' }
       ];
       const CATEGORY_ORDER = CATEGORY_META.map(function (item) { return item.value; });
       const CATEGORY_ALIASES = {
         'Plats cuisin&eacute;s': 'Plats cuisinés',
-        'Plats cuisinés': 'Plats cuisinés'
+        'Plats cuisinés': 'Plats cuisinés',
+        'Fruits': 'Dessert',
+        'Autre': 'Dessert',
+        'Autres': 'Dessert'
       };
       const DEFAULT_FIREBASE_CONFIG = {
         apiKey: 'AIzaSyDsNEGaBaq9JhTxSTvIeAQKbhRKNPecXgw',
@@ -858,9 +915,11 @@
         category: document.getElementById('category'),
         categoryPicker: document.getElementById('categoryPicker'),
         quantity: document.getElementById('quantity'),
-        frozenAt: document.getElementById('frozenAt'),
-        months: document.getElementById('months'),
+        createdAt: document.getElementById('createdAt'),
         notes: document.getElementById('notes'),
+        qtyMinus: document.getElementById('qtyMinus'),
+        qtyPlus: document.getElementById('qtyPlus'),
+        qtyDisplay: document.getElementById('qtyDisplay'),
         searchSheet: document.getElementById('searchSheet'),
         closeSearchBtn: document.getElementById('closeSearchBtn'),
         searchToDashboardBtn: document.getElementById('searchToDashboardBtn'),
@@ -892,7 +951,7 @@
       state.deviceName = state.settings.deviceName || localStorage.getItem(DEVICE_NAME_KEY) || defaultDeviceName();
       populateSelects();
       populateSettingsUI();
-      renderCategoryPicker(normalizeCategory(els.category.value || 'Autre'));
+      renderCategoryPicker(normalizeCategory(els.category.value || 'Viande'));
       renderAll();
       setStatus('Hors ligne', 'offline');
       setSubtitle();
@@ -963,7 +1022,7 @@
           els.categoryPicker.addEventListener('click', function (e) {
             var btn = e.target.closest('[data-category]');
             if (!btn) return;
-            els.category.value = btn.getAttribute('data-category') || 'Autre';
+            els.category.value = btn.getAttribute('data-category') || 'Viande';
             renderCategoryPicker(els.category.value);
           });
         }
@@ -1027,22 +1086,27 @@
         return d.toISOString().slice(0, 10);
       }
       function daysSince(dateStr) {
-        if (!isDateISO(dateStr)) return 9999;
-        return Math.floor((Date.now() - new Date(dateStr + 'T12:00:00').getTime()) / 86400000);
-      }
-      function daysLeft(item) {
-        var exp = addMonthsISO(item.frozenAt, item.months);
-        if (!isDateISO(exp)) return Number.POSITIVE_INFINITY;
-        return Math.ceil((new Date(exp + 'T23:59:59') - new Date()) / 86400000);
+        var d = String(dateStr || '').slice(0, 10);
+        if (!isDateISO(d)) return 9999;
+        return Math.floor((Date.now() - new Date(d + 'T12:00:00').getTime()) / 86400000);
       }
       function ageBucket(item) {
         var age = daysSince(item.createdAt || item.frozenAt || todayISO());
-        if (age <= 30) return 'fresh';
-        if (age <= 90) return 'warn';
+        if (age < 30) return 'fresh';
+        if (age < 120) return 'warn';
         return 'old';
       }
-      function statusText(dl) {
-        if (dl < 0) return 'Perime';
+      function isSoon(item) {
+        var age = daysSince(item.createdAt || item.frozenAt || todayISO());
+        return age >= 150 && age < 180;
+      }
+      function isOverdue(item) {
+        var age = daysSince(item.createdAt || item.frozenAt || todayISO());
+        return age >= 180;
+      }
+      function statusText(item) {
+        var dl = 180 - daysSince(item.createdAt || item.frozenAt || todayISO());
+        if (dl < 0) return 'Date depassee';
         if (dl <= 30) return dl + ' j restants';
         return dl + ' j restants';
       }
@@ -1057,16 +1121,16 @@
 
       function normalizeItem(item) {
         if (!item || !item.name) return null;
+        var created = item.createdAt && String(item.createdAt).length ? String(item.createdAt) : (isDateISO(item.frozenAt) ? item.frozenAt + 'T12:00:00.000Z' : new Date().toISOString());
         return {
           id: item.id || uid(),
           name: String(item.name),
           category: normalizeCategory(item.category),
           quantity: Math.max(1, Number(item.quantity) || 1),
-          unit: String(item.unit || 'portion'),
-          frozenAt: isDateISO(item.frozenAt) ? item.frozenAt : todayISO(),
-          months: Math.max(1, Number(item.months) || 3),
+          frozenAt: isDateISO(item.frozenAt) ? item.frozenAt : String(created).slice(0, 10),
+          months: 6,
           notes: String(item.notes || ''),
-          createdAt: item.createdAt && String(item.createdAt).length ? item.createdAt : (isDateISO(item.frozenAt) ? item.frozenAt : new Date().toISOString()),
+          createdAt: created,
           updatedAt: item.updatedAt || new Date().toISOString(),
           updatedBy: item.updatedBy || '',
           updatedByName: item.updatedByName || ''
@@ -1112,22 +1176,22 @@
       function populateSelects() {
         var categoryHtml = CATEGORY_ORDER.map(function (c) { return '<option value="' + esc(c) + '">' + c + '</option>'; }).join('');
         els.searchCategory.innerHTML = '<option value="all">Toutes categories</option>' + categoryHtml;
-        renderCategoryPicker(normalizeCategory(els.category.value || 'Autre'));
+        renderCategoryPicker(normalizeCategory(els.category.value || 'Viande'));
       }
 
       function renderCategoryPicker(selected) {
         if (!els.categoryPicker) return;
-        var current = normalizeCategory(selected || 'Autre');
+        var current = normalizeCategory(selected || 'Viande');
         els.categoryPicker.innerHTML = CATEGORY_META.map(function (cat) {
           var active = cat.value === current ? ' active' : '';
-          return '<button type="button" class="cat-btn' + active + '" data-category="' + esc(cat.value) + '" style="--cat-color:' + cat.color + '"><span class="cat-swatch"></span><span class="cat-text"><span>' + esc(cat.label) + '</span><small>' + esc(cat.hint) + '</small></span></button>'; 
+          return '<button type="button" class="cat-btn' + active + '" data-category="' + esc(cat.value) + '" style="--cat-color:' + cat.color + '"><span class="cat-swatch"></span><span class="cat-text"><span>' + esc(cat.label) + '</span><small>' + esc(cat.hint) + '</small></span></button>';
         }).join('');
       }
 
       function normalizeCategory(value) {
         var v = String(value || '').trim();
         if (CATEGORY_ALIASES[v]) return CATEGORY_ALIASES[v];
-        return CATEGORY_ORDER.indexOf(v) >= 0 ? v : 'Autre';
+        return CATEGORY_ORDER.indexOf(v) >= 0 ? v : 'Dessert';
       }
 
       function populateSettingsUI() {
@@ -1233,11 +1297,10 @@
         els.itemModalTitle.textContent = item ? 'Modifier l\'article' : 'Ajouter un article';
         els.itemId.value = item ? item.id : '';
         els.name.value = item ? item.name : '';
-        els.category.value = normalizeCategory(item ? item.category : 'Autre');
+        els.category.value = normalizeCategory(item ? item.category : 'Viande');
         renderCategoryPicker(els.category.value);
-        els.quantity.value = item ? item.quantity : 1;
-        els.frozenAt.value = item ? item.frozenAt : todayISO();
-        els.months.value = item ? item.months : 3;
+        setQty(item ? item.quantity : 1);
+        els.createdAt.value = item ? (item.createdAt || item.frozenAt || todayISO()) : todayISO();
         els.notes.value = item ? item.notes : '';
         els.itemSheet.classList.add('open');
         els.itemSheet.setAttribute('aria-hidden', 'false');
@@ -1284,10 +1347,10 @@
         renderAll();
       }
       function setScope(scope) {
-        state.scope = scope;
-        els.scopeAll.classList.toggle('active', scope === 'all');
-        els.scopeSoon.classList.toggle('active', scope === 'soon');
-        els.scopeOverdue.classList.toggle('active', scope === 'overdue');
+        state.scope = (state.scope === scope) ? 'all' : scope;
+        els.scopeAll.classList.toggle('active', state.scope === 'all');
+        els.scopeSoon.classList.toggle('active', state.scope === 'soon');
+        els.scopeOverdue.classList.toggle('active', state.scope === 'overdue');
         renderAll();
       }
 
@@ -1295,15 +1358,16 @@
         ev.preventDefault();
         var name = (els.name.value || '').trim();
         if (!name) return;
+        var existing = els.itemId.value ? state.items.find(function (x) { return x.id === els.itemId.value; }) : null;
         var item = {
           id: els.itemId.value || uid(),
           name: name,
-          category: normalizeCategory(els.category.value || 'Autre'),
-          quantity: Math.max(1, Number(els.quantity.value) || 1),
-          frozenAt: els.frozenAt.value || todayISO(),
-          months: Math.max(1, Number(els.months.value) || 3),
+          category: normalizeCategory(els.category.value || 'Viande'),
+          quantity: Math.max(1, Number(getQty()) || 1),
+          frozenAt: existing && existing.frozenAt ? existing.frozenAt : todayISO(),
+          months: 6,
           notes: (els.notes.value || '').trim(),
-          createdAt: els.itemId.value ? (state.items.find(function (x) { return x.id === els.itemId.value; }) || {}).createdAt || new Date().toISOString() : new Date().toISOString(),
+          createdAt: existing && existing.createdAt ? existing.createdAt : new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           updatedBy: state.deviceId,
           updatedByName: state.deviceName
@@ -1319,6 +1383,16 @@
       function persistItems() {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
         if (!state.suppressPush) pushToFirebase();
+      }
+
+      function getQty() {
+        return Math.max(1, Number(els.quantity && els.quantity.value ? els.quantity.value : (els.qtyDisplay ? els.qtyDisplay.textContent : 1)) || 1);
+      }
+
+      function setQty(value) {
+        var next = Math.max(1, Number(value) || 1);
+        if (els.quantity) els.quantity.value = String(next);
+        if (els.qtyDisplay) els.qtyDisplay.textContent = String(next);
       }
 
       function deleteItem(id) {
@@ -1386,37 +1460,47 @@
 
       function getScopedItems() {
         var items = state.items.slice();
-        if (state.scope === 'soon') items = items.filter(function (it) { return daysLeft(it) >= 0 && daysLeft(it) <= 30; });
-        if (state.scope === 'overdue') items = items.filter(function (it) { return daysLeft(it) < 0; });
-        items.sort(function (a, b) { return daysLeft(a) - daysLeft(b) || a.name.localeCompare(b.name, 'fr'); });
+        if (state.scope === 'soon') items = items.filter(function (it) { return isSoon(it); });
+        if (state.scope === 'overdue') items = items.filter(function (it) { return isOverdue(it); });
+        items.sort(function (a, b) {
+          var ad = daysSince(a.createdAt || a.frozenAt || todayISO());
+          var bd = daysSince(b.createdAt || b.frozenAt || todayISO());
+          return ad - bd || a.name.localeCompare(b.name, 'fr');
+        });
         return items;
       }
 
       function scopeTitle(scope) {
         if (scope === 'soon') return 'A consommer';
-        if (scope === 'overdue') return 'Perimes';
+        if (scope === 'overdue') return 'Date depassee';
         return 'Tous les articles';
       }
 
+      function categoryColor(category) {
+        var meta = CATEGORY_META.find(function (c) { return c.value === normalizeCategory(category); });
+        return meta ? meta.color : '#64748b';
+      }
+
       function renderItemCard(item) {
-        var dl = daysLeft(item);
         var age = ageBucket(item);
-        var dateText = isDateISO(item.frozenAt) ? prettyDate(item.frozenAt) : 'date inconnue';
-        var expire = isDateISO(addMonthsISO(item.frozenAt, item.months)) ? prettyDate(addMonthsISO(item.frozenAt, item.months)) : '-';
-        var qtyLabel = 'x' + esc(String(item.quantity));
+        var ageDays = daysSince(item.createdAt || item.frozenAt || todayISO());
+        var addedText = isDateISO(item.createdAt || item.frozenAt || '') ? prettyDate((item.createdAt || item.frozenAt || '').slice(0, 10)) : 'date inconnue';
+        var expire = isDateISO(addMonthsISO((item.createdAt || item.frozenAt || todayISO()).slice(0, 10), 6)) ? prettyDate(addMonthsISO((item.createdAt || item.frozenAt || todayISO()).slice(0, 10), 6)) : '-';
+        var cat = normalizeCategory(item.category);
         return [
-          '<article class="item">',
+          '<article class="item item-' + esc(cat.toLowerCase().replace(/[^a-z0-9]+/g, '-')) + '">',
+          '<div class="item-liseret" style="--cat-color:' + esc(categoryColor(cat)) + '"></div>',
           '<div class="age-pill age-' + age + '"></div>',
           '<div class="item-top">',
           '<div class="item-title">',
           '<p class="item-name">' + esc(item.name) + '</p>',
-          '<div class="item-sub">Congel&eacute; le ' + esc(dateText) + ' &bull; a consommer idealement avant ' + esc(expire) + (item.notes ? '<br>' + esc(item.notes) : '') + '</div>',
+          '<div class="item-sub">Categorie : <strong>' + esc(cat) + '</strong><br>Ajoute le ' + esc(addedText) + ' • Consommer avant ' + esc(expire) + (item.notes ? '<br>' + esc(item.notes) : '') + '</div>',
           '</div>',
           '</div>',
           '<div class="chips">',
-          '<span class="chip">' + esc(item.category) + '</span>',
-          '<span class="chip">' + qtyLabel + '</span>',
-          '<span class="chip">' + esc(statusText(dl)) + '</span>',
+          '<span class="chip chip-cat" style="--cat-color:' + esc(categoryColor(cat)) + '">' + esc(cat) + '</span>',
+          '<span class="chip">' + esc(String(item.quantity)) + 'x</span>',
+          '<span class="chip">' + esc(statusText(item)) + '</span>',
           '</div>',
           '<div class="item-actions">',
           '<div class="qty-stepper">',
@@ -1451,8 +1535,8 @@
       function renderAll() {
         var counts = {
           all: state.items.length,
-          soon: state.items.filter(function (it) { return daysLeft(it) >= 0 && daysLeft(it) <= 30; }).length,
-          overdue: state.items.filter(function (it) { return daysLeft(it) < 0; }).length
+          soon: state.items.filter(function (it) { return isSoon(it); }).length,
+          overdue: state.items.filter(function (it) { return isOverdue(it); }).length
         };
         els.statItems.textContent = String(counts.all);
         els.statSoon.textContent = String(counts.soon);
@@ -1474,7 +1558,7 @@
         var items = state.items.slice();
         if (q) {
           items = items.filter(function (it) {
-            return [it.name, it.category, it.notes, it.unit, it.updatedByName].join(' ').toLowerCase().indexOf(q) >= 0;
+            return [it.name, it.category, it.notes, it.updatedByName].join(' ').toLowerCase().indexOf(q) >= 0;
           });
         }
         if (cat !== 'all') items = items.filter(function (it) { return it.category === cat; });
@@ -1496,7 +1580,7 @@
 
       function saveSettingsFromUI() {
         persistSettingsAndMaybeReconnect();
-        setStatus('Config enregistree', 'offline');
+        setStatus(state.syncing ? 'Config mise a jour' : 'Config enregistree', state.syncing ? 'online' : 'offline');
         window.alert('Configuration enregistree sur cet iPhone.');
       }
 
@@ -1585,6 +1669,20 @@
           state.db = firebase.database();
           state.refPath = 'freezerRooms/' + settings.roomId + '/items';
           var ref = state.db.ref(state.refPath);
+          var initialSnapshot = await ref.once('value');
+          var initialPayload = initialSnapshot.val() || {};
+          var remoteItems = Object.keys(initialPayload).map(function (key) { return normalizeItem(initialPayload[key]); }).filter(Boolean).sort(function (a, b) { return (b.updatedAt || '').localeCompare(a.updatedAt || ''); });
+          if (remoteItems.length) {
+            state.suppressPush = true;
+            state.items = remoteItems;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
+            state.suppressPush = false;
+            renderAll();
+          } else if (state.items.length) {
+            var payload = {};
+            state.items.forEach(function (item) { payload[item.id] = normalizeItem(item); });
+            await ref.set(payload);
+          }
           state.listener = function (snapshot) {
             var payload = snapshot.val() || {};
             var nextItems = Object.keys(payload).map(function (key) { return normalizeItem(payload[key]); }).filter(Boolean).sort(function (a, b) { return (b.updatedAt || '').localeCompare(a.updatedAt || ''); });
@@ -1599,8 +1697,8 @@
             setStatus('Erreur de sync', 'error');
           });
           state.syncing = true;
-          setStatus('Synchronise: ' + settings.roomId, 'online');
-          await pushToFirebase(true);
+          setStatus('Connecte: ' + settings.roomId, 'online');
+          window.alert('Connexion Firebase etablie sur ' + settings.roomId + '.');
         } catch (err) {
           console.error(err);
           state.syncing = false;
@@ -1617,7 +1715,8 @@
         } catch (e) {}
         state.listener = null;
         state.syncing = false;
-        setStatus('Hors ligne', 'offline');
+        setStatus('Deconnecte', 'offline');
+        window.alert('Deconnecte de Firebase.');
       }
 
       function pushToFirebase(force) {
@@ -1658,16 +1757,14 @@
           ok(els.menuPopover.classList.contains('open'), 'menu opens');
           els.menuSettingsBtn.click();
           ok(els.settingsSheet.classList.contains('open'), 'settings opens');
-          ok(els.fbApiKey.value.trim().length > 0, 'firebase fields visible');
+          ok(els.fbApiKey.value.trim().length > 0 && els.fbProjectId.value.trim().length > 0, 'firebase fields visible');
           closeSettings();
           openItemModal();
           ok(els.itemSheet.classList.contains('open'), 'add modal opens');
-          ok(!!els.categoryPicker.querySelector('[data-category="Autre"]'), 'category picker visible');
-          els.categoryPicker.querySelector('[data-category="Autre"]').click();
+          ok(!!els.categoryPicker.querySelector('[data-category="Viande"]'), 'category picker visible');
+          els.categoryPicker.querySelector('[data-category="Viande"]').click();
           els.name.value = 'Test plat';
-          els.quantity.value = '2';
-          els.frozenAt.value = todayISO();
-          els.months.value = '3';
+          setQty(2);
           els.notes.value = 'selftest';
           els.itemForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
           ok(state.items.some(function (x) { return x.name === 'Test plat'; }), 'item saved');
@@ -1677,7 +1774,7 @@
           els.searchQuery.dispatchEvent(new Event('input', { bubbles: true }));
           ok(els.searchResults.textContent.indexOf('Test plat') >= 0, 'search renders item');
           closeSearchModal();
-          state.items.unshift(normalizeItem({ id: 'old-1', name: 'Vieux plat', category: 'Autre', quantity: 1, unit: 'portion', frozenAt: '2024-01-01', months: 1, notes: '', createdAt: '2024-01-01T00:00:00Z', updatedAt: '2024-01-01T00:00:00Z' }));
+          state.items.unshift(normalizeItem({ id: 'old-1', name: 'Vieux plat', category: 'Viande', quantity: 1, frozenAt: '2024-01-01', notes: '', createdAt: '2024-01-01T00:00:00Z', updatedAt: '2024-01-01T00:00:00Z' }));
           persistItems();
           setScope('overdue');
           ok(els.list.textContent.indexOf('Vieux plat') >= 0, 'overdue filter works');
