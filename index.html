@@ -110,6 +110,7 @@
     .badge { display:inline-flex; align-items:center; gap:6px; border-radius:999px; padding:6px 10px; font-size:.75rem; font-weight:800; }
     .badge.cat { background: rgba(15,23,42,.05); color: var(--muted); text-transform:uppercase; letter-spacing:.04em; }
     .badge.fresh { background: rgba(34,197,94,.12); color:#15803d; }
+    .badge.neutral { background: rgba(100,116,139,.12); color:#475569; }
     .badge.warn { background: rgba(245,158,11,.14); color:#b45309; }
     .badge.old { background: rgba(239,68,68,.12); color:#b91c1c; }
     .badge svg { width:12px; height:12px; flex:0 0 auto; margin-top:1px; }
@@ -210,7 +211,7 @@
       .bottom-tabs { left:50%; right:auto; transform:translateX(-50%); width:calc(100vw - 16px); }
     }
 
-    /* v18 - mobile app layout */
+    /* v20 - mobile app layout */
     .app { max-width: 1180px; padding: calc(8px + var(--safe-top)) 12px calc(104px + var(--safe-bottom)); }
     .topbar { display:grid; grid-template-columns:48px minmax(0,1fr) 48px; align-items:center; padding:8px 4px 12px; background:rgba(243,246,251,.96); }
     .brand { text-align:center; min-width:0; }
@@ -259,7 +260,7 @@
       pointer-events:none;
       display:none !important;
     }
-    .fab { position:fixed; right:max(18px, calc((100vw - 1180px)/2 + 18px)); bottom:calc(82px + var(--safe-bottom)); z-index:2450; width:58px; height:58px; border:0; border-radius:50%; background:linear-gradient(180deg,#168bff,#0878e8); color:#fff; font-size:2rem; line-height:1; box-shadow:0 14px 30px rgba(10,132,255,.30); transition: opacity .18s ease, transform .18s ease; }
+    .fab { position:fixed; right:max(18px, calc((100vw - 1180px)/2 + 18px)); bottom:calc(82px + var(--safe-bottom)); z-index:2450; width:58px; height:58px; border:0; border-radius:50%; background:linear-gradient(180deg,#fde047,#facc15); color:#422006; font-size:2rem; line-height:1; box-shadow:0 14px 30px rgba(234,179,8,.32); transition: opacity .18s ease, transform .18s ease; }
     .menu { left:max(12px, calc((100vw - 1180px)/2 + 12px)); right:auto; }
     @media (min-width: 760px) {
       .list { grid-template-columns:repeat(2,minmax(0,1fr)); }
@@ -276,6 +277,163 @@
       .meta-actions { padding:10px 8px; }
       .badge { font-size:.7rem; padding:5px 7px; }
     }
+  
+
+    /* v20 — carte article claire : catégorie / contenu / actions */
+    .item {
+      position: relative !important;
+      display: grid !important;
+      grid-template-columns: 38px minmax(0, 1fr) 76px !important;
+      min-height: 196px !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+      border: 1px solid var(--line) !important;
+      border-radius: 22px !important;
+      background: #fff !important;
+      box-shadow: 0 8px 24px rgba(15,23,42,.06) !important;
+    }
+    .item::before { display: none !important; }
+    .item-rail {
+      position: relative !important;
+      inset: auto !important;
+      grid-column: 1 !important;
+      grid-row: 1 / -1 !important;
+      width: auto !important;
+      min-width: 0 !important;
+      height: auto !important;
+      margin: 0 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      border-radius: 21px 0 0 21px !important;
+      overflow: hidden !important;
+    }
+    .rail-label {
+      writing-mode: vertical-rl !important;
+      text-orientation: mixed !important;
+      transform: rotate(180deg) !important;
+      padding: 8px 0 !important;
+      color: #fff !important;
+      font-size: .65rem !important;
+      font-weight: 900 !important;
+      line-height: 1 !important;
+      letter-spacing: .14em !important;
+      text-transform: uppercase !important;
+      white-space: nowrap !important;
+      text-shadow: 0 1px 2px rgba(0,0,0,.14) !important;
+    }
+    .item-body {
+      grid-column: 2 !important;
+      grid-row: 1 !important;
+      min-width: 0 !important;
+      padding: 18px 14px 14px 16px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: flex-start !important;
+    }
+    .item-title {
+      margin: 0 !important;
+      color: var(--text) !important;
+      font-size: 1.08rem !important;
+      font-weight: 900 !important;
+      line-height: 1.2 !important;
+      overflow-wrap: anywhere !important;
+    }
+    .item-status { margin-top: 8px !important; }
+    .item-status .badge { padding: 5px 9px !important; }
+    .item-date {
+      margin-top: 10px !important;
+      color: var(--text) !important;
+      font-size: .79rem !important;
+      font-weight: 850 !important;
+      line-height: 1.2 !important;
+    }
+    .item-sub {
+      margin: 9px 0 0 !important;
+      padding: 0 !important;
+      color: var(--muted) !important;
+      font-size: .86rem !important;
+      line-height: 1.3 !important;
+      overflow-wrap: anywhere !important;
+    }
+    .item-actions {
+      width: 100% !important;
+      margin: auto 0 0 !important;
+      padding: 10px 0 0 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: flex-start !important;
+    }
+    .qty-stepper { display: flex !important; align-items: center !important; gap: 10px !important; }
+    .qty-btn {
+      width: 44px !important;
+      height: 44px !important;
+      flex: 0 0 44px !important;
+      border: 1px solid var(--line) !important;
+      border-radius: 14px !important;
+      background: #fff !important;
+      color: var(--text) !important;
+      font-size: 1.05rem !important;
+      font-weight: 900 !important;
+    }
+    .qty-pill {
+      min-width: 36px !important;
+      padding: 0 2px !important;
+      color: var(--text) !important;
+      text-align: center !important;
+      font-size: 1rem !important;
+      font-weight: 900 !important;
+    }
+    .meta-actions {
+      grid-column: 3 !important;
+      grid-row: 1 !important;
+      width: auto !important;
+      height: auto !important;
+      align-self: stretch !important;
+      padding: 12px 10px !important;
+      display: grid !important;
+      grid-template-rows: 1fr 1fr !important;
+      gap: 10px !important;
+      border-left: 1px solid var(--line) !important;
+      background: #fff !important;
+    }
+    .meta-actions .mini {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 66px !important;
+      margin: 0 !important;
+      border: 0 !important;
+      border-radius: 18px !important;
+      color: #fff !important;
+      display: grid !important;
+      place-items: center !important;
+    }
+    .meta-actions .mini svg { width: 22px !important; height: 22px !important; }
+    .action-edit { background: linear-gradient(180deg,#168bff,#0878e8) !important; }
+    .action-delete { background: linear-gradient(180deg,#ff3131,#e91620) !important; }
+
+    /* Le bouton flottant d'ajout reste jaune. */
+    .fab {
+      background: linear-gradient(180deg,#fde047,#facc15) !important;
+      color: #111827 !important;
+      box-shadow: 0 14px 30px rgba(250,204,21,.32) !important;
+    }
+
+    @media (max-width: 430px) {
+      .item {
+        grid-template-columns: 34px minmax(0, 1fr) 70px !important;
+        min-height: 196px !important;
+      }
+      .item-body { padding: 16px 12px 13px 13px !important; }
+      .rail-label { font-size: .61rem !important; letter-spacing: .12em !important; }
+      .meta-actions { padding: 10px 8px !important; gap: 9px !important; }
+      .meta-actions .mini { min-height: 68px !important; border-radius: 17px !important; }
+      .item-title { font-size: 1rem !important; }
+      .item-date { font-size: .76rem !important; }
+      .item-sub { font-size: .82rem !important; }
+      .qty-btn { width: 42px !important; height: 42px !important; flex-basis: 42px !important; }
+    }
+
   </style>
 </head>
 <body>
@@ -359,7 +517,7 @@
     <div class="menu-title">Menu</div>
     <button class="menu-item" id="menuConnectBtn" type="button">↻ <span>Connexion</span></button>
     <button class="menu-item danger" id="menuDisconnectBtn" type="button">⎋ <span>Déconnexion</span></button>
-    <div class="menu-item version" id="menuVersionItem">Version <strong>v18</strong></div>
+    <div class="menu-item version" id="menuVersionItem">Version <strong>v20</strong></div>
   </div>
 
   <section class="sheet" id="settingsSheet">
@@ -474,7 +632,7 @@
   (() => {
     'use strict';
 
-    const APP_VERSION = 'v18';
+    const APP_VERSION = 'v20';
     const STORAGE_KEY = 'freezer-items-v2';
     const SETTINGS_KEY = 'freezer-settings-v2';
     const DEVICE_KEY = 'freezer-device-id-v2';
@@ -630,7 +788,7 @@
     function isDateISO(v) { return /^\d{4}-\d{2}-\d{2}$/.test(String(v || '')); }
     function daysSince(dateStr) { if (!isDateISO(dateStr)) return 9999; return Math.floor((Date.now() - new Date(dateStr + 'T12:00:00').getTime()) / 86400000); }
     function ageDays(item) { return daysSince(item.createdAt || item.frozenAt || todayISO()); }
-    function ageBucket(item) { const age = ageDays(item); return age < 30 ? 'fresh' : age < 120 ? 'warn' : 'old'; }
+    function ageBucket(item) { const age = ageDays(item); return age < 30 ? 'fresh' : age < 90 ? 'neutral' : age < SOON_DAYS ? 'warn' : 'old'; }
     function statusText(item) { const age = ageDays(item); if (age >= SHELF_LIFE_DAYS) return 'Date dépassée'; if (age >= SOON_DAYS) return 'À consommer'; return (SHELF_LIFE_DAYS - age) + ' j restants'; }
     function statusIcon(item) {
       const age = ageBucket(item);
@@ -835,10 +993,10 @@
     }
 
     function openSettings() {
-      console.log('[Freezer v18] openSettings()');
+      console.log('[Freezer v20] openSettings()');
       populateSettingsUI();
       openSheet(els.settingsSheet, els.roomId);
-      console.log('[Freezer v18] settingsSheet ouvert');
+      console.log('[Freezer v20] settingsSheet ouvert');
     }
     function closeSettings() { closeSheet(els.settingsSheet); }
 
@@ -940,23 +1098,17 @@
         : `<span class="badge ${ageCls}">${esc(statusText(item))}</span>`;
       return `
         <article class="item ${meta.cls}">
-          <div class="item-rail"><span class="rail-label">${esc(item.category)}</span></div>
+          <div class="item-rail" aria-hidden="true"><span class="rail-label">${esc(item.category)}</span></div>
           <div class="item-body">
-            <div class="item-top">
-              <div>
-                <div class="item-title">${esc(item.name)}</div>
-                <div class="item-meta">
-                  ${statusContent}
-                  <span class="badge">${esc(prettyDate(item.createdAt || item.frozenAt))}</span>
-                </div>
-              </div>
-            </div>
+            <div class="item-title">${esc(item.name)}</div>
+            <div class="item-status">${statusContent}</div>
+            <div class="item-date">${esc(prettyDate(item.createdAt || item.frozenAt))}</div>
             <div class="item-sub">${esc(item.notes || 'Aucune note')}</div>
             <div class="item-actions">
-              <div class="qty-stepper">
-                <button class="qty-btn action-qty-minus" type="button" data-id="${esc(item.id)}">−</button>
+              <div class="qty-stepper" aria-label="Quantité ${item.quantity}">
+                <button class="qty-btn action-qty-minus" type="button" data-id="${esc(item.id)}" aria-label="Diminuer la quantité">−</button>
                 <div class="qty-pill">${item.quantity}</div>
-                <button class="qty-btn action-qty-plus" type="button" data-id="${esc(item.id)}">＋</button>
+                <button class="qty-btn action-qty-plus" type="button" data-id="${esc(item.id)}" aria-label="Augmenter la quantité">＋</button>
               </div>
             </div>
           </div>
@@ -1033,7 +1185,7 @@
       if (els.fabAddBtn) els.fabAddBtn.addEventListener('click', () => openItem(null));
       if (els.menuDisconnectBtn) {
         els.menuDisconnectBtn.addEventListener('click', () => {
-          console.log('[Freezer v18] click Déconnexion');
+          console.log('[Freezer v20] click Déconnexion');
           closeMenu();
           disconnectSync();
         });
