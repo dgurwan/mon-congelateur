@@ -25,7 +25,7 @@
       --radius-lg: 22px;
       --radius-md: 16px;
       --radius-sm: 13px;
-      --app-width: 480px;
+      --app-width: 960px;
     }
     * { box-sizing: border-box; }
     html, body { height: 100%; }
@@ -55,6 +55,7 @@
       box-shadow: 0 10px 26px rgba(15,23,42,.05);
       margin: 0 8px 10px;
       padding: 10px 12px;
+      overflow: visible;
     }
     .topbar-row {
       display: flex;
@@ -140,9 +141,9 @@
     .mini-btn svg { width: 20px; height: 20px; }
     .menu-wrap { position: relative; }
     .menu-popover {
-      position: absolute;
-      top: calc(100% + 10px);
-      right: 0;
+      position: fixed;
+      top: calc(68px + env(safe-area-inset-top));
+      right: 12px;
       width: min(240px, calc(100vw - 24px));
       padding: 10px;
       border-radius: 22px;
@@ -188,17 +189,17 @@
       .topbar { padding: 10px 10px 12px; }
       .topbar-row {
         display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 10px 10px;
+        grid-template-columns: 1fr;
+        gap: 10px;
         align-items: center;
       }
-      .brand { grid-column: 1 / -1; width: 100%; }
+      .brand { width: 100%; }
       .brand-text { display: grid; gap: 3px; }
+      .brand-text h1 { font-size: 1rem; }
       .brand-text p { max-width: none; }
       .actions-top {
-        grid-column: 1 / -1;
         width: 100%;
-        justify-content: flex-end;
+        justify-content: space-between;
       }
       .actions-top .chip-status { display: none; }
       .menu-popover { right: 0; left: auto; width: min(240px, calc(100vw - 20px)); }
@@ -228,7 +229,7 @@
     }
     .summary-grid {
       display: grid;
-      grid-template-columns: 1.5fr 1fr 1fr;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 10px;
     }
     .summary-card {
@@ -407,13 +408,18 @@
       background: #fff;
       border: 1px solid rgba(17,24,39,.08);
     }
-    .sheet.open { display: block; }
+    .sheet.open { display: flex; }
     .sheet-header {
+      position: sticky;
+      top: 0;
+      z-index: 4;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
       margin-bottom: 12px;
+      padding: 2px 0 10px;
+      background: linear-gradient(180deg, #fff 88%, rgba(255,255,255,0));
     }
     .sheet-header h3 { margin: 0; font-size: 1.1rem; }
     .form-grid {
@@ -452,6 +458,13 @@
     .sheet-actions {
       position: sticky;
       bottom: 0;
+      z-index: 3;
+      padding: 14px 0 calc(12px + env(safe-area-inset-bottom));
+      background: linear-gradient(180deg, rgba(255,255,255,0), #fff 24px);
+    }
+    .sheet-actions {
+      position: sticky;
+      bottom: 0;
       padding-top: 12px;
       padding-bottom: max(10px, env(safe-area-inset-bottom));
       background: linear-gradient(180deg, rgba(255,255,255,0), rgba(255,255,255,.98) 18%);
@@ -477,6 +490,29 @@
       font-size: .82rem;
       line-height: 1.35;
     }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(14px + env(safe-area-inset-bottom));
+      transform: translateX(-50%) translateY(20px);
+      min-width: min(92vw, 420px);
+      max-width: min(92vw, 420px);
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(17,24,39,.94);
+      color: #fff;
+      font-size: .9rem;
+      font-weight: 700;
+      box-shadow: 0 18px 36px rgba(15,23,42,.22);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease, transform .2s ease;
+      z-index: 2000;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.success { background: rgba(17,24,39,.94); }
+    .toast.error { background: rgba(185,28,28,.96); }
+    .toast.info { background: rgba(17,24,39,.94); }
     .sync-key {
       display: inline-flex;
       align-items: center;
@@ -511,7 +547,6 @@
     .settings-head strong { font-size: .96rem; }
     .hidden { display: none !important; }
     @media (max-width: 420px) {
-      .summary-grid { grid-template-columns: 1fr; }
       .summary-card { min-height: auto; }
       .form-grid { grid-template-columns: 1fr; }
       .item-actions { flex-direction: column; align-items: flex-start; }
@@ -612,6 +647,8 @@
       </section>
     </main>
   </div>
+
+  <div class="toast" id="toast" aria-live="polite" aria-atomic="true"></div>
 
   <div class="backdrop" id="menuBackdrop"></div>
 
@@ -787,6 +824,7 @@
         resetBtn: document.getElementById('resetBtn'),
         fileInput: document.getElementById('fileInput'),
         firebaseSummary: document.getElementById('firebaseSummary'),
+        toast: document.getElementById('toast'),
         itemSheet: document.getElementById('itemSheet'),
         closeItemBtn: document.getElementById('closeItemBtn'),
         cancelItemBtn: document.getElementById('cancelItemBtn'),
@@ -825,6 +863,7 @@
         deviceName: '',
         suppressPush: false,
         firebaseLoadPromise: null,
+        toastTimer: null,
         selfTest: new URLSearchParams(location.search).has('selftest')
       };
 
@@ -1109,6 +1148,16 @@
         setSubtitle();
       }
 
+      function showToast(message, kind) {
+        if (!els.toast) return;
+        clearTimeout(state.toastTimer);
+        els.toast.textContent = message;
+        els.toast.className = 'toast show ' + (kind || 'info');
+        state.toastTimer = setTimeout(function () {
+          els.toast.className = 'toast';
+        }, 2400);
+      }
+
       function openMenu() {
         closeSettings();
         closeItemModal();
@@ -1135,6 +1184,7 @@
         els.settingsSheet.classList.add('open');
         els.settingsSheet.setAttribute('aria-hidden', 'false');
         els.menuBackdrop.style.display = 'block';
+        showToast('Reglages Firebase ouverts', 'info');
         setTimeout(function () { els.roomId.focus(); }, 50);
       }
       function closeSettings() {
@@ -1200,10 +1250,12 @@
         renderAll();
       }
       function setScope(scope) {
-        state.scope = scope;
-        els.scopeAll.classList.toggle('active', scope === 'all');
-        els.scopeSoon.classList.toggle('active', scope === 'soon');
-        els.scopeOverdue.classList.toggle('active', scope === 'overdue');
+        var next = scope;
+        if (state.scope === scope && scope !== 'all') next = 'all';
+        state.scope = next;
+        els.scopeAll.classList.toggle('active', next === 'all');
+        els.scopeSoon.classList.toggle('active', next === 'soon');
+        els.scopeOverdue.classList.toggle('active', next === 'overdue');
         renderAll();
       }
 
@@ -1414,6 +1466,7 @@
       function saveSettingsFromUI() {
         persistSettingsAndMaybeReconnect();
         setStatus('Config enregistree', 'offline');
+        showToast('Configuration enregistree', 'success');
         window.alert('Configuration enregistree sur cet iPhone.');
       }
 
@@ -1464,6 +1517,42 @@
         return state.firebaseLoadPromise;
       }
 
+      function sortItemsForDisplay(a, b) {
+        return String(b.updatedAt || b.createdAt || '').localeCompare(String(a.updatedAt || a.createdAt || '')) || a.name.localeCompare(b.name, 'fr');
+      }
+
+      function snapshotToItems(snapshot) {
+        var payload = snapshot && snapshot.val() ? snapshot.val() : {};
+        return Object.keys(payload).map(function (key) { return normalizeItem(payload[key]); }).filter(Boolean);
+      }
+
+      function itemsToPayload(items) {
+        var payload = {};
+        items.forEach(function (item) {
+          var normalized = normalizeItem(item);
+          if (normalized) payload[normalized.id] = normalized;
+        });
+        return payload;
+      }
+
+      function mergeItems(remoteItems, localItems) {
+        var map = {};
+        function put(item) {
+          if (!item) return;
+          var current = map[item.id];
+          if (!current) {
+            map[item.id] = item;
+            return;
+          }
+          var currentTime = Date.parse(current.updatedAt || current.createdAt || '') || 0;
+          var nextTime = Date.parse(item.updatedAt || item.createdAt || '') || 0;
+          if (nextTime >= currentTime) map[item.id] = item;
+        }
+        (Array.isArray(remoteItems) ? remoteItems : []).forEach(function (item) { put(normalizeItem(item)); });
+        (Array.isArray(localItems) ? localItems : []).forEach(function (item) { put(normalizeItem(item)); });
+        return Object.keys(map).map(function (id) { return map[id]; }).filter(Boolean).sort(sortItemsForDisplay);
+      }
+
       function ensureFirebaseApp(cfg) {
         var existing = firebase.apps && firebase.apps.length ? firebase.apps[0] : null;
         if (!existing) {
@@ -1489,10 +1578,12 @@
         if (!cfg) {
           window.alert('Complete les champs Firebase avant de connecter.');
           setStatus('Config Firebase incomplete', 'error');
+          showToast('Configuration Firebase incomplete', 'error');
           return;
         }
         try {
           setStatus('Connexion...', 'connecting');
+          showToast('Connexion Firebase en cours...', 'info');
           await loadFirebaseCompat();
           if (typeof firebase === 'undefined') throw new Error('Firebase non charge');
           await ensureFirebaseApp(cfg);
@@ -1502,9 +1593,17 @@
           state.db = firebase.database();
           state.refPath = 'freezerRooms/' + settings.roomId + '/items';
           var ref = state.db.ref(state.refPath);
+          var remoteSnapshot = await ref.once('value');
+          var remoteItems = snapshotToItems(remoteSnapshot);
+          var mergedItems = mergeItems(remoteItems, state.items);
+          state.suppressPush = true;
+          state.items = mergedItems;
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
+          state.suppressPush = false;
+          renderAll();
+          await ref.set(itemsToPayload(mergedItems));
           state.listener = function (snapshot) {
-            var payload = snapshot.val() || {};
-            var nextItems = Object.keys(payload).map(function (key) { return normalizeItem(payload[key]); }).filter(Boolean).sort(function (a, b) { return (b.updatedAt || '').localeCompare(a.updatedAt || ''); });
+            var nextItems = snapshotToItems(snapshot).sort(sortItemsForDisplay);
             state.suppressPush = true;
             state.items = nextItems;
             localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
@@ -1514,14 +1613,16 @@
           };
           ref.on('value', state.listener, function () {
             setStatus('Erreur de sync', 'error');
+            showToast('Erreur de synchronisation', 'error');
           });
           state.syncing = true;
           setStatus('Synchronise: ' + settings.roomId, 'online');
-          await pushToFirebase(true);
+          showToast('Synchronisation active', 'success');
         } catch (err) {
           console.error(err);
           state.syncing = false;
           setStatus('Erreur de connexion', 'error');
+          showToast('Connexion Firebase impossible', 'error');
           window.alert('Connexion Firebase impossible. Verifie le projet et le code de partage.');
         }
       }
@@ -1535,6 +1636,7 @@
         state.listener = null;
         state.syncing = false;
         setStatus('Hors ligne', 'offline');
+        showToast('Deconnecte de Firebase', 'info');
       }
 
       function pushToFirebase(force) {
@@ -1625,6 +1727,7 @@
         localStorage.setItem(SETTINGS_KEY, JSON.stringify(state.settings));
         populateSettingsUI();
         setStatus('Config enregistree', 'offline');
+        showToast('Configuration enregistree', 'success');
         window.alert('Configuration enregistree sur cet iPhone.');
       }
     })();
