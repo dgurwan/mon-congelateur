@@ -5,819 +5,1576 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="theme-color" content="#2563eb" />
-  <title>Mon congélateur</title>
+  <meta name="theme-color" content="#f2f2f7" />
+  <title>Mon congelateur</title>
   <style>
     :root {
-      --bg: #f6fbff;
-      --panel: rgba(255,255,255,.92);
-      --text: #10223d;
-      --muted: #607087;
-      --primary: #2563eb;
-      --primary-2: #1d4ed8;
-      --danger: #dc2626;
-      --ok: #059669;
-      --warn: #d97706;
-      --border: rgba(16,34,61,.12);
-      --shadow: 0 18px 40px rgba(15, 23, 42, .08);
-      --radius: 22px;
+      --bg: #f2f2f7;
+      --panel: rgba(255,255,255,.94);
+      --panel-solid: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --line: rgba(17,24,39,.10);
+      --blue: #007aff;
+      --blue2: #0a84ff;
+      --green: #22c55e;
+      --orange: #f59e0b;
+      --red: #ef4444;
+      --shadow: 0 12px 40px rgba(15,23,42,.10);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 13px;
+      --app-width: 480px;
     }
     * { box-sizing: border-box; }
+    html, body { height: 100%; }
     body {
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background:
-        radial-gradient(1200px 800px at 20% 0%, rgba(37,99,235,.10), transparent 55%),
-        radial-gradient(900px 700px at 100% 10%, rgba(14,165,233,.12), transparent 40%),
-        var(--bg);
+      background: var(--bg);
       color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
     }
-    .app { max-width: 1100px; margin: 0 auto; padding: 18px 14px 32px; }
-    .hero { display: grid; grid-template-columns: 1.15fr .85fr; gap: 14px; align-items: stretch; margin-bottom: 14px; }
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(16px);
+    button, input, select, textarea { font: inherit; }
+    button { -webkit-tap-highlight-color: transparent; }
+    .app {
+      width: min(var(--app-width), calc(100vw - 16px));
+      margin: 0 auto;
+      padding: 10px 0 24px;
     }
-    .hero-main { padding: 18px; }
-    .eyebrow { color: var(--primary); font-weight: 700; font-size: .82rem; letter-spacing: .02em; text-transform: uppercase; }
-    h1 { margin: 8px 0 8px; font-size: clamp(1.7rem, 3vw, 2.8rem); line-height: 1.05; }
-    .sub { color: var(--muted); line-height: 1.55; margin: 0; }
-    .side-grid { display: grid; gap: 14px; }
-    .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-    .stat { padding: 16px; }
-    .stat .label { color: var(--muted); font-size: .9rem; }
-    .stat .value { font-size: 1.7rem; font-weight: 800; margin-top: 4px; }
-    .toolbar {
-      display: grid;
-      grid-template-columns: 1.35fr .9fr .8fr auto;
-      gap: 10px;
-      margin: 16px 0;
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(18px);
+      background: rgba(242,242,247,.78);
+      border: 1px solid rgba(17,24,39,.08);
+      border-radius: 24px;
+      box-shadow: 0 10px 26px rgba(15,23,42,.05);
+      margin: 0 8px 10px;
+      padding: 10px 12px;
+    }
+    .topbar-row {
+      display: flex;
       align-items: center;
+      justify-content: space-between;
+      gap: 10px;
     }
-    input, select, button, textarea {
-      font: inherit;
-      border-radius: 16px;
-      border: 1px solid rgba(16,34,61,.15);
-      background: white;
-      color: var(--text);
-      padding: 13px 14px;
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      color: white;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--blue), var(--blue2));
+      box-shadow: 0 8px 18px rgba(0,122,255,.24);
+      flex: 0 0 auto;
+    }
+    .brand-text { min-width: 0; }
+    .brand-text h1 {
+      margin: 0;
+      font-size: 1.06rem;
+      line-height: 1.1;
+      letter-spacing: -.02em;
+    }
+    .brand-text p {
+      margin: 3px 0 0;
+      font-size: .82rem;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 230px;
+    }
+    .actions-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
+    .chip-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 11px;
+      border-radius: 999px;
+      background: rgba(17,24,39,.05);
+      color: var(--muted);
+      font-size: .81rem;
+      white-space: nowrap;
+    }
+    .dot { width: 10px; height: 10px; border-radius: 999px; background: #94a3b8; }
+    .dot.online { background: var(--green); }
+    .dot.connecting { background: var(--orange); }
+    .dot.error { background: var(--red); }
+    .icon-btn, .btn {
+      border: 0;
+      cursor: pointer;
+      transition: transform .08s ease, opacity .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+    .icon-btn:active, .btn:active { transform: translateY(1px); }
+    .mini-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: rgba(0,122,255,.10);
+      color: var(--blue);
+    }
+    .mini-btn svg { width: 20px; height: 20px; }
+    .menu-wrap { position: relative; }
+    .menu-popover {
+      position: fixed;
+      top: calc(66px + env(safe-area-inset-top));
+      right: 12px;
+      width: min(240px, calc(100vw - 24px));
+      padding: 10px;
+      border-radius: 22px;
+      background: var(--panel-solid);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      display: none;
+      z-index: 1200;
+    }
+    .menu-popover.open { display: grid; gap: 8px; }
+    .menu-title {
+      padding: 4px 6px 2px;
+      font-size: .76rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 900;
+    }
+    .menu-item {
       width: 100%;
+      text-align: left;
+      border: 1px solid rgba(17,24,39,.08);
+      background: #fff;
+      border-radius: 16px;
+      padding: 13px 12px;
+      font-weight: 800;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
+    .menu-item svg { width: 18px; height: 18px; }
+    .menu-item.danger { color: var(--red); background: #fff5f5; }
+    .backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,.22);
+      display: none;
+      z-index: 1100;
+    }
+    .shell { padding: 8px 10px 22px; display: grid; gap: 12px; }
+    .hero {
+      padding: 16px 16px 14px;
+      border-radius: 28px;
+      background:
+        radial-gradient(900px 300px at 0% 0%, rgba(0,122,255,.12), transparent 42%),
+        linear-gradient(180deg, #fff, #fdfdff);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+    .eyebrow {
+      color: var(--blue);
+      font-weight: 800;
+      font-size: .76rem;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+    }
+    .hero h2 {
+      margin: 7px 0 0;
+      font-size: 1.56rem;
+      line-height: 1.05;
+      letter-spacing: -.03em;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr;
+      gap: 10px;
+    }
+    .summary-card {
+      position: relative;
+      text-align: left;
+      padding: 14px 12px 16px;
+      border-radius: 24px;
+      background: var(--panel-solid);
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 24px rgba(15,23,42,.05);
+      overflow: hidden;
+      min-height: 110px;
+    }
+    .summary-card.active {
+      outline: 2px solid rgba(0,122,255,.22);
+      box-shadow: 0 10px 28px rgba(0,122,255,.12);
+    }
+    .summary-card.full { min-height: 110px; }
+    .summary-label { font-size: .8rem; color: var(--muted); font-weight: 800; }
+    .summary-value { margin-top: 8px; font-size: 2rem; font-weight: 900; letter-spacing: -.05em; }
+    .summary-hint { margin-top: 4px; font-size: .78rem; color: var(--muted); line-height: 1.2; }
+    .summary-accent {
+      position: absolute;
+      inset: auto 12px 10px auto;
+      width: 40px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(0,122,255,.16);
+    }
+    .actions-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .action-btn {
+      border-radius: 20px;
+      padding: 15px 12px;
+      font-weight: 800;
+      font-size: 1rem;
+      background: linear-gradient(180deg, var(--blue2), var(--blue));
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 12px 24px rgba(0,122,255,.16);
+    }
+    .action-btn.secondary {
+      background: #fff;
+      color: var(--text);
+      border: 1px solid rgba(17,24,39,.10);
+      box-shadow: 0 8px 18px rgba(15,23,42,.04);
+    }
+    .action-btn svg { width: 20px; height: 20px; }
+    .card {
+      background: var(--panel-solid);
+      border-radius: 24px;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+    .panel { padding: 14px; }
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .section-header h3 { margin: 0; font-size: 1.03rem; letter-spacing: -.01em; }
+    .small, .subtle { color: var(--muted); font-size: .84rem; }
+    .list {
+      display: grid;
+      gap: 10px;
+    }
+    .item {
+      position: relative;
+      padding: 14px;
+      border-radius: 22px;
+      background: #fff;
+      border: 1px solid rgba(17,24,39,.08);
+      box-shadow: 0 8px 18px rgba(15,23,42,.04);
+      overflow: hidden;
+    }
+    .age-pill {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      box-shadow: 0 0 0 3px rgba(255,255,255,.92);
+    }
+    .age-fresh { background: var(--green); }
+    .age-warn { background: var(--orange); }
+    .age-old { background: var(--red); }
+    .item-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding-right: 24px;
+    }
+    .item-title { min-width: 0; flex: 1 1 auto; }
+    .item-name {
+      margin: 0;
+      font-size: 1.03rem;
+      font-weight: 900;
+      letter-spacing: -.02em;
+    }
+    .item-sub {
+      margin-top: 5px;
+      font-size: .82rem;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(17,24,39,.05);
+      color: #334155;
+      font-size: .77rem;
+      font-weight: 700;
+    }
+    .item-actions {
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .qty-stepper, .meta-actions { display: flex; align-items: center; gap: 8px; }
+    .circle-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: rgba(17,24,39,.05);
+      color: var(--text);
+      border: 1px solid rgba(17,24,39,.06);
+    }
+    .circle-btn.primary { background: rgba(0,122,255,.10); color: var(--blue); }
+    .circle-btn.danger { background: rgba(239,68,68,.10); color: var(--red); }
+    .circle-btn svg { width: 18px; height: 18px; }
+    .qty-stepper strong { min-width: 28px; text-align: center; font-size: 1rem; }
+    .empty {
+      padding: 18px 14px;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed rgba(17,24,39,.14);
+      border-radius: 18px;
+      background: #fff;
+    }
+    .sheet {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      top: 12px;
+      width: min(var(--app-width), calc(100vw - 16px));
+      max-height: calc(100vh - 24px);
+      overflow: auto;
+      z-index: 1400;
+      display: none;
+      padding: 14px;
+      border-radius: 28px;
+      box-shadow: 0 26px 60px rgba(15,23,42,.18);
+      background: #fff;
+      border: 1px solid rgba(17,24,39,.08);
+    }
+    .sheet.open { display: block; }
+    .sheet-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .sheet-header h3 { margin: 0; font-size: 1.1rem; }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .full { grid-column: 1 / -1; }
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: .82rem;
+      font-weight: 700;
+    }
+    input, select, textarea {
+      width: 100%;
+      border-radius: 16px;
+      border: 1px solid rgba(17,24,39,.12);
+      background: #fff;
+      padding: 12px 12px;
+      color: var(--text);
+      outline: none;
+    }
+    textarea { min-height: 92px; resize: vertical; }
     input:focus, select:focus, textarea:focus {
-      outline: 3px solid rgba(37,99,235,.18);
-      border-color: rgba(37,99,235,.5);
+      border-color: rgba(0,122,255,.45);
+      box-shadow: 0 0 0 4px rgba(0,122,255,.10);
     }
-    .btn { border: none; cursor: pointer; font-weight: 700; transition: transform .08s ease, box-shadow .2s ease, opacity .2s ease; }
-    .btn:active { transform: translateY(1px); }
-    .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-2)); color: white; box-shadow: 0 12px 25px rgba(37,99,235,.18); }
-    .btn-secondary { background: white; }
-    .btn-danger { background: #fff1f2; color: var(--danger); }
-    .btn-ghost { background: transparent; border: 1px dashed rgba(16,34,61,.18); }
-    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-    .section-title { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 18px 0 10px; }
-    .section-title h2 { margin: 0; font-size: 1.1rem; }
-    .list { display: grid; gap: 10px; }
-    .item { padding: 14px; display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: start; }
-    .item.overdue { border-left: 6px solid var(--danger); }
-    .item.soon { border-left: 6px solid var(--warn); }
-    .item.fresh { border-left: 6px solid var(--ok); }
-    .title-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-    .name { font-size: 1.05rem; font-weight: 800; }
-    .badge {
-      display: inline-flex; align-items: center; gap: 6px; font-size: .78rem;
-      padding: 6px 10px; border-radius: 999px; background: rgba(16,34,61,.06); color: var(--muted); white-space: nowrap;
+    .sheet-actions, .pill-row, .search-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
     }
-    .meta { color: var(--muted); font-size: .92rem; line-height: 1.45; margin-top: 4px; }
-    .actions { display: grid; gap: 8px; min-width: 136px; }
-    .qty { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
-    .qty strong { min-width: 34px; text-align: center; }
-    .icon-btn { width: 38px; height: 38px; padding: 0; border-radius: 12px; display: grid; place-items: center; font-size: 1.05rem; line-height: 1; }
-    .empty { padding: 24px; text-align: center; color: var(--muted); }
-    .panel-title { display:flex; justify-content:space-between; align-items:center; gap:10px; }
-    .panel { padding:16px; }
-    .small { font-size: .85rem; color: var(--muted); }
-    .pill-row { display:flex; flex-wrap: wrap; gap: 8px; }
-    .hint { margin-top: 10px; color: var(--muted); font-size: .9rem; line-height: 1.45; }
-    .status { display:inline-flex; align-items:center; gap:8px; font-size:.88rem; padding:8px 11px; border-radius:999px; background:rgba(16,34,61,.06); }
-    .dot { width:10px; height:10px; border-radius:999px; background:#94a3b8; }
-    .dot.online { background: var(--ok); }
-    .dot.offline { background: #94a3b8; }
-    .dot.error { background: var(--danger); }
-    .dot.connecting { background: var(--warn); }
-    .config { display:grid; gap:10px; }
-    .config label { display:grid; gap:7px; font-size:.92rem; color: var(--muted); }
-    .config .two { display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
-    .sync-key { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9rem; word-break: break-all; }
-    .sync-note { font-size: .85rem; color: var(--muted); line-height: 1.45; }
-    .modal-backdrop { position: fixed; inset: 0; background: rgba(15, 23, 42, .38); display: none; place-items: center; z-index: 40; padding: 14px; }
-    .modal { width: min(700px, 100%); max-height: 92vh; overflow: auto; padding: 16px; }
-    .modal header { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; }
-    .modal h3 { margin: 0; font-size: 1.15rem; }
-    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-    .form-grid .full { grid-column: 1 / -1; }
-    label { display: grid; gap: 7px; font-size: .94rem; color: var(--muted); }
-    textarea { min-height: 90px; resize: vertical; }
-    .footer-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; margin-top: 14px; }
-    @media (max-width: 920px) {
-      .hero { grid-template-columns: 1fr; }
-      .toolbar { grid-template-columns: 1fr 1fr; }
-      .grid, .form-grid, .config .two { grid-template-columns: 1fr; }
-      .item { grid-template-columns: 1fr; }
-      .actions { min-width: 0; }
-      .qty { justify-content: flex-start; }
+    .small-btn {
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(17,24,39,.10);
+      background: #fff;
+      color: var(--text);
+      font-weight: 800;
     }
-    @media (max-width: 560px) {
-      .toolbar { grid-template-columns: 1fr; }
-      .stats { grid-template-columns: 1fr 1fr; }
+    .small-btn.primary { background: linear-gradient(180deg, var(--blue2), var(--blue)); color: #fff; border-color: transparent; }
+    .small-btn.danger { background: #fff5f5; color: var(--red); border-color: rgba(239,68,68,.18); }
+    .sync-note {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(17,24,39,.04);
+      color: var(--muted);
+      font-size: .82rem;
+      line-height: 1.35;
+    }
+    .sync-key {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(0,122,255,.10);
+      color: var(--blue);
+      font-weight: 800;
+    }
+    .results {
+      display: grid;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .settings-block {
+      display: grid;
+      gap: 10px;
+    }
+    .settings-card {
+      border-radius: 20px;
+      border: 1px solid rgba(17,24,39,.08);
+      background: #fff;
+      padding: 12px;
+    }
+    .settings-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .settings-head strong { font-size: .96rem; }
+    .hidden { display: none !important; }
+    @media (max-width: 420px) {
+      .summary-grid { grid-template-columns: 1fr; }
+      .summary-card { min-height: auto; }
+      .form-grid { grid-template-columns: 1fr; }
+      .item-actions { flex-direction: column; align-items: flex-start; }
+      .qty-stepper, .meta-actions { width: 100%; justify-content: flex-start; }
     }
   </style>
-  <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-database-compat.js"></script>
 </head>
 <body>
-  <div class="app">
-    <section class="hero">
-      <div class="card hero-main">
-        <div class="eyebrow">Gestion du congélateur</div>
-        <h1>Mon congélateur</h1>
-        <p class="sub">Lister, retrouver et faire tourner ce que tu as déjà. L’application marche hors ligne, puis se synchronise dès qu’elle est connectée au même espace partagé sur les deux iPhone.</p>
-      </div>
-      <div class="side-grid">
-        <div class="card stats">
-          <div class="stat"><div class="label">Articles</div><div class="value" id="statItems">0</div></div>
-          <div class="stat"><div class="label">Portions</div><div class="value" id="statQty">0</div></div>
-          <div class="stat"><div class="label">À consommer</div><div class="value" id="statSoon">0</div></div>
-          <div class="stat"><div class="label">Périmés</div><div class="value" id="statOverdue">0</div></div>
-        </div>
-        <div class="card panel">
-          <div class="panel-title">
-            <strong>Synchronisation</strong>
-            <span class="status"><span id="syncDot" class="dot offline"></span><span id="syncStatus">Hors ligne</span></span>
-          </div>
-          <div class="config" style="margin-top:12px;">
-            <div class="two">
-              <label>Code de partage
-                <input id="roomId" placeholder="ex. maison-dubois" />
-              </label>
-              <label>Nom de l’appareil
-                <input id="deviceName" placeholder="iPhone cuisine" />
-              </label>
-            </div>
-            <details>
-              <summary style="cursor:pointer; font-weight:700; color: var(--primary);">Connexion Firebase</summary>
-              <div style="padding-top:12px;" class="config">
-                <label>apiKey
-                  <input id="fbApiKey" placeholder="AIza..." value="AIzaSyDsNEGaBaq9JhTxSTvIeAQKbhRKNPecXgw" />
-                </label>
-                <div class="two">
-                  <label>authDomain
-                    <input id="fbAuthDomain" placeholder="mon-projet.firebaseapp.com" value="myfreezer-b488a.firebaseapp.com" />
-                  </label>
-                  <label>databaseURL
-                    <input id="fbDatabaseURL" placeholder="https://mon-projet-default-rtdb.europe-west1.firebasedatabase.app" value="https://myfreezer-b488a-default-rtdb.europe-west1.firebasedatabase.app" />
-                  </label>
-                </div>
-                <div class="two">
-                  <label>projectId
-                    <input id="fbProjectId" placeholder="mon-projet" value="myfreezer-b488a" />
-                  </label>
-                  <label>appId
-                    <input id="fbAppId" placeholder="1:123:web:abc" value="1:893959065266:web:c3bc8222855358927b43ab" />
-                  </label>
-                </div>
-                <div class="pill-row">
-                  <button class="btn btn-secondary" id="connectBtn" type="button">Connecter</button>
-                  <button class="btn btn-secondary" id="disconnectBtn" type="button">Déconnecter</button>
-                  <button class="btn btn-ghost" id="saveSettingsBtn" type="button">Sauver la config</button>
-                </div>
-                <div class="sync-note">
-                  Les deux iPhone doivent utiliser le même code de partage et le même projet Firebase. Le contenu est privé par le code de partage, donc garde-le confidentiel.
-                </div>
-                <div class="sync-note" style="background:rgba(37,99,235,.06); border:1px solid rgba(37,99,235,.12); padding:10px 12px; border-radius:14px;">
-                  <strong>Firebase détecté :</strong> <span class="sync-key">myfreezer-b488a</span>
-                </div>
-              </div>
-            </details>
-            <div class="pill-row">
-              <button class="btn btn-secondary" id="exportBtn" type="button">Exporter</button>
-              <button class="btn btn-secondary" id="importBtn" type="button">Importer</button>
-              <button class="btn btn-danger" id="resetBtn" type="button">Vider</button>
-            </div>
-            <input type="file" id="fileInput" accept="application/json" hidden>
-            <div class="sync-note">En secours, tu peux toujours exporter une copie JSON. La synchronisation reste active entre les deux iPhone dès que Firebase est configuré.</div>
+  <div class="app" id="appRoot">
+    <header class="topbar">
+      <div class="topbar-row">
+        <div class="brand">
+          <div class="brand-mark">&#10052;</div>
+          <div class="brand-text">
+            <h1>Mon congelateur</h1>
+            <p id="subtitle">Dashboard du congelateur</p>
           </div>
         </div>
+        <div class="actions-top">
+          <span class="chip-status"><span id="syncDot" class="dot"></span><span id="syncStatus">Hors ligne</span></span>
+          <div class="menu-wrap">
+            <button class="icon-btn mini-btn" id="menuBtn" type="button" aria-label="Menu">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg>
+            </button>
+            <div class="menu-popover" id="menuPopover" aria-hidden="true">
+              <div class="menu-title">Menu</div>
+              <button class="menu-item" id="menuSettingsBtn" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.05.06a2 2 0 0 1 0 2.83l-.44.44a2 2 0 0 1-2.83 0l-.06-.05a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V22a2 2 0 0 1-2 2h-.62a2 2 0 0 1-2-2v-.14a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.05a2 2 0 0 1-2.83 0l-.44-.44a2 2 0 0 1 0-2.83l.05-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H2a2 2 0 0 1-2-2v-.62a2 2 0 0 1 2-2h.14a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.05-.06a2 2 0 0 1 0-2.83l.44-.44a2 2 0 0 1 2.83 0l.06.05a1.7 1.7 0 0 0 1.87.34h0A1.7 1.7 0 0 0 10 2.14V2a2 2 0 0 1 2-2h.62a2 2 0 0 1 2 2v.14a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.05a2 2 0 0 1 2.83 0l.44.44a2 2 0 0 1 0 2.83l-.05.06a1.7 1.7 0 0 0-.34 1.87A1.7 1.7 0 0 0 22 10h.14a2 2 0 0 1 2 2v.62a2 2 0 0 1-2 2h-.14a1.7 1.7 0 0 0-1.55 1Z"/></svg>
+                Parametres
+              </button>
+              <button class="menu-item danger" id="menuDisconnectBtn" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/><path d="M21 3v18"/></svg>
+                Deconnexion
+              </button>
+            </div>
+          </div>
+          <button class="icon-btn mini-btn" id="homeBtn" type="button" aria-label="Dashboard">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10.5V21h14V10.5"/><path d="M10 21v-6h4v6"/></svg>
+          </button>
+        </div>
       </div>
-    </section>
+    </header>
 
-    <div class="toolbar">
-      <input id="search" placeholder="Rechercher un aliment…" />
-      <select id="filterCategory"><option value="all">Toutes catégories</option></select>
-      <select id="sortBy">
-        <option value="due">Tri: date limite</option>
-        <option value="name">Tri: nom</option>
-        <option value="category">Tri: catégorie</option>
-      </select>
-      <button class="btn btn-primary" id="addBtn">+ Ajouter</button>
-    </div>
+    <main class="shell">
+      <section class="hero card">
+        <div class="eyebrow">Dashboard</div>
+        <h2>Mon congelateur</h2>
+      </section>
 
-    <div class="section-title">
-      <h2>Liste</h2>
-      <span class="small" id="listCount">0 article</span>
-    </div>
-    <div class="list" id="list"></div>
+      <section class="summary-grid" aria-label="Resume du congelateur">
+        <button class="summary-card full active" id="scopeAll" type="button" data-scope="all">
+          <div class="summary-label">Articles</div>
+          <div class="summary-value" id="statItems">0</div>
+          <div class="summary-hint">Tous les articles du congelateur</div>
+          <div class="summary-accent"></div>
+        </button>
+        <button class="summary-card" id="scopeSoon" type="button" data-scope="soon">
+          <div class="summary-label">A consommer</div>
+          <div class="summary-value" id="statSoon">0</div>
+          <div class="summary-hint">A utiliser bientot</div>
+          <div class="summary-accent"></div>
+        </button>
+        <button class="summary-card" id="scopeOverdue" type="button" data-scope="overdue">
+          <div class="summary-label">Perimes</div>
+          <div class="summary-value" id="statOverdue">0</div>
+          <div class="summary-hint">Filtre des articles perimes</div>
+          <div class="summary-accent"></div>
+        </button>
+      </section>
+
+      <section class="actions-row">
+        <button class="btn action-btn" id="addBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+          Ajouter
+        </button>
+        <button class="btn action-btn secondary" id="searchBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          Rechercher
+        </button>
+      </section>
+
+      <section class="card panel">
+        <div class="section-header">
+          <h3 id="listTitle">Tous les articles</h3>
+          <span class="small" id="listCount">0 article</span>
+        </div>
+        <div class="list" id="list"></div>
+      </section>
+    </main>
   </div>
 
-  <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true">
-    <div class="card modal">
-      <header>
-        <h3 id="modalTitle">Ajouter un article</h3>
-        <button class="btn btn-secondary icon-btn" id="closeModal" aria-label="Fermer">✕</button>
-      </header>
-      <form id="itemForm">
-        <input type="hidden" id="itemId">
+  <div class="backdrop" id="menuBackdrop"></div>
+
+  <section class="sheet" id="settingsSheet" aria-hidden="true">
+    <div class="sheet-header">
+      <h3>Parametres</h3>
+      <button class="icon-btn mini-btn" id="closeSettingsBtn" type="button" aria-label="Fermer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="settings-block">
+      <div class="settings-card">
+        <div class="settings-head"><strong>Connexion Firebase</strong><span class="subtle">Sauvegarde locale conservee</span></div>
         <div class="form-grid">
-          <label class="full">Nom
-            <input id="name" required placeholder="Ex. Poulet, haricots verts, soupe…" />
+          <label>Code de partage
+            <input id="roomId" placeholder="ex. maison-dubois" />
           </label>
-          <label>Catégorie
-            <select id="category">
-              <option>Viande</option>
-              <option>Poisson</option>
-              <option>Légumes</option>
-              <option>Plats cuisinés</option>
-              <option>Fruits</option>
-              <option>Produits laitiers</option>
-              <option>Autre</option>
-            </select>
+          <label>Nom de l'appareil
+            <input id="deviceName" placeholder="iPhone cuisine" />
           </label>
-          <label>Quantité
-            <input id="quantity" type="number" min="1" step="1" value="1" />
+          <label>Firebase apiKey
+            <input id="fbApiKey" placeholder="AIza..." />
           </label>
-          <label>Unité
-            <input id="unit" placeholder="portions, sachets, pièces…" value="portion" />
+          <label>Firebase authDomain
+            <input id="fbAuthDomain" placeholder="projet.firebaseapp.com" />
           </label>
-          <label>Date de congélation
-            <input id="frozenAt" type="date" />
+          <label class="full">Firebase databaseURL
+            <input id="fbDatabaseURL" placeholder="https://...firebasedatabase.app" />
           </label>
-          <label>Durée (mois)
-            <input id="months" type="number" min="1" step="1" value="3" />
+          <label>Firebase projectId
+            <input id="fbProjectId" placeholder="myfreezer-b488a" />
           </label>
-          <label class="full">Notes
-            <textarea id="notes" placeholder="Ex. soupe maison, 2 portions restantes, déjà cuit…"></textarea>
+          <label>Firebase appId
+            <input id="fbAppId" placeholder="1:...:web:..." />
           </label>
         </div>
-        <div class="footer-actions">
-          <button type="button" class="btn btn-secondary" id="cancelBtn">Annuler</button>
-          <button type="submit" class="btn btn-primary" id="saveBtn">Enregistrer</button>
+        <div class="pill-row">
+          <button class="btn small-btn primary" id="connectBtn" type="button">Connecter</button>
+          <button class="btn small-btn" id="disconnectBtn" type="button">Deconnecter</button>
+          <button class="btn small-btn" id="saveSettingsBtn" type="button">Sauver la config</button>
+          <button class="btn small-btn" id="exportBtn" type="button">Exporter</button>
+          <button class="btn small-btn" id="importBtn" type="button">Importer</button>
+          <button class="btn small-btn danger" id="resetBtn" type="button">Vider</button>
         </div>
-      </form>
+        <input id="fileInput" type="file" accept="application/json" hidden />
+        <div class="sync-note">Le meme code de partage sur les 2 iPhone pointe vers la meme base Firebase.</div>
+        <div class="sync-note">Projet detecte : <span class="sync-key">myfreezer-b488a</span></div>
+        <div class="sync-note" id="firebaseSummary">Firebase pret a etre configure.</div>
+      </div>
     </div>
-  </div>
+  </section>
+
+  <section class="sheet" id="itemSheet" aria-hidden="true">
+    <div class="sheet-header">
+      <h3 id="itemModalTitle">Ajouter un article</h3>
+      <button class="icon-btn mini-btn" id="closeItemBtn" type="button" aria-label="Fermer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <form id="itemForm">
+      <input type="hidden" id="itemId" />
+      <div class="form-grid">
+        <label class="full">Nom
+          <input id="name" required placeholder="Poulet, soupe, legumes..." />
+        </label>
+        <label>Cat&eacute;gorie
+          <select id="category"></select>
+        </label>
+        <label>Quantite
+          <input id="quantity" type="number" min="1" step="1" value="1" />
+        </label>
+        <label>Unite
+          <input id="unit" placeholder="portion, sachet..." value="portion" />
+        </label>
+        <label>Date de congelation
+          <input id="frozenAt" type="date" />
+        </label>
+        <label>Duree (mois)
+          <input id="months" type="number" min="1" step="1" value="3" />
+        </label>
+        <label class="full">Notes
+          <textarea id="notes" placeholder="Ex. deja cuit, 2 portions restantes..."></textarea>
+        </label>
+      </div>
+      <div class="sheet-actions">
+        <button class="btn action-btn" type="submit">Enregistrer</button>
+        <button class="btn action-btn secondary" id="cancelItemBtn" type="button">Retour au dashboard</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="sheet" id="searchSheet" aria-hidden="true">
+    <div class="sheet-header">
+      <h3>Rechercher</h3>
+      <button class="icon-btn mini-btn" id="closeSearchBtn" type="button" aria-label="Fermer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="form-grid">
+      <label class="full">Recherche
+        <input id="searchQuery" placeholder="Nom, categorie, notes..." />
+      </label>
+      <label>Cat&eacute;gorie
+        <select id="searchCategory"></select>
+      </label>
+      <div class="subtle" id="searchCount" style="align-self:end; padding-bottom: 11px;">0 resultat</div>
+    </div>
+    <div class="search-meta">
+      <button class="btn small-btn" id="clearSearchBtn" type="button">Reinitialiser</button>
+    </div>
+    <div class="results" id="searchResults"></div>
+    <div class="sheet-actions">
+      <button class="btn action-btn secondary" id="searchToDashboardBtn" type="button">Retour au dashboard</button>
+    </div>
+  </section>
+
+  <div id="testLog" class="hidden"></div>
 
   <script>
-    const STORAGE_KEY = 'freezer-inventory-v2';
-    const SETTINGS_KEY = 'freezer-sync-settings-v1';
-    const DEVICE_KEY = 'freezer-device-id-v1';
-    const CATEGORY_ORDER = ['Viande', 'Poisson', 'Légumes', 'Plats cuisinés', 'Fruits', 'Produits laitiers', 'Autre'];
-    const DEFAULT_FIREBASE_CONFIG = {
-      apiKey: "AIzaSyDsNEGaBaq9JhTxSTvIeAQKbhRKNPecXgw",
-      authDomain: "myfreezer-b488a.firebaseapp.com",
-      databaseURL: "https://myfreezer-b488a-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "myfreezer-b488a",
-      appId: "1:893959065266:web:c3bc8222855358927b43ab"
-    };
+    (function () {
+      'use strict';
 
-    const state = {
-      items: loadItems(),
-      syncing: false,
-      firebaseReady: false,
-      db: null,
-      itemsRef: null,
-      itemsListener: null,
-      roomId: '',
-      deviceId: getOrCreateDeviceId(),
-      deviceName: localStorage.getItem('freezer-device-name-v1') || defaultDeviceName(),
-      settings: loadSettings(),
-      remoteVersion: 0,
-      suppressLocalSync: false,
-    };
-
-    const els = {
-      list: document.getElementById('list'),
-      listCount: document.getElementById('listCount'),
-      search: document.getElementById('search'),
-      filterCategory: document.getElementById('filterCategory'),
-      sortBy: document.getElementById('sortBy'),
-      statItems: document.getElementById('statItems'),
-      statQty: document.getElementById('statQty'),
-      statSoon: document.getElementById('statSoon'),
-      statOverdue: document.getElementById('statOverdue'),
-      modalBackdrop: document.getElementById('modalBackdrop'),
-      modalTitle: document.getElementById('modalTitle'),
-      form: document.getElementById('itemForm'),
-      itemId: document.getElementById('itemId'),
-      name: document.getElementById('name'),
-      category: document.getElementById('category'),
-      quantity: document.getElementById('quantity'),
-      unit: document.getElementById('unit'),
-      frozenAt: document.getElementById('frozenAt'),
-      months: document.getElementById('months'),
-      notes: document.getElementById('notes'),
-      fileInput: document.getElementById('fileInput'),
-      roomId: document.getElementById('roomId'),
-      deviceName: document.getElementById('deviceName'),
-      fbApiKey: document.getElementById('fbApiKey'),
-      fbAuthDomain: document.getElementById('fbAuthDomain'),
-      fbDatabaseURL: document.getElementById('fbDatabaseURL'),
-      fbProjectId: document.getElementById('fbProjectId'),
-      fbAppId: document.getElementById('fbAppId'),
-      connectBtn: document.getElementById('connectBtn'),
-      disconnectBtn: document.getElementById('disconnectBtn'),
-      saveSettingsBtn: document.getElementById('saveSettingsBtn'),
-      syncDot: document.getElementById('syncDot'),
-      syncStatus: document.getElementById('syncStatus'),
-    };
-
-    document.getElementById('addBtn').addEventListener('click', () => openModal());
-    document.getElementById('closeModal').addEventListener('click', closeModal);
-    document.getElementById('cancelBtn').addEventListener('click', closeModal);
-    els.modalBackdrop.addEventListener('click', (e) => { if (e.target === els.modalBackdrop) closeModal(); });
-    els.form.addEventListener('submit', onSave);
-    els.search.addEventListener('input', render);
-    els.filterCategory.addEventListener('change', render);
-    els.sortBy.addEventListener('change', render);
-    document.getElementById('exportBtn').addEventListener('click', exportData);
-    document.getElementById('importBtn').addEventListener('click', () => els.fileInput.click());
-    document.getElementById('resetBtn').addEventListener('click', clearAll);
-    els.fileInput.addEventListener('change', importData);
-    els.connectBtn.addEventListener('click', connectSync);
-    els.disconnectBtn.addEventListener('click', disconnectSync);
-    els.saveSettingsBtn.addEventListener('click', saveSettingsFromUI);
-    els.deviceName.addEventListener('change', () => {
-      state.deviceName = (els.deviceName.value || '').trim() || defaultDeviceName();
-      localStorage.setItem('freezer-device-name-v1', state.deviceName);
-    });
-
-    populateCategoryFilter();
-    populateSettingsUI();
-    render();
-    autoConnectIfConfigured();
-
-    function getOrCreateDeviceId() {
-      let id = localStorage.getItem(DEVICE_KEY);
-      if (!id) {
-        id = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
-        localStorage.setItem(DEVICE_KEY, id);
-      }
-      return id;
-    }
-
-    function defaultDeviceName() {
-      const suffix = (localStorage.getItem(DEVICE_KEY) || 'iPhone').slice(-4).toUpperCase();
-      return `iPhone ${suffix}`;
-    }
-
-    function loadItems() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        const arr = raw ? JSON.parse(raw) : [];
-        return Array.isArray(arr) ? arr.map(normalizeItem).filter(Boolean) : [];
-      } catch {
-        return [];
-      }
-    }
-
-    function saveItems() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
-      render();
-      if (!state.suppressLocalSync) pushToFirebase();
-    }
-
-    function loadSettings() {
-      try {
-        const raw = localStorage.getItem(SETTINGS_KEY);
-        const saved = raw ? JSON.parse(raw) : {};
-        const savedFb = saved.fb || {};
-        const fb = Object.fromEntries(Object.entries(DEFAULT_FIREBASE_CONFIG).map(([key, value]) => {
-          const candidate = typeof savedFb[key] === 'string' ? savedFb[key].trim() : '';
-          return [key, candidate || value];
-        }));
-        return { ...saved, fb };
-      } catch {
-        return { fb: { ...DEFAULT_FIREBASE_CONFIG } };
-      }
-    }
-
-    function saveSettingsFromUI() {
-      const settings = gatherSettingsFromUI();
-      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-      state.settings = settings;
-      state.roomId = settings.roomId;
-      state.deviceName = settings.deviceName || defaultDeviceName();
-      localStorage.setItem('freezer-device-name-v1', state.deviceName);
-      setSyncStatus('Config sauvegardée', 'offline');
-      alert('Configuration enregistrée sur cet iPhone.');
-    }
-
-    function populateSettingsUI() {
-      els.roomId.value = state.settings.roomId || '';
-      els.deviceName.value = state.settings.deviceName || state.deviceName;
-      els.fbApiKey.value = state.settings.fb?.apiKey || '';
-      els.fbAuthDomain.value = state.settings.fb?.authDomain || '';
-      els.fbDatabaseURL.value = state.settings.fb?.databaseURL || '';
-      els.fbProjectId.value = state.settings.fb?.projectId || '';
-      els.fbAppId.value = state.settings.fb?.appId || '';
-    }
-
-    function gatherSettingsFromUI() {
-      return {
-        roomId: sanitizeRoomId(els.roomId.value || ''),
-        deviceName: (els.deviceName.value || '').trim(),
-        fb: {
-          apiKey: (els.fbApiKey.value || '').trim(),
-          authDomain: (els.fbAuthDomain.value || '').trim(),
-          databaseURL: (els.fbDatabaseURL.value || '').trim(),
-          projectId: (els.fbProjectId.value || '').trim(),
-          appId: (els.fbAppId.value || '').trim(),
-        },
+      const STORAGE_KEY = 'freezer-inventory-v4';
+      const SETTINGS_KEY = 'freezer-sync-settings-v2';
+      const DEVICE_KEY = 'freezer-device-id-v1';
+      const DEVICE_NAME_KEY = 'freezer-device-name-v2';
+      const CATEGORY_ORDER = ['Viande', 'Poisson', 'Legumes', 'Plats cuisin&eacute;s', 'Fruits', 'Produits laitiers', 'Autre'];
+      const DEFAULT_FIREBASE_CONFIG = {
+        apiKey: 'AIzaSyDsNEGaBaq9JhTxSTvIeAQKbhRKNPecXgw',
+        authDomain: 'myfreezer-b488a.firebaseapp.com',
+        databaseURL: 'https://myfreezer-b488a-default-rtdb.europe-west1.firebasedatabase.app',
+        projectId: 'myfreezer-b488a',
+        appId: '1:893959065266:web:c3bc8222855358927b43ab'
       };
-    }
 
-    function autoConnectIfConfigured() {
-      const settings = state.settings;
-      if (!settings || !settings.roomId || !settings.fb || !settings.fb.apiKey || !settings.fb.databaseURL) {
-        setSyncStatus('Hors ligne', 'offline');
-        return;
-      }
-      connectSync();
-    }
-
-    function sanitizeRoomId(value) {
-      return String(value || '')
-        .trim()
-        .toLowerCase()
-        .replace(/[^a-z0-9-_]+/g, '-')
-        .replace(/-+/g, '-')
-        .replace(/(^-|-$)/g, '')
-        .slice(0, 48);
-    }
-
-    function uid() {
-      return crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2);
-    }
-
-    function openModal(item = null) {
-      els.modalTitle.textContent = item ? 'Modifier l’article' : 'Ajouter un article';
-      els.itemId.value = item?.id || '';
-      els.name.value = item?.name || '';
-      els.category.value = item?.category || 'Autre';
-      els.quantity.value = item?.quantity ?? 1;
-      els.unit.value = item?.unit || 'portion';
-      els.frozenAt.value = item?.frozenAt || todayISO();
-      els.months.value = item?.months ?? 3;
-      els.notes.value = item?.notes || '';
-      els.modalBackdrop.style.display = 'grid';
-      els.modalBackdrop.setAttribute('aria-hidden', 'false');
-      setTimeout(() => els.name.focus(), 50);
-    }
-
-    function closeModal() {
-      els.modalBackdrop.style.display = 'none';
-      els.modalBackdrop.setAttribute('aria-hidden', 'true');
-      els.form.reset();
-      els.itemId.value = '';
-    }
-
-    function onSave(ev) {
-      ev.preventDefault();
-      const item = {
-        id: els.itemId.value || uid(),
-        name: els.name.value.trim(),
-        category: els.category.value,
-        quantity: Math.max(0, Number(els.quantity.value) || 1),
-        unit: els.unit.value.trim() || 'portion',
-        frozenAt: els.frozenAt.value || todayISO(),
-        months: Math.max(1, Number(els.months.value) || 3),
-        notes: els.notes.value.trim(),
-        updatedAt: new Date().toISOString(),
-        updatedBy: state.deviceId,
-        updatedByName: state.deviceName,
+      const els = {
+        appRoot: document.getElementById('appRoot'),
+        subtitle: document.getElementById('subtitle'),
+        syncDot: document.getElementById('syncDot'),
+        syncStatus: document.getElementById('syncStatus'),
+        menuBtn: document.getElementById('menuBtn'),
+        menuPopover: document.getElementById('menuPopover'),
+        menuBackdrop: document.getElementById('menuBackdrop'),
+        menuSettingsBtn: document.getElementById('menuSettingsBtn'),
+        menuDisconnectBtn: document.getElementById('menuDisconnectBtn'),
+        homeBtn: document.getElementById('homeBtn'),
+        scopeAll: document.getElementById('scopeAll'),
+        scopeSoon: document.getElementById('scopeSoon'),
+        scopeOverdue: document.getElementById('scopeOverdue'),
+        statItems: document.getElementById('statItems'),
+        statSoon: document.getElementById('statSoon'),
+        statOverdue: document.getElementById('statOverdue'),
+        listTitle: document.getElementById('listTitle'),
+        listCount: document.getElementById('listCount'),
+        list: document.getElementById('list'),
+        addBtn: document.getElementById('addBtn'),
+        searchBtn: document.getElementById('searchBtn'),
+        settingsSheet: document.getElementById('settingsSheet'),
+        closeSettingsBtn: document.getElementById('closeSettingsBtn'),
+        roomId: document.getElementById('roomId'),
+        deviceName: document.getElementById('deviceName'),
+        fbApiKey: document.getElementById('fbApiKey'),
+        fbAuthDomain: document.getElementById('fbAuthDomain'),
+        fbDatabaseURL: document.getElementById('fbDatabaseURL'),
+        fbProjectId: document.getElementById('fbProjectId'),
+        fbAppId: document.getElementById('fbAppId'),
+        connectBtn: document.getElementById('connectBtn'),
+        disconnectBtn: document.getElementById('disconnectBtn'),
+        saveSettingsBtn: document.getElementById('saveSettingsBtn'),
+        exportBtn: document.getElementById('exportBtn'),
+        importBtn: document.getElementById('importBtn'),
+        resetBtn: document.getElementById('resetBtn'),
+        fileInput: document.getElementById('fileInput'),
+        firebaseSummary: document.getElementById('firebaseSummary'),
+        itemSheet: document.getElementById('itemSheet'),
+        closeItemBtn: document.getElementById('closeItemBtn'),
+        cancelItemBtn: document.getElementById('cancelItemBtn'),
+        itemForm: document.getElementById('itemForm'),
+        itemModalTitle: document.getElementById('itemModalTitle'),
+        itemId: document.getElementById('itemId'),
+        name: document.getElementById('name'),
+        category: document.getElementById('category'),
+        quantity: document.getElementById('quantity'),
+        unit: document.getElementById('unit'),
+        frozenAt: document.getElementById('frozenAt'),
+        months: document.getElementById('months'),
+        notes: document.getElementById('notes'),
+        searchSheet: document.getElementById('searchSheet'),
+        closeSearchBtn: document.getElementById('closeSearchBtn'),
+        searchToDashboardBtn: document.getElementById('searchToDashboardBtn'),
+        searchQuery: document.getElementById('searchQuery'),
+        searchCategory: document.getElementById('searchCategory'),
+        searchCount: document.getElementById('searchCount'),
+        clearSearchBtn: document.getElementById('clearSearchBtn'),
+        searchResults: document.getElementById('searchResults'),
+        testLog: document.getElementById('testLog')
       };
-      if (!item.name) return;
-      const idx = state.items.findIndex(x => x.id === item.id);
-      if (idx >= 0) state.items[idx] = { ...state.items[idx], ...item };
-      else state.items.unshift({ ...item, createdAt: new Date().toISOString() });
-      persistAndClose();
-    }
 
-    function persistAndClose() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
-      closeModal();
-      render();
-      if (!state.suppressLocalSync) pushToFirebase();
-    }
+      const state = {
+        items: loadItems(),
+        settings: loadSettings(),
+        scope: 'all',
+        searchQuery: '',
+        searchCategory: 'all',
+        syncing: false,
+        db: null,
+        refPath: '',
+        listener: null,
+        deviceId: getOrCreateDeviceId(),
+        deviceName: '',
+        suppressPush: false,
+        firebaseLoadPromise: null,
+        selfTest: new URLSearchParams(location.search).has('selftest')
+      };
 
-    function deleteItem(id) {
-      state.items = state.items.filter(x => x.id !== id);
-      saveItems();
-    }
+      state.deviceName = state.settings.deviceName || localStorage.getItem(DEVICE_NAME_KEY) || defaultDeviceName();
+      populateSelects();
+      populateSettingsUI();
+      renderAll();
+      setStatus('Hors ligne', 'offline');
+      setSubtitle();
+      bindEvents();
+      if (shouldAutoConnect()) {
+        connectSync().catch(function () { /* handled inside */ });
+      }
+      if (state.selfTest) {
+        setTimeout(runSelfTest, 300);
+      }
 
-    function adjustQty(id, delta) {
-      const item = state.items.find(x => x.id === id);
-      if (!item) return;
-      const next = Math.max(0, (Number(item.quantity) || 0) + delta);
-      if (next === 0) {
-        if (confirm(`Supprimer définitivement « ${item.name} » ?`)) {
-          deleteItem(id);
+      function bindEvents() {
+        els.menuBtn.addEventListener('click', toggleMenu);
+        els.menuBackdrop.addEventListener('click', closeAllSheets);
+        els.menuSettingsBtn.addEventListener('click', function () { closeMenu(); openSettings(); });
+        els.menuDisconnectBtn.addEventListener('click', function () { closeMenu(); disconnectSync(); });
+        els.homeBtn.addEventListener('click', function () { closeAllSheets(); goHome(); });
+        els.scopeAll.addEventListener('click', function () { setScope('all'); });
+        els.scopeSoon.addEventListener('click', function () { setScope('soon'); });
+        els.scopeOverdue.addEventListener('click', function () { setScope('overdue'); });
+        els.addBtn.addEventListener('click', function (e) { e.preventDefault(); openItemModal(); });
+        els.searchBtn.addEventListener('click', function (e) { e.preventDefault(); openSearch(); });
+        els.closeSettingsBtn.addEventListener('click', closeSettings);
+        els.closeItemBtn.addEventListener('click', closeItemModal);
+        els.cancelItemBtn.addEventListener('click', closeItemModal);
+        els.closeSearchBtn.addEventListener('click', closeSearchModal);
+        els.searchToDashboardBtn.addEventListener('click', closeSearchModal);
+        els.itemForm.addEventListener('submit', saveItemFromForm);
+        els.connectBtn.addEventListener('click', function () { connectSync(); });
+        els.disconnectBtn.addEventListener('click', function () { disconnectSync(); });
+        els.saveSettingsBtn.addEventListener('click', saveSettingsFromUI);
+        els.exportBtn.addEventListener('click', exportData);
+        els.importBtn.addEventListener('click', function () { els.fileInput.click(); });
+        els.fileInput.addEventListener('change', importData);
+        els.resetBtn.addEventListener('click', clearAll);
+        els.searchQuery.addEventListener('input', function () {
+          state.searchQuery = els.searchQuery.value || '';
+          renderSearchResults();
+        });
+        els.searchCategory.addEventListener('change', function () {
+          state.searchCategory = els.searchCategory.value || 'all';
+          renderSearchResults();
+        });
+        els.clearSearchBtn.addEventListener('click', function () {
+          els.searchQuery.value = '';
+          els.searchCategory.value = 'all';
+          state.searchQuery = '';
+          state.searchCategory = 'all';
+          renderSearchResults();
+        });
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape') {
+            closeMenu();
+            closeSettings();
+            closeItemModal();
+            closeSearchModal();
+          }
+        });
+        document.addEventListener('click', function (e) {
+          if (!els.menuPopover.contains(e.target) && !els.menuBtn.contains(e.target)) closeMenu();
+        });
+        [els.fbApiKey, els.fbAuthDomain, els.fbDatabaseURL, els.fbProjectId, els.fbAppId].forEach(function (input) {
+          input.addEventListener('change', function () {
+            persistSettingsDraft();
+          });
+        });
+        els.roomId.addEventListener('change', persistSettingsDraft);
+        els.deviceName.addEventListener('change', function () {
+          state.deviceName = (els.deviceName.value || '').trim() || defaultDeviceName();
+          localStorage.setItem(DEVICE_NAME_KEY, state.deviceName);
+          persistSettingsDraft();
+        });
+      }
+
+      function icons(name) {
+        var map = {
+          edit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
+          trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>',
+          plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>',
+          minus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>',
+          search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
+          add: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>',
+          close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg>',
+          home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10.5V21h14V10.5"/><path d="M10 21v-6h4v6"/></svg>',
+          settings: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.05.06a2 2 0 0 1 0 2.83l-.44.44a2 2 0 0 1-2.83 0l-.06-.05a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V22a2 2 0 0 1-2 2h-.62a2 2 0 0 1-2-2v-.14a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.05a2 2 0 0 1-2.83 0l-.44-.44a2 2 0 0 1 0-2.83l.05-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H2a2 2 0 0 1-2-2v-.62a2 2 0 0 1 2-2h.14a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.05-.06a2 2 0 0 1 0-2.83l.44-.44a2 2 0 0 1 2.83 0l.06.05a1.7 1.7 0 0 0 1.87.34h0A1.7 1.7 0 0 0 10 2.14V2a2 2 0 0 1 2-2h.62a2 2 0 0 1 2 2v.14a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.05a2 2 0 0 1 2.83 0l.44.44a2 2 0 0 1 0 2.83l-.05.06a1.7 1.7 0 0 0-.34 1.87A1.7 1.7 0 0 0 22 10h.14a2 2 0 0 1 2 2v.62a2 2 0 0 1-2 2h-.14a1.7 1.7 0 0 0-1.55 1Z"/></svg>'
+        };
+        return map[name] || '';
+      }
+
+      function getOrCreateDeviceId() {
+        var id = localStorage.getItem(DEVICE_KEY);
+        if (!id) {
+          id = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2);
+          localStorage.setItem(DEVICE_KEY, id);
+        }
+        return id;
+      }
+
+      function defaultDeviceName() {
+        return 'iPhone';
+      }
+
+      function sanitizeRoomId(value) {
+        return String(value || '').trim().toLowerCase().replace(/[^a-z0-9-_]+/g, '-').replace(/-+/g, '-').replace(/(^-|-$)/g, '').slice(0, 48);
+      }
+
+      function uid() {
+        return (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2);
+      }
+
+      function todayISO() { return new Date().toISOString().slice(0, 10); }
+      function isDateISO(s) { return /^\d{4}-\d{2}-\d{2}$/.test(String(s || '')); }
+      function prettyDate(iso) {
+        try {
+          return new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(iso + 'T12:00:00'));
+        } catch (e) {
+          return iso;
+        }
+      }
+      function addMonthsISO(dateStr, months) {
+        if (!isDateISO(dateStr)) return '';
+        var d = new Date(dateStr + 'T12:00:00');
+        d.setMonth(d.getMonth() + Number(months || 0));
+        return d.toISOString().slice(0, 10);
+      }
+      function daysSince(dateStr) {
+        if (!isDateISO(dateStr)) return 9999;
+        return Math.floor((Date.now() - new Date(dateStr + 'T12:00:00').getTime()) / 86400000);
+      }
+      function daysLeft(item) {
+        var exp = addMonthsISO(item.frozenAt, item.months);
+        if (!isDateISO(exp)) return Number.POSITIVE_INFINITY;
+        return Math.ceil((new Date(exp + 'T23:59:59') - new Date()) / 86400000);
+      }
+      function ageBucket(item) {
+        var age = daysSince(item.createdAt || item.frozenAt || todayISO());
+        if (age <= 30) return 'fresh';
+        if (age <= 90) return 'warn';
+        return 'old';
+      }
+      function statusText(dl) {
+        if (dl < 0) return 'Perime';
+        if (dl <= 30) return dl + ' j restants';
+        return dl + ' j restants';
+      }
+      function esc(str) {
+        return String(str)
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#39;');
+      }
+
+      function normalizeItem(item) {
+        if (!item || !item.name) return null;
+        return {
+          id: item.id || uid(),
+          name: String(item.name),
+          category: CATEGORY_ORDER.indexOf(item.category) >= 0 ? item.category : 'Autre',
+          quantity: Math.max(1, Number(item.quantity) || 1),
+          unit: String(item.unit || 'portion'),
+          frozenAt: isDateISO(item.frozenAt) ? item.frozenAt : todayISO(),
+          months: Math.max(1, Number(item.months) || 3),
+          notes: String(item.notes || ''),
+          createdAt: item.createdAt && String(item.createdAt).length ? item.createdAt : (isDateISO(item.frozenAt) ? item.frozenAt : new Date().toISOString()),
+          updatedAt: item.updatedAt || new Date().toISOString(),
+          updatedBy: item.updatedBy || '',
+          updatedByName: item.updatedByName || ''
+        };
+      }
+
+      function loadItems() {
+        try {
+          var raw = localStorage.getItem(STORAGE_KEY);
+          var data = raw ? JSON.parse(raw) : [];
+          return Array.isArray(data) ? data.map(normalizeItem).filter(Boolean) : [];
+        } catch (e) {
+          return [];
+        }
+      }
+
+      function loadSettings() {
+        try {
+          var raw = localStorage.getItem(SETTINGS_KEY);
+          var saved = raw ? JSON.parse(raw) : {};
+          var savedFb = saved.fb || {};
+          var fb = {};
+          Object.keys(DEFAULT_FIREBASE_CONFIG).forEach(function (key) {
+            var candidate = typeof savedFb[key] === 'string' ? savedFb[key].trim() : '';
+            fb[key] = candidate || DEFAULT_FIREBASE_CONFIG[key];
+          });
+          var settings = {
+            roomId: sanitizeRoomId(saved.roomId || ''),
+            deviceName: String(saved.deviceName || '').trim(),
+            fb: fb
+          };
+          if (!raw) {
+            localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+          }
+          return settings;
+        } catch (e) {
+          var fallback = { roomId: '', deviceName: '', fb: Object.assign({}, DEFAULT_FIREBASE_CONFIG) };
+          localStorage.setItem(SETTINGS_KEY, JSON.stringify(fallback));
+          return fallback;
+        }
+      }
+
+      function populateSelects() {
+        var categoryHtml = CATEGORY_ORDER.map(function (c) { return '<option value="' + esc(c) + '">' + c + '</option>'; }).join('');
+        els.category.innerHTML = categoryHtml;
+        els.searchCategory.innerHTML = '<option value="all">Toutes categories</option>' + categoryHtml;
+      }
+
+      function populateSettingsUI() {
+        els.roomId.value = state.settings.roomId || '';
+        els.deviceName.value = state.settings.deviceName || state.deviceName;
+        els.fbApiKey.value = state.settings.fb.apiKey || '';
+        els.fbAuthDomain.value = state.settings.fb.authDomain || '';
+        els.fbDatabaseURL.value = state.settings.fb.databaseURL || '';
+        els.fbProjectId.value = state.settings.fb.projectId || '';
+        els.fbAppId.value = state.settings.fb.appId || '';
+      }
+
+      function collectSettings() {
+        var current = state.settings || loadSettings();
+        function mergeField(currentValue, newValue, fallbackValue) {
+          var v = String(newValue || '').trim();
+          if (v) return v;
+          var c = String(currentValue || '').trim();
+          if (c) return c;
+          return fallbackValue || '';
+        }
+        return {
+          roomId: sanitizeRoomId(mergeField(current.roomId, els.roomId.value, '')),
+          deviceName: mergeField(current.deviceName, els.deviceName.value, state.deviceName || defaultDeviceName()),
+          fb: {
+            apiKey: mergeField(current.fb.apiKey, els.fbApiKey.value, DEFAULT_FIREBASE_CONFIG.apiKey),
+            authDomain: mergeField(current.fb.authDomain, els.fbAuthDomain.value, DEFAULT_FIREBASE_CONFIG.authDomain),
+            databaseURL: mergeField(current.fb.databaseURL, els.fbDatabaseURL.value, DEFAULT_FIREBASE_CONFIG.databaseURL),
+            projectId: mergeField(current.fb.projectId, els.fbProjectId.value, DEFAULT_FIREBASE_CONFIG.projectId),
+            appId: mergeField(current.fb.appId, els.fbAppId.value, DEFAULT_FIREBASE_CONFIG.appId)
+          }
+        };
+      }
+
+      function persistSettingsDraft() {
+        var next = collectSettings();
+        state.settings = next;
+        state.deviceName = next.deviceName || defaultDeviceName();
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(next));
+        localStorage.setItem(DEVICE_NAME_KEY, state.deviceName);
+        setSubtitle();
+      }
+
+      function setSubtitle() {
+        if (state.syncing && state.settings.roomId) {
+          els.subtitle.textContent = 'Connecte a ' + state.settings.roomId;
+        } else {
+          els.subtitle.textContent = 'Dashboard du congelateur';
+        }
+      }
+
+      function setStatus(text, mode) {
+        els.syncStatus.textContent = text;
+        els.syncDot.className = 'dot ' + mode;
+        if (mode === 'online') {
+          els.firebaseSummary.textContent = 'Firebase connecte sur ' + (state.settings.roomId || 'ce compte') + '.';
+        } else if (mode === 'connecting') {
+          els.firebaseSummary.textContent = 'Connexion Firebase en cours...';
+        } else if (mode === 'error') {
+          els.firebaseSummary.textContent = 'Connexion Firebase a verifier.';
+        } else {
+          els.firebaseSummary.textContent = 'Firebase pret a etre configure.';
+        }
+        setSubtitle();
+      }
+
+      function openMenu() {
+        els.menuPopover.classList.add('open');
+        els.menuPopover.setAttribute('aria-hidden', 'false');
+        els.menuBackdrop.style.display = 'block';
+      }
+      function closeMenu() {
+        els.menuPopover.classList.remove('open');
+        els.menuPopover.setAttribute('aria-hidden', 'true');
+        els.menuBackdrop.style.display = 'none';
+      }
+      function toggleMenu() {
+        if (els.menuPopover.classList.contains('open')) closeMenu(); else openMenu();
+      }
+      function openSettings() {
+        populateSettingsUI();
+        els.settingsSheet.classList.add('open');
+        els.settingsSheet.setAttribute('aria-hidden', 'false');
+        els.menuBackdrop.style.display = 'block';
+        setTimeout(function () { els.roomId.focus(); }, 50);
+      }
+      function closeSettings() {
+        els.settingsSheet.classList.remove('open');
+        els.settingsSheet.setAttribute('aria-hidden', 'true');
+        if (!els.menuPopover.classList.contains('open') && !els.itemSheet.classList.contains('open') && !els.searchSheet.classList.contains('open')) {
+          els.menuBackdrop.style.display = 'none';
+        }
+      }
+      function openItemModal(item) {
+        item = item || null;
+        els.itemModalTitle.textContent = item ? 'Modifier l\'article' : 'Ajouter un article';
+        els.itemId.value = item ? item.id : '';
+        els.name.value = item ? item.name : '';
+        els.category.value = item ? item.category : 'Autre';
+        els.quantity.value = item ? item.quantity : 1;
+        els.unit.value = item ? item.unit : 'portion';
+        els.frozenAt.value = item ? item.frozenAt : todayISO();
+        els.months.value = item ? item.months : 3;
+        els.notes.value = item ? item.notes : '';
+        els.itemSheet.classList.add('open');
+        els.itemSheet.setAttribute('aria-hidden', 'false');
+        els.menuBackdrop.style.display = 'block';
+        setTimeout(function () { els.name.focus(); }, 50);
+      }
+      function closeItemModal() {
+        els.itemSheet.classList.remove('open');
+        els.itemSheet.setAttribute('aria-hidden', 'true');
+        if (!els.menuPopover.classList.contains('open') && !els.settingsSheet.classList.contains('open') && !els.searchSheet.classList.contains('open')) {
+          els.menuBackdrop.style.display = 'none';
+        }
+        els.itemForm.reset();
+        els.itemId.value = '';
+      }
+      function openSearch() {
+        els.searchSheet.classList.add('open');
+        els.searchSheet.setAttribute('aria-hidden', 'false');
+        els.menuBackdrop.style.display = 'block';
+        renderSearchResults();
+        setTimeout(function () { els.searchQuery.focus(); }, 50);
+      }
+      function closeSearchModal() {
+        els.searchSheet.classList.remove('open');
+        els.searchSheet.setAttribute('aria-hidden', 'true');
+        if (!els.menuPopover.classList.contains('open') && !els.settingsSheet.classList.contains('open') && !els.itemSheet.classList.contains('open')) {
+          els.menuBackdrop.style.display = 'none';
+        }
+        goHome();
+      }
+      function closeAllSheets() {
+        closeMenu();
+        closeSettings();
+        closeItemModal();
+        closeSearchModal();
+      }
+
+      function goHome() {
+        setScope('all');
+        els.searchQuery.value = '';
+        els.searchCategory.value = 'all';
+        state.searchQuery = '';
+        state.searchCategory = 'all';
+        renderAll();
+      }
+      function setScope(scope) {
+        state.scope = scope;
+        els.scopeAll.classList.toggle('active', scope === 'all');
+        els.scopeSoon.classList.toggle('active', scope === 'soon');
+        els.scopeOverdue.classList.toggle('active', scope === 'overdue');
+        renderAll();
+      }
+
+      function saveItemFromForm(ev) {
+        ev.preventDefault();
+        var name = (els.name.value || '').trim();
+        if (!name) return;
+        var item = {
+          id: els.itemId.value || uid(),
+          name: name,
+          category: els.category.value,
+          quantity: Math.max(1, Number(els.quantity.value) || 1),
+          unit: (els.unit.value || '').trim() || 'portion',
+          frozenAt: els.frozenAt.value || todayISO(),
+          months: Math.max(1, Number(els.months.value) || 3),
+          notes: (els.notes.value || '').trim(),
+          createdAt: els.itemId.value ? (state.items.find(function (x) { return x.id === els.itemId.value; }) || {}).createdAt || new Date().toISOString() : new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          updatedBy: state.deviceId,
+          updatedByName: state.deviceName
+        };
+        var idx = state.items.findIndex(function (x) { return x.id === item.id; });
+        if (idx >= 0) state.items[idx] = Object.assign({}, state.items[idx], item);
+        else state.items.unshift(item);
+        persistItems();
+        closeItemModal();
+        renderAll();
+      }
+
+      function persistItems() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
+        if (!state.suppressPush) pushToFirebase();
+      }
+
+      function deleteItem(id) {
+        state.items = state.items.filter(function (x) { return x.id !== id; });
+        persistItems();
+        renderAll();
+      }
+
+      function adjustQty(id, delta) {
+        var item = state.items.find(function (x) { return x.id === id; });
+        if (!item) return;
+        var next = Math.max(0, (Number(item.quantity) || 0) + delta);
+        if (next === 0) {
+          if (window.confirm('Supprimer definitivement \u00ab ' + item.name + ' \u00bb ?')) {
+            deleteItem(id);
+            return;
+          }
+          item.quantity = 1;
+        } else {
+          item.quantity = next;
+        }
+        item.updatedAt = new Date().toISOString();
+        item.updatedBy = state.deviceId;
+        item.updatedByName = state.deviceName;
+        persistItems();
+        renderAll();
+      }
+
+      function exportData() {
+        var blob = new Blob([JSON.stringify({ version: 4, exportedAt: new Date().toISOString(), items: state.items }, null, 2)], { type: 'application/json' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'mon-congelateur-backup-' + todayISO() + '.json';
+        a.click();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 250);
+      }
+
+      async function importData(e) {
+        var file = e.target.files && e.target.files[0];
+        if (!file) return;
+        try {
+          var text = await file.text();
+          var parsed = JSON.parse(text);
+          var items = Array.isArray(parsed) ? parsed : parsed.items;
+          if (!Array.isArray(items)) throw new Error('bad format');
+          state.items = items.map(normalizeItem).filter(Boolean);
+          persistItems();
+          renderAll();
+        } catch (err) {
+          window.alert('Import impossible. Verifie le fichier JSON.');
+        } finally {
+          e.target.value = '';
+        }
+      }
+
+      function clearAll() {
+        if (!state.items.length) return;
+        if (window.confirm('Vider toute la liste ?')) {
+          state.items = [];
+          persistItems();
+          renderAll();
+        }
+      }
+
+      function getScopedItems() {
+        var items = state.items.slice();
+        if (state.scope === 'soon') items = items.filter(function (it) { return daysLeft(it) >= 0 && daysLeft(it) <= 30; });
+        if (state.scope === 'overdue') items = items.filter(function (it) { return daysLeft(it) < 0; });
+        items.sort(function (a, b) { return daysLeft(a) - daysLeft(b) || a.name.localeCompare(b.name, 'fr'); });
+        return items;
+      }
+
+      function scopeTitle(scope) {
+        if (scope === 'soon') return 'A consommer';
+        if (scope === 'overdue') return 'Perimes';
+        return 'Tous les articles';
+      }
+
+      function renderItemCard(item) {
+        var dl = daysLeft(item);
+        var age = ageBucket(item);
+        var dateText = isDateISO(item.frozenAt) ? prettyDate(item.frozenAt) : 'date inconnue';
+        var expire = isDateISO(addMonthsISO(item.frozenAt, item.months)) ? prettyDate(addMonthsISO(item.frozenAt, item.months)) : '-';
+        var qtyLabel = esc(String(item.quantity)) + ' ' + esc(item.unit || 'portion') + (Number(item.quantity) > 1 ? 's' : '');
+        return [
+          '<article class="item">',
+          '<div class="age-pill age-' + age + '"></div>',
+          '<div class="item-top">',
+          '<div class="item-title">',
+          '<p class="item-name">' + esc(item.name) + '</p>',
+          '<div class="item-sub">Congel&eacute; le ' + esc(dateText) + ' &bull; a consommer idealement avant ' + esc(expire) + (item.notes ? '<br>' + esc(item.notes) : '') + '</div>',
+          '</div>',
+          '</div>',
+          '<div class="chips">',
+          '<span class="chip">' + esc(item.category) + '</span>',
+          '<span class="chip">' + qtyLabel + '</span>',
+          '<span class="chip">' + esc(statusText(dl)) + '</span>',
+          '</div>',
+          '<div class="item-actions">',
+          '<div class="qty-stepper">',
+          '<button class="circle-btn" type="button" data-action="minus" data-id="' + esc(item.id) + '" aria-label="Diminuer">' + icons('minus') + '</button>',
+          '<strong>' + esc(String(item.quantity)) + '</strong>',
+          '<button class="circle-btn primary" type="button" data-action="plus" data-id="' + esc(item.id) + '" aria-label="Ajouter 1">' + icons('plus') + '</button>',
+          '</div>',
+          '<div class="meta-actions">',
+          '<button class="circle-btn" type="button" data-action="edit" data-id="' + esc(item.id) + '" aria-label="Modifier">' + icons('edit') + '</button>',
+          '<button class="circle-btn danger" type="button" data-action="delete" data-id="' + esc(item.id) + '" aria-label="Supprimer">' + icons('trash') + '</button>',
+          '</div>',
+          '</div>',
+          '</article>'
+        ].join('');
+      }
+
+      function bindItemActions(root) {
+        root.querySelectorAll('[data-action]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var action = btn.dataset.action;
+            var id = btn.dataset.id;
+            var item = state.items.find(function (x) { return x.id === id; });
+            if (!item) return;
+            if (action === 'plus') adjustQty(id, 1);
+            if (action === 'minus') adjustQty(id, -1);
+            if (action === 'edit') openItemModal(item);
+            if (action === 'delete' && window.confirm('Supprimer \u00ab ' + item.name + ' \u00bb ?')) deleteItem(id);
+          });
+        });
+      }
+
+      function renderAll() {
+        var counts = {
+          all: state.items.length,
+          soon: state.items.filter(function (it) { return daysLeft(it) >= 0 && daysLeft(it) <= 30; }).length,
+          overdue: state.items.filter(function (it) { return daysLeft(it) < 0; }).length
+        };
+        els.statItems.textContent = String(counts.all);
+        els.statSoon.textContent = String(counts.soon);
+        els.statOverdue.textContent = String(counts.overdue);
+        els.listTitle.textContent = scopeTitle(state.scope);
+        var scoped = getScopedItems();
+        els.listCount.textContent = scoped.length + ' article' + (scoped.length > 1 ? 's' : '');
+        els.list.innerHTML = scoped.length ? scoped.map(renderItemCard).join('') : '<div class="empty">Aucun article dans cette vue. Appuie sur <strong>Ajouter</strong>.</div>';
+        bindItemActions(els.list);
+        populateSettingsUI();
+        renderSearchResults();
+      }
+
+      function renderSearchResults() {
+        state.searchQuery = els.searchQuery.value || '';
+        state.searchCategory = els.searchCategory.value || 'all';
+        var q = state.searchQuery.trim().toLowerCase();
+        var cat = state.searchCategory || 'all';
+        var items = state.items.slice();
+        if (q) {
+          items = items.filter(function (it) {
+            return [it.name, it.category, it.notes, it.unit, it.updatedByName].join(' ').toLowerCase().indexOf(q) >= 0;
+          });
+        }
+        if (cat !== 'all') items = items.filter(function (it) { return it.category === cat; });
+        items.sort(function (a, b) { return daysLeft(a) - daysLeft(b) || a.name.localeCompare(b.name, 'fr'); });
+        els.searchCount.textContent = items.length + ' resultat' + (items.length > 1 ? 's' : '');
+        els.searchResults.innerHTML = items.length ? items.map(renderItemCard).join('') : '<div class="empty">Aucun resultat.</div>';
+        bindItemActions(els.searchResults);
+      }
+
+      function persistSettingsAndMaybeReconnect() {
+        var next = collectSettings();
+        state.settings = next;
+        state.deviceName = next.deviceName;
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(next));
+        localStorage.setItem(DEVICE_NAME_KEY, state.deviceName);
+        populateSettingsUI();
+        setSubtitle();
+      }
+
+      function saveSettingsFromUI() {
+        persistSettingsAndMaybeReconnect();
+        setStatus('Config enregistree', 'offline');
+        window.alert('Configuration enregistree sur cet iPhone.');
+      }
+
+      function shouldAutoConnect() {
+        var s = state.settings || {};
+        var fb = s.fb || {};
+        return !!(s.roomId && fb.apiKey && fb.authDomain && fb.databaseURL && fb.projectId && fb.appId);
+      }
+
+      function fbConfigFromSettings() {
+        var fb = state.settings.fb || {};
+        var keys = ['apiKey', 'authDomain', 'databaseURL', 'projectId', 'appId'];
+        var ok = keys.every(function (k) { return String(fb[k] || '').trim(); });
+        if (!ok) return null;
+        return {
+          apiKey: String(fb.apiKey).trim(),
+          authDomain: String(fb.authDomain).trim(),
+          databaseURL: String(fb.databaseURL).trim(),
+          projectId: String(fb.projectId).trim(),
+          appId: String(fb.appId).trim()
+        };
+      }
+
+      function loadScript(src) {
+        return new Promise(function (resolve, reject) {
+          var existing = Array.from(document.scripts).find(function (s) { return s.src === src; });
+          if (existing && typeof firebase !== 'undefined') { resolve(); return; }
+          var script = document.createElement('script');
+          script.src = src;
+          script.async = false;
+          script.onload = function () { resolve(); };
+          script.onerror = function () { reject(new Error('Impossible de charger ' + src)); };
+          document.head.appendChild(script);
+        });
+      }
+
+      function loadFirebaseCompat() {
+        if (typeof firebase !== 'undefined') return Promise.resolve();
+        if (!state.firebaseLoadPromise) {
+          var urls = [
+            'https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js',
+            'https://www.gstatic.com/firebasejs/10.13.2/firebase-database-compat.js'
+          ];
+          state.firebaseLoadPromise = urls.reduce(function (p, src) {
+            return p.then(function () { return loadScript(src); });
+          }, Promise.resolve());
+        }
+        return state.firebaseLoadPromise;
+      }
+
+      function ensureFirebaseApp(cfg) {
+        var existing = firebase.apps && firebase.apps.length ? firebase.apps[0] : null;
+        if (!existing) {
+          firebase.initializeApp(cfg);
+          return Promise.resolve(firebase.app());
+        }
+        var current = existing.options || {};
+        var same = ['apiKey', 'authDomain', 'databaseURL', 'projectId', 'appId'].every(function (key) {
+          return String(current[key] || '') === String(cfg[key] || '');
+        });
+        if (same) return Promise.resolve(existing);
+        return existing.delete().then(function () { firebase.initializeApp(cfg); return firebase.app(); });
+      }
+
+      async function connectSync() {
+        persistSettingsAndMaybeReconnect();
+        var settings = state.settings;
+        if (!settings.roomId) {
+          window.alert('Ajoute un code de partage.');
           return;
         }
-        item.quantity = 1;
-      } else {
-        item.quantity = next;
-      }
-      item.updatedAt = new Date().toISOString();
-      item.updatedBy = state.deviceId;
-      item.updatedByName = state.deviceName;
-      saveItems();
-    }
-
-    function exportData() {
-      const blob = new Blob([JSON.stringify({ version: 2, exportedAt: new Date().toISOString(), items: state.items }, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `mon-congelateur-backup-${todayISO()}.json`;
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(url), 250);
-    }
-
-    async function importData(e) {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      try {
-        const text = await file.text();
-        const parsed = JSON.parse(text);
-        const items = Array.isArray(parsed) ? parsed : parsed.items;
-        if (!Array.isArray(items)) throw new Error('Format invalide');
-        state.items = items.map(normalizeItem).filter(Boolean);
-        saveItems();
-      } catch (err) {
-        alert('Import impossible. Vérifie le fichier JSON.');
-      } finally {
-        e.target.value = '';
-      }
-    }
-
-    function normalizeItem(it) {
-      if (!it || !it.name) return null;
-      return {
-        id: it.id || uid(),
-        name: String(it.name),
-        category: CATEGORY_ORDER.includes(it.category) ? it.category : 'Autre',
-        quantity: Math.max(0, Number(it.quantity) || 1),
-        unit: String(it.unit || 'portion'),
-        frozenAt: validDate(it.frozenAt) ? it.frozenAt : todayISO(),
-        months: Math.max(1, Number(it.months) || 3),
-        notes: String(it.notes || ''),
-        createdAt: it.createdAt || new Date().toISOString(),
-        updatedAt: it.updatedAt || new Date().toISOString(),
-        updatedBy: it.updatedBy || '',
-        updatedByName: it.updatedByName || '',
-      };
-    }
-
-    function clearAll() {
-      if (!state.items.length) return;
-      if (confirm('Vider toute la liste ?')) {
-        state.items = [];
-        saveItems();
-      }
-    }
-
-    function populateCategoryFilter() {
-      els.filterCategory.innerHTML = '<option value="all">Toutes catégories</option>' + CATEGORY_ORDER.map(c => `<option value="${c}">${c}</option>`).join('');
-    }
-
-    function render() {
-      const q = els.search.value.trim().toLowerCase();
-      const cat = els.filterCategory.value;
-      let items = [...state.items];
-      if (q) items = items.filter(it => [it.name, it.category, it.notes, it.unit, it.updatedByName].join(' ').toLowerCase().includes(q));
-      if (cat !== 'all') items = items.filter(it => it.category === cat);
-
-      items.sort((a, b) => {
-        if (els.sortBy.value === 'name') return a.name.localeCompare(b.name, 'fr');
-        if (els.sortBy.value === 'category') return a.category.localeCompare(b.category, 'fr') || a.name.localeCompare(b.name, 'fr');
-        return daysLeft(a) - daysLeft(b) || a.name.localeCompare(b.name, 'fr');
-      });
-
-      const totalQty = state.items.reduce((s, it) => s + (Number(it.quantity) || 0), 0);
-      const soon = state.items.filter(it => daysLeft(it) <= 30 && daysLeft(it) >= 0).length;
-      const overdue = state.items.filter(it => daysLeft(it) < 0).length;
-      els.statItems.textContent = state.items.length;
-      els.statQty.textContent = totalQty;
-      els.statSoon.textContent = soon;
-      els.statOverdue.textContent = overdue;
-      els.listCount.textContent = `${items.length} article${items.length > 1 ? 's' : ''}`;
-
-      if (!items.length) {
-        els.list.innerHTML = `<div class="card empty">Aucun article trouvé. Ajoute ton premier aliment avec <strong>+ Ajouter</strong>.</div>`;
-        return;
-      }
-
-      els.list.innerHTML = items.map(item => {
-        const dl = daysLeft(item);
-        const status = dl < 0 ? 'overdue' : dl <= 30 ? 'soon' : 'fresh';
-        const dateText = validDate(item.frozenAt) ? prettyDate(item.frozenAt) : 'date inconnue';
-        const expire = addMonthsISO(item.frozenAt, item.months);
-        const expireText = validDate(expire) ? prettyDate(expire) : '—';
-        const deviceMeta = item.updatedByName ? ` • mis à jour sur ${escapeHtml(item.updatedByName)}` : '';
-        return `
-          <article class="card item ${status}">
-            <div>
-              <div class="title-row">
-                <div class="name">${escapeHtml(item.name)}</div>
-                <span class="badge">${escapeHtml(item.category)}</span>
-                <span class="badge">${escapeHtml(String(item.quantity))} ${escapeHtml(item.unit || 'portion')}${Number(item.quantity) > 1 ? 's' : ''}</span>
-                <span class="badge">${statusLabel(dl)}</span>
-              </div>
-              <div class="meta">Congelé le ${dateText} • à consommer idéalement avant ${expireText}${deviceMeta}${item.notes ? `<br>${escapeHtml(item.notes)}` : ''}</div>
-            </div>
-            <div class="actions">
-              <div class="qty">
-                <button class="btn btn-secondary icon-btn" data-action="minus" data-id="${item.id}">−</button>
-                <strong>${escapeHtml(String(item.quantity))}</strong>
-                <button class="btn btn-secondary icon-btn" data-action="plus" data-id="${item.id}">+</button>
-              </div>
-              <div class="qty" style="justify-content:flex-end; flex-wrap:wrap;">
-                <button class="btn btn-secondary" data-action="edit" data-id="${item.id}">Modifier</button>
-                <button class="btn btn-danger" data-action="delete" data-id="${item.id}">Supprimer</button>
-              </div>
-            </div>
-          </article>
-        `;
-      }).join('');
-
-      document.querySelectorAll('[data-action]').forEach(btn => btn.addEventListener('click', handleAction));
-    }
-
-    function handleAction(e) {
-      const action = e.currentTarget.dataset.action;
-      const id = e.currentTarget.dataset.id;
-      const item = state.items.find(x => x.id === id);
-      if (!item) return;
-      if (action === 'plus') adjustQty(id, 1);
-      if (action === 'minus') adjustQty(id, -1);
-      if (action === 'edit') openModal(item);
-      if (action === 'delete' && confirm(`Supprimer « ${item.name} » ?`)) deleteItem(id);
-    }
-
-    function daysLeft(item) {
-      const expire = addMonthsISO(item.frozenAt, item.months);
-      if (!validDate(expire)) return Number.POSITIVE_INFINITY;
-      const diff = new Date(expire + 'T23:59:59') - new Date();
-      return Math.ceil(diff / 86400000);
-    }
-
-    function statusLabel(dl) {
-      if (dl < 0) return 'Périmé';
-      if (dl <= 30) return `${dl} j restants`;
-      return `${dl} j restants`;
-    }
-
-    function addMonthsISO(dateStr, months) {
-      if (!validDate(dateStr)) return '';
-      const d = new Date(dateStr + 'T12:00:00');
-      d.setMonth(d.getMonth() + Number(months || 0));
-      return d.toISOString().slice(0, 10);
-    }
-
-    function todayISO() { return new Date().toISOString().slice(0, 10); }
-    function validDate(s) { return /^\d{4}-\d{2}-\d{2}$/.test(String(s || '')); }
-    function prettyDate(iso) {
-      try { return new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(iso + 'T12:00:00')); }
-      catch { return iso; }
-    }
-    function escapeHtml(str) {
-      return String(str)
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#39;');
-    }
-
-    function fbConfigFromSettings() {
-      const fb = state.settings?.fb || {};
-      const required = ['apiKey', 'authDomain', 'databaseURL', 'projectId', 'appId'];
-      if (!required.every(k => (fb[k] || '').trim())) return null;
-      return {
-        apiKey: fb.apiKey.trim(),
-        authDomain: fb.authDomain.trim(),
-        databaseURL: fb.databaseURL.trim(),
-        projectId: fb.projectId.trim(),
-        appId: fb.appId.trim(),
-      };
-    }
-
-    async function connectSync() {
-      const settings = gatherSettingsFromUI();
-      settings.roomId = sanitizeRoomId(settings.roomId);
-      if (!settings.roomId) {
-        alert('Ajoute un code de partage.');
-        return;
-      }
-      if (!settings.fb.apiKey || !settings.fb.databaseURL || !settings.fb.projectId || !settings.fb.authDomain || !settings.fb.appId) {
-        alert('Complète la configuration Firebase.');
-        return;
-      }
-
-      state.settings = settings;
-      state.roomId = settings.roomId;
-      state.deviceName = settings.deviceName || defaultDeviceName();
-      localStorage.setItem('freezer-device-name-v1', state.deviceName);
-      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-
-      if (typeof firebase === 'undefined') {
-        setSyncStatus('Firebase non chargé', 'error');
-        alert('Les bibliothèques Firebase n’ont pas pu être chargées. Vérifie ta connexion réseau.');
-        return;
-      }
-
-      try {
-        setSyncStatus('Connexion…', 'connecting');
-        if (!firebase.apps.length) firebase.initializeApp(fbConfigFromSettings());
-        if (state.itemsListener && state.itemsRef) {
-          firebase.database().ref(state.itemsRef).off('value', state.itemsListener);
+        var cfg = fbConfigFromSettings();
+        if (!cfg) {
+          window.alert('Complete les champs Firebase avant de connecter.');
+          setStatus('Config Firebase incomplete', 'error');
+          return;
         }
-        state.db = firebase.database();
-        state.itemsRef = `freezerRooms/${state.roomId}/items`;
-        const ref = state.db.ref(state.itemsRef);
-        state.syncing = true;
-        state.firebaseReady = true;
-        state.remoteVersion = 0;
-        state.itemsListener = (snapshot) => {
-          const payload = snapshot.val() || {};
-          const nextItems = Object.values(payload)
-            .map(normalizeItem)
-            .filter(Boolean)
-            .sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
-          state.suppressLocalSync = true;
-          state.items = nextItems;
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
-          state.suppressLocalSync = false;
-          render();
-          setSyncStatus(`Synchronisé: ${state.roomId}`, 'online');
-        };
-        ref.on('value', state.itemsListener, (err) => {
+        try {
+          setStatus('Connexion...', 'connecting');
+          await loadFirebaseCompat();
+          if (typeof firebase === 'undefined') throw new Error('Firebase non charge');
+          await ensureFirebaseApp(cfg);
+          if (state.listener && state.refPath && state.db) {
+            state.db.ref(state.refPath).off('value', state.listener);
+          }
+          state.db = firebase.database();
+          state.refPath = 'freezerRooms/' + settings.roomId + '/items';
+          var ref = state.db.ref(state.refPath);
+          state.listener = function (snapshot) {
+            var payload = snapshot.val() || {};
+            var nextItems = Object.keys(payload).map(function (key) { return normalizeItem(payload[key]); }).filter(Boolean).sort(function (a, b) { return (b.updatedAt || '').localeCompare(a.updatedAt || ''); });
+            state.suppressPush = true;
+            state.items = nextItems;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
+            state.suppressPush = false;
+            renderAll();
+            setStatus('Synchronise: ' + settings.roomId, 'online');
+          };
+          ref.on('value', state.listener, function () {
+            setStatus('Erreur de sync', 'error');
+          });
+          state.syncing = true;
+          setStatus('Synchronise: ' + settings.roomId, 'online');
+          await pushToFirebase(true);
+        } catch (err) {
           console.error(err);
-          setSyncStatus('Erreur de sync', 'error');
-        });
-        setSyncStatus(`Synchronisé: ${state.roomId}`, 'online');
-        await pushToFirebase(true);
-      } catch (err) {
-        console.error(err);
-        setSyncStatus('Erreur de connexion', 'error');
-        alert('Connexion Firebase impossible. Vérifie le projet et le code de partage.');
-      }
-    }
-
-    function disconnectSync() {
-      try {
-        if (state.itemsListener && state.db && state.itemsRef) {
-          state.db.ref(state.itemsRef).off('value', state.itemsListener);
+          state.syncing = false;
+          setStatus('Erreur de connexion', 'error');
+          window.alert('Connexion Firebase impossible. Verifie le projet et le code de partage.');
         }
-      } catch (err) {
-        console.warn(err);
       }
-      state.syncing = false;
-      state.firebaseReady = false;
-      state.itemsListener = null;
-      setSyncStatus('Hors ligne', 'offline');
-    }
 
-    async function pushToFirebase(force = false) {
-      if (!state.syncing || !state.db || !state.roomId) return;
-      try {
-        const ref = state.db.ref(state.itemsRef);
-        const payload = {};
-        for (const item of state.items) payload[item.id] = normalizeItem(item);
-        await ref.set(payload);
-        if (force) setSyncStatus(`Synchronisé: ${state.roomId}`, 'online');
-      } catch (err) {
-        console.error(err);
-        setSyncStatus('Sync en erreur', 'error');
+      function disconnectSync() {
+        try {
+          if (state.listener && state.db && state.refPath) {
+            state.db.ref(state.refPath).off('value', state.listener);
+          }
+        } catch (e) {}
+        state.listener = null;
+        state.syncing = false;
+        setStatus('Hors ligne', 'offline');
       }
-    }
 
-    function setSyncStatus(text, mode) {
-      els.syncStatus.textContent = text;
-      els.syncDot.className = `dot ${mode}`;
-    }
+      function pushToFirebase(force) {
+        if (!state.syncing || !state.db || !state.refPath) return Promise.resolve();
+        var payload = {};
+        state.items.forEach(function (item) {
+          payload[item.id] = normalizeItem(item);
+        });
+        return state.db.ref(state.refPath).set(payload).then(function () {
+          if (force) setStatus('Synchronise: ' + state.settings.roomId, 'online');
+        }).catch(function (err) {
+          console.error(err);
+          setStatus('Sync en erreur', 'error');
+        });
+      }
+
+      function renderSettingsSummary() {
+        var fb = state.settings.fb || DEFAULT_FIREBASE_CONFIG;
+        return [
+          'Room: ' + (state.settings.roomId || '(none)'),
+          'apiKey: ' + (fb.apiKey ? 'ok' : 'empty'),
+          'authDomain: ' + (fb.authDomain ? 'ok' : 'empty'),
+          'databaseURL: ' + (fb.databaseURL ? 'ok' : 'empty'),
+          'projectId: ' + (fb.projectId ? 'ok' : 'empty'),
+          'appId: ' + (fb.appId ? 'ok' : 'empty')
+        ].join(' | ');
+      }
+
+      async function runSelfTest() {
+        var log = [];
+        function ok(cond, label) {
+          if (!cond) throw new Error(label);
+          log.push('OK: ' + label);
+        }
+        try {
+          window.confirm = function () { return true; };
+          els.menuBtn.click();
+          ok(els.menuPopover.classList.contains('open'), 'menu opens');
+          els.menuSettingsBtn.click();
+          ok(els.settingsSheet.classList.contains('open'), 'settings opens');
+          ok(els.fbApiKey.value.trim().length > 0, 'firebase fields visible');
+          closeSettings();
+          openItemModal();
+          ok(els.itemSheet.classList.contains('open'), 'add modal opens');
+          els.name.value = 'Test plat';
+          els.category.value = 'Autre';
+          els.quantity.value = '2';
+          els.unit.value = 'portion';
+          els.frozenAt.value = todayISO();
+          els.months.value = '3';
+          els.notes.value = 'selftest';
+          els.itemForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+          ok(state.items.some(function (x) { return x.name === 'Test plat'; }), 'item saved');
+          els.searchBtn.click();
+          ok(els.searchSheet.classList.contains('open'), 'search modal opens');
+          els.searchQuery.value = 'Test';
+          els.searchQuery.dispatchEvent(new Event('input', { bubbles: true }));
+          ok(els.searchResults.textContent.indexOf('Test plat') >= 0, 'search renders item');
+          closeSearchModal();
+          state.items.unshift(normalizeItem({ id: 'old-1', name: 'Vieux plat', category: 'Autre', quantity: 1, unit: 'portion', frozenAt: '2024-01-01', months: 1, notes: '', createdAt: '2024-01-01T00:00:00Z', updatedAt: '2024-01-01T00:00:00Z' }));
+          persistItems();
+          setScope('overdue');
+          ok(els.list.textContent.indexOf('Vieux plat') >= 0, 'overdue filter works');
+          state.items = state.items.filter(function (x) { return x.id !== 'old-1'; x.id !== 'old-1'; });
+          state.items = state.items.filter(function (x) { return x.name !== 'Test plat'; });
+          persistItems();
+          setScope('all');
+          renderAll();
+          ok(els.listCount.textContent.indexOf('article') >= 0, 'dashboard renders');
+          document.body.setAttribute('data-selftest', 'pass');
+          els.testLog.textContent = log.join('\n');
+          document.title = 'SELFTEST PASS';
+        } catch (err) {
+          document.body.setAttribute('data-selftest', 'fail');
+          els.testLog.textContent = String(err && err.message ? err.message : err);
+          document.title = 'SELFTEST FAIL';
+          console.error(err);
+        }
+      }
+
+      window.toggleMenu = toggleMenu;
+      window.openSettings = openSettings;
+      window.closeMenu = closeMenu;
+      window.__app = { state: state, runSelfTest: runSelfTest };
+
+      function saveSettingsFromUI() {
+        persistSettingsAndMaybeReconnect();
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(state.settings));
+        populateSettingsUI();
+        setStatus('Config enregistree', 'offline');
+        window.alert('Configuration enregistree sur cet iPhone.');
+      }
+    })();
   </script>
 </body>
 </html>
