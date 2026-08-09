@@ -51,7 +51,7 @@
     .section-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
     .section-head h2, .section-head h3 { margin: 0; font-size: 1rem; }
     .small { color: var(--muted); font-size:.85rem; }
-    .filters, .category-grid { display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap:8px; }
+    .filters, .category-grid { display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:10px; }
     .chip, .cat-btn {
       border:1px solid var(--line); background: var(--panel-solid); border-radius:16px; padding:11px 10px; font-weight:800; color: var(--text); text-align:center;
       display:flex; align-items:center; justify-content:center; gap:8px; min-height:46px;
@@ -96,7 +96,7 @@
 .cat-plats-cuisines .swatch, .cat-btn.cat-plats-cuisines .swatch { background:#a855f7; }
 .cat-dessert .swatch, .cat-btn.cat-dessert .swatch { background:#f97316; }
 .cat-produits-laitiers .swatch, .cat-btn.cat-produits-laitiers .swatch { background:#14b8a6; }
-.category-grid .cat-btn { justify-content:flex-start; text-align:left; padding-left:12px; }
+.category-grid .cat-btn { justify-content:flex-start; text-align:left; align-items:flex-start; min-height:84px; padding:18px 16px; font-size:1rem; line-height:1.15; }
 .category-grid .cat-btn.active { outline-color: rgba(10,132,255,.26); }
 .bottom-tabs {
       position: fixed;
@@ -143,7 +143,7 @@
     .form-grid { display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:10px; }
     .full { grid-column:1 / -1; }
     label { display:grid; gap:6px; font-size:.82rem; font-weight:700; color:var(--muted); }
-    input, textarea { width:100%; border:1px solid rgba(15,23,42,.14); background:#fff; border-radius:16px; padding:12px 12px; color:var(--text); outline:none; }
+    input, textarea { width:100%; border:1px solid rgba(15,23,42,.14); background:#fff; border-radius:16px; padding:12px 12px; color:var(--text); outline:none; font-size:16px; }
     input:focus, textarea:focus { border-color: rgba(10,132,255,.45); box-shadow: 0 0 0 4px rgba(10,132,255,.10); }
     textarea { min-height:96px; resize:vertical; }
     .section-label { color:var(--muted); font-size:.82rem; font-weight:800; margin-bottom:8px; }
@@ -166,13 +166,14 @@
     .empty { padding:16px; text-align:center; color:var(--muted); border:1px dashed rgba(15,23,42,.14); border-radius:18px; background:#fff; }
     @media (max-width: 720px) {
       .app { padding-left:8px; padding-right:8px; }
-      .summary-grid, .filters, .category-grid, .form-grid, .actions-row { grid-template-columns: 1fr; }
+      .summary-grid, .filters, .form-grid, .actions-row { grid-template-columns: 1fr; }
+      .category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .item-actions { align-items:flex-start; }
       .menu { left:8px; right:8px; width:auto; }
       .bottom-tabs { left:8px; right:8px; width:auto; }
     }
 
-    /* v10 - mobile app layout */
+    /* v13 - mobile app layout */
     .app { max-width: 1180px; padding: calc(8px + var(--safe-top)) 12px calc(104px + var(--safe-bottom)); }
     .topbar { display:grid; grid-template-columns:48px minmax(0,1fr) 48px; align-items:center; padding:8px 4px 12px; background:rgba(243,246,251,.96); }
     .brand { text-align:center; min-width:0; }
@@ -319,8 +320,9 @@
 
   <div class="menu" id="menuPopover">
     <div class="menu-title">Menu</div>
-    <div class="menu-item version" id="menuVersionItem">Version <strong>v10</strong></div>
+    <button class="menu-item" id="menuConnectBtn" type="button">↻ <span>Connexion</span></button>
     <button class="menu-item danger" id="menuDisconnectBtn" type="button">⎋ <span>Déconnexion</span></button>
+    <div class="menu-item version" id="menuVersionItem">Version <strong>v13</strong></div>
   </div>
 
   <section class="sheet" id="settingsSheet">
@@ -372,9 +374,6 @@
       </div>
       <div class="sheet-body">
         <div class="form-grid">
-          <label class="full">Nom
-            <input id="itemName" placeholder="Poulet, soupe, dessert..." />
-          </label>
           <div class="full">
             <div class="section-label">Catégorie</div>
             <div class="category-grid" id="categoryGrid"></div>
@@ -391,6 +390,9 @@
           </div>
           <label class="full">Notes
             <textarea id="itemNotes" placeholder="Ex. déjà cuit, pour ce soir..."></textarea>
+          </label>
+          <label class="full">Nom
+            <input id="itemName" placeholder="Poulet, soupe, dessert..." />
           </label>
           <div class="full small">La date d’ajout est utilisée automatiquement pour le calcul. Durée fixe : 6 mois.</div>
         </div>
@@ -435,7 +437,7 @@
   (() => {
     'use strict';
 
-    const APP_VERSION = 'v10';
+    const APP_VERSION = 'v13';
     const STORAGE_KEY = 'freezer-items-v2';
     const SETTINGS_KEY = 'freezer-settings-v2';
     const DEVICE_KEY = 'freezer-device-id-v2';
@@ -524,6 +526,7 @@
       settings: loadSettings(),
       scope: 'all',
       searchCategory: 'all',
+      categoryFilter: 'all',
       syncing: false,
       db: null,
       refPath: '',
@@ -772,10 +775,10 @@
     }
 
     function openSettings() {
-      console.log('[Freezer v10] openSettings()');
+      console.log('[Freezer v13] openSettings()');
       populateSettingsUI();
       openSheet(els.settingsSheet, els.roomId);
-      console.log('[Freezer v10] settingsSheet ouvert');
+      console.log('[Freezer v13] settingsSheet ouvert');
     }
     function closeSettings() { closeSheet(els.settingsSheet); }
 
@@ -840,7 +843,8 @@
       let items = state.items.slice();
       if (state.scope === 'soon') items = items.filter(it => { const a = ageDays(it); return a >= SOON_DAYS && a < SHELF_LIFE_DAYS; });
       if (state.scope === 'overdue') items = items.filter(it => ageDays(it) >= SHELF_LIFE_DAYS);
-      if (state.categoryFilter !== 'all') items = items.filter(it => it.category === state.categoryFilter);
+      const categoryFilter = state.categoryFilter || 'all';
+      if (categoryFilter !== 'all') items = items.filter(it => it.category === categoryFilter);
       return items.sort(sortItems);
     }
     function scopeTitle(scope) { return scope === 'soon' ? 'À consommer' : scope === 'overdue' ? 'Date dépassée' : 'Tous les articles'; }
@@ -949,10 +953,11 @@
     function bindEvents() {
       els.menuBtn.addEventListener('click', toggleMenu);
       if (els.topSettingsBtn) els.topSettingsBtn.addEventListener('click', openSettings);
+      if (els.menuConnectBtn) els.menuConnectBtn.addEventListener('click', connectSync);
       if (els.fabAddBtn) els.fabAddBtn.addEventListener('click', () => openItem(null));
       if (els.menuDisconnectBtn) {
         els.menuDisconnectBtn.addEventListener('click', () => {
-          console.log('[Freezer v10] click Déconnexion');
+          console.log('[Freezer v13] click Déconnexion');
           closeMenu();
           disconnectSync();
         });
