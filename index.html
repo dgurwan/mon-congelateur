@@ -104,12 +104,13 @@
       transform: translateX(-50%);
       bottom: calc(10px + var(--safe-bottom));
       width: min(100%, 1080px);
-      z-index: 3500;
+      z-index: 2400;
       padding: 0 10px;
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 10px;
       pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease;
     }
     .bottom-tab {
       pointer-events: auto;
@@ -131,7 +132,7 @@
     .menu-item.version strong { color: var(--text); }
     .backdrop { position:fixed; inset:0; background: rgba(15,23,42,.18); z-index:2500; display:none; }
     .backdrop.show { display:block; }
-    .sheet { position:fixed; inset:0; z-index:3000; display:none; background:#fff; overflow:auto; -webkit-overflow-scrolling: touch; }
+    .sheet { position:fixed; inset:0; z-index:3800; display:none; background:#fff; overflow:auto; -webkit-overflow-scrolling: touch; }
     .sheet.open { display:block; }
     .sheet-inner { min-height:100%; display:flex; flex-direction:column; }
     .sheet-header { position:sticky; top:0; z-index:2; background:#fff; border-bottom:1px solid rgba(15,23,42,.08); padding: calc(12px + var(--safe-top)) 14px 12px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
@@ -171,7 +172,7 @@
       .bottom-tabs { left:8px; right:8px; width:auto; }
     }
 
-    /* v9 - mobile app layout */
+    /* v10 - mobile app layout */
     .app { max-width: 1180px; padding: calc(8px + var(--safe-top)) 12px calc(104px + var(--safe-bottom)); }
     .topbar { display:grid; grid-template-columns:48px minmax(0,1fr) 48px; align-items:center; padding:8px 4px 12px; background:rgba(243,246,251,.96); }
     .brand { text-align:center; min-width:0; }
@@ -215,7 +216,12 @@
     .bottom-tab { min-height:58px; border:0; box-shadow:none; background:transparent; border-radius:16px; display:flex; flex-direction:column; gap:3px; align-items:center; justify-content:center; font-size:.74rem; }
     .bottom-tab.active { color:var(--blue); outline:0; }
     .tab-icon { font-size:1.2rem; line-height:1; }
-    .fab { position:fixed; right:max(18px, calc((100vw - 1180px)/2 + 18px)); bottom:calc(82px + var(--safe-bottom)); z-index:3600; width:58px; height:58px; border:0; border-radius:50%; background:linear-gradient(180deg,#168bff,#0878e8); color:#fff; font-size:2rem; line-height:1; box-shadow:0 14px 30px rgba(10,132,255,.30); }
+    body.sheet-open .bottom-tabs, body.sheet-open .fab {
+      opacity:0;
+      pointer-events:none;
+      display:none !important;
+    }
+    .fab { position:fixed; right:max(18px, calc((100vw - 1180px)/2 + 18px)); bottom:calc(82px + var(--safe-bottom)); z-index:2450; width:58px; height:58px; border:0; border-radius:50%; background:linear-gradient(180deg,#168bff,#0878e8); color:#fff; font-size:2rem; line-height:1; box-shadow:0 14px 30px rgba(10,132,255,.30); transition: opacity .18s ease, transform .18s ease; }
     .menu { left:max(12px, calc((100vw - 1180px)/2 + 12px)); right:auto; }
     @media (min-width: 760px) {
       .list { grid-template-columns:repeat(2,minmax(0,1fr)); }
@@ -313,7 +319,7 @@
 
   <div class="menu" id="menuPopover">
     <div class="menu-title">Menu</div>
-    <div class="menu-item version" id="menuVersionItem">Version <strong>v9</strong></div>
+    <div class="menu-item version" id="menuVersionItem">Version <strong>v10</strong></div>
     <button class="menu-item danger" id="menuDisconnectBtn" type="button">⎋ <span>Déconnexion</span></button>
   </div>
 
@@ -429,7 +435,7 @@
   (() => {
     'use strict';
 
-    const APP_VERSION = 'v9';
+    const APP_VERSION = 'v10';
     const STORAGE_KEY = 'freezer-items-v2';
     const SETTINGS_KEY = 'freezer-settings-v2';
     const DEVICE_KEY = 'freezer-device-id-v2';
@@ -590,6 +596,17 @@
     function defaultDeviceName() { return (navigator.userAgent.includes('iPad') ? 'iPad' : 'iPhone') + ' ' + Math.floor(Math.random() * 90 + 10); }
     function getOrCreateDeviceId() { let id = localStorage.getItem(DEVICE_KEY); if (!id) { id = 'dev-' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36); localStorage.setItem(DEVICE_KEY, id); } return id; }
 
+    function debugLog(step, details) {
+      if (details !== undefined) console.log('[Freezer ' + APP_VERSION + '] ' + step, details);
+      else console.log('[Freezer ' + APP_VERSION + '] ' + step);
+    }
+
+    function syncSheetState() {
+      const open = [els.settingsSheet, els.itemSheet, els.searchSheet].some(s => s.classList.contains('open'));
+      document.body.classList.toggle('sheet-open', open);
+      return open;
+    }
+
     function loadSettings() {
       try {
         const raw = localStorage.getItem(SETTINGS_KEY);
@@ -745,18 +762,20 @@
       closeMenu();
       els.backdrop.classList.add('show');
       sheet.classList.add('open');
+      syncSheetState();
       if (focusEl) setTimeout(() => focusEl.focus(), 50);
     }
     function closeSheet(sheet) {
       sheet.classList.remove('open');
-      if (![els.settingsSheet, els.itemSheet, els.searchSheet].some(s => s.classList.contains('open'))) els.backdrop.classList.remove('show');
+      const stillOpen = syncSheetState();
+      if (!stillOpen) els.backdrop.classList.remove('show');
     }
 
     function openSettings() {
-      console.log('[Freezer v9] openSettings()');
+      console.log('[Freezer v10] openSettings()');
       populateSettingsUI();
       openSheet(els.settingsSheet, els.roomId);
-      console.log('[Freezer v9] settingsSheet ouvert');
+      console.log('[Freezer v10] settingsSheet ouvert');
     }
     function closeSettings() { closeSheet(els.settingsSheet); }
 
@@ -933,7 +952,7 @@
       if (els.fabAddBtn) els.fabAddBtn.addEventListener('click', () => openItem(null));
       if (els.menuDisconnectBtn) {
         els.menuDisconnectBtn.addEventListener('click', () => {
-          console.log('[Freezer v9] click Déconnexion');
+          console.log('[Freezer v10] click Déconnexion');
           closeMenu();
           disconnectSync();
         });
@@ -1012,59 +1031,92 @@
     }
 
     function loadFirebaseCompat() {
-      if (typeof firebase !== 'undefined') return Promise.resolve();
+      if (typeof firebase !== 'undefined') {
+        debugLog('loadFirebaseCompat:already loaded');
+        return Promise.resolve();
+      }
       if (!state.firebaseLoadPromise) {
+        debugLog('loadFirebaseCompat:loading scripts');
         const urls = [
           'https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js',
           'https://www.gstatic.com/firebasejs/10.13.2/firebase-database-compat.js'
         ];
         state.firebaseLoadPromise = urls.reduce((p, src) => p.then(() => loadScript(src)), Promise.resolve());
+      } else {
+        debugLog('loadFirebaseCompat:reusing pending promise');
       }
-      return state.firebaseLoadPromise;
+      return state.firebaseLoadPromise.then(() => debugLog('loadFirebaseCompat:ready'));
     }
 
     function ensureFirebaseApp(cfg) {
+      debugLog('ensureFirebaseApp:start', { projectId: cfg.projectId, databaseURL: cfg.databaseURL });
       const existing = firebase.apps && firebase.apps.length ? firebase.apps[0] : null;
-      if (!existing) { firebase.initializeApp(cfg); return Promise.resolve(firebase.app()); }
+      if (!existing) {
+        firebase.initializeApp(cfg);
+        debugLog('ensureFirebaseApp:initialized new app');
+        return Promise.resolve(firebase.app());
+      }
       const current = existing.options || {};
       const same = ['apiKey', 'authDomain', 'databaseURL', 'projectId', 'appId'].every(key => String(current[key] || '') === String(cfg[key] || ''));
-      if (same) return Promise.resolve(existing);
-      return existing.delete().then(() => { firebase.initializeApp(cfg); return firebase.app(); });
+      if (same) {
+        debugLog('ensureFirebaseApp:existing app matches config');
+        return Promise.resolve(existing);
+      }
+      debugLog('ensureFirebaseApp:config changed, recreating app');
+      return existing.delete().then(() => { firebase.initializeApp(cfg); debugLog('ensureFirebaseApp:reinitialized'); return firebase.app(); });
     }
 
     async function connectSync() {
       persistSettingsDraft();
       const settings = state.settings;
       const cfg = fbConfigFromSettings();
-      if (!settings.roomId) { toast('Ajoute un code de partage'); return; }
-      if (!cfg) { setStatus('Config incomplète'); toast('Complète les champs Firebase'); return; }
+      debugLog('connectSync:start', { roomId: settings.roomId, syncing: state.syncing, hasConfig: !!cfg });
+      if (!settings.roomId) { debugLog('connectSync:missing-roomId'); toast('Ajoute un code de partage'); return; }
+      if (!cfg) { debugLog('connectSync:missing-config'); setStatus('Config incomplète'); toast('Complète les champs Firebase'); return; }
       try {
         setStatus('Connexion...');
+        debugLog('connectSync:loading firebase compat');
         await loadFirebaseCompat();
+        debugLog('connectSync:firebase compat ready', typeof firebase);
         if (typeof firebase === 'undefined') throw new Error('Firebase non chargé');
         await ensureFirebaseApp(cfg);
-        if (state.listener && state.db && state.refPath) state.db.ref(state.refPath).off('value', state.listener);
+        debugLog('connectSync:firebase app ready', firebase.apps ? firebase.apps.length : 'n/a');
+        if (state.listener && state.db && state.refPath) {
+          debugLog('connectSync:detach previous listener', state.refPath);
+          state.db.ref(state.refPath).off('value', state.listener);
+        }
         state.db = firebase.database();
         state.refPath = 'freezerRooms/' + settings.roomId + '/items';
+        debugLog('connectSync:database ref path', state.refPath);
         const ref = state.db.ref(state.refPath);
-        state.listener = snapshot => {
-          const payload = snapshot.val() || {};
-          const remote = Object.keys(payload).map(k => normalizeItem(payload[k])).filter(Boolean).sort(sortItems);
+        const applySnapshot = (snapshot, source) => {
+          const raw = snapshot && typeof snapshot.val === 'function' ? snapshot.val() : null;
+          const exists = !!(snapshot && typeof snapshot.exists === 'function' && snapshot.exists());
+          const payload = Array.isArray(raw) ? raw : (raw && typeof raw === 'object' && raw.items && typeof raw.items === 'object' && !Array.isArray(raw.items) ? raw.items : raw || {});
+          const keys = payload && typeof payload === 'object' ? Object.keys(payload) : [];
+          debugLog('connectSync:snapshot ' + source, { exists, keys: keys.length });
+          const remote = keys.map(k => normalizeItem(payload[k])).filter(Boolean).sort(sortItems);
+          debugLog('connectSync:remote items parsed', remote.map(it => ({ id: it.id, name: it.name, category: it.category, qty: it.quantity })));
           if (remote.length) {
             state.items = remote;
             localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
-          } else if (state.items.length) {
-            pushToFirebase(true);
+            debugLog('connectSync:local state replaced from remote', state.items.length);
+          } else {
+            debugLog('connectSync:remote empty, keeping current local view', state.items.length);
           }
           renderAll();
           setStatus('Synchronisé : ' + settings.roomId);
         };
-        ref.on('value', state.listener, () => setStatus('Erreur de sync'));
+        state.listener = snapshot => applySnapshot(snapshot, 'listener');
+        ref.on('value', state.listener, err => { console.error(err); debugLog('connectSync:listener error', err); setStatus('Erreur de sync'); });
         state.syncing = true;
-        setStatus('Synchronisé : ' + settings.roomId);
+        const initial = await ref.once('value');
+        applySnapshot(initial, 'initial-once');
+        debugLog('connectSync:subscribed and initial snapshot processed');
         toast('Connexion Firebase active');
       } catch (err) {
         console.error(err);
+        debugLog('connectSync:error', err);
         state.syncing = false;
         setStatus('Erreur de connexion');
         toast('Connexion Firebase impossible');
@@ -1072,28 +1124,40 @@
     }
 
     function disconnectSync() {
+      debugLog('disconnectSync:start', { syncing: state.syncing, path: state.refPath });
       try {
         if (state.listener && state.db && state.refPath) state.db.ref(state.refPath).off('value', state.listener);
-      } catch (err) {}
+      } catch (err) {
+        console.error(err);
+        debugLog('disconnectSync:detach error', err);
+      }
       state.listener = null;
       state.syncing = false;
       state.db = null;
       state.refPath = '';
       state.items = [];
-      try { localStorage.removeItem(STORAGE_KEY); } catch (err) {}
+      try { localStorage.removeItem(STORAGE_KEY); } catch (err) { console.error(err); }
       renderAll();
       setStatus('Hors ligne');
+      debugLog('disconnectSync:local items cleared');
       toast('Déconnecté de Firebase');
     }
 
     function pushToFirebase(force) {
-      if (!state.syncing || !state.db || !state.refPath) return Promise.resolve();
+      debugLog('pushToFirebase:called', { syncing: state.syncing, hasDb: !!state.db, path: state.refPath, itemCount: state.items.length, force: !!force });
+      if (!state.syncing || !state.db || !state.refPath) {
+        debugLog('pushToFirebase:skipped');
+        return Promise.resolve();
+      }
       const payload = {};
       state.items.forEach(item => { payload[item.id] = normalizeItem(item); });
+      debugLog('pushToFirebase:payload keys', Object.keys(payload));
       return state.db.ref(state.refPath).set(payload).then(() => {
+        debugLog('pushToFirebase:success');
         if (force) setStatus('Synchronisé : ' + state.settings.roomId);
       }).catch(err => {
         console.error(err);
+        debugLog('pushToFirebase:error', err);
         setStatus('Sync en erreur');
       });
     }
@@ -1105,6 +1169,7 @@
       } else {
         setStatus('Prêt pour Firebase');
       }
+      debugLog('saveSettings', { syncing: state.syncing, roomId: state.settings.roomId });
       toast('Configuration enregistrée sur cet iPhone');
     }
 
