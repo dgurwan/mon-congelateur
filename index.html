@@ -193,13 +193,14 @@
         align-items: center;
       }
       .brand { grid-column: 1 / -1; width: 100%; }
+      .brand-text { display: grid; gap: 3px; }
       .brand-text p { max-width: none; }
       .actions-top {
         grid-column: 1 / -1;
         width: 100%;
         justify-content: flex-end;
       }
-      .chip-status { flex: 1 1 auto; min-width: 0; }
+      .actions-top .chip-status { display: none; }
       .menu-popover { right: 0; left: auto; width: min(240px, calc(100vw - 20px)); }
     }
     .shell { padding: 8px 10px 22px; display: grid; gap: 12px; }
@@ -395,11 +396,12 @@
       transform: translateX(-50%);
       top: 12px;
       width: min(var(--app-width), calc(100vw - 16px));
-      max-height: calc(100vh - 24px);
+      max-height: calc(100dvh - 24px);
       overflow: auto;
+      -webkit-overflow-scrolling: touch;
       z-index: 1400;
       display: none;
-      padding: 14px;
+      padding: 14px 14px calc(14px + env(safe-area-inset-bottom));
       border-radius: 28px;
       box-shadow: 0 26px 60px rgba(15,23,42,.18);
       background: #fff;
@@ -446,6 +448,15 @@
       flex-wrap: wrap;
       gap: 8px;
       margin-top: 12px;
+    }
+    .sheet-actions {
+      position: sticky;
+      bottom: 0;
+      padding-top: 12px;
+      padding-bottom: max(10px, env(safe-area-inset-bottom));
+      background: linear-gradient(180deg, rgba(255,255,255,0), rgba(255,255,255,.98) 18%);
+      z-index: 2;
+      margin-bottom: -4px;
     }
     .small-btn {
       padding: 10px 12px;
@@ -505,6 +516,16 @@
       .form-grid { grid-template-columns: 1fr; }
       .item-actions { flex-direction: column; align-items: flex-start; }
       .qty-stepper, .meta-actions { width: 100%; justify-content: flex-start; }
+      .sheet {
+        left: 8px;
+        right: 8px;
+        top: 8px;
+        transform: none;
+        width: auto;
+        max-height: calc(100dvh - 16px);
+        border-radius: 24px;
+      }
+      .sheet-header { position: sticky; top: 0; background: linear-gradient(180deg, #fff 75%, rgba(255,255,255,0)); padding-top: 2px; z-index: 3; }
     }
   </style>
 </head>
@@ -822,7 +843,7 @@
       }
 
       function bindEvents() {
-        els.menuBtn.addEventListener('click', toggleMenu);
+        els.menuBtn.addEventListener('click', function (e) { e.preventDefault(); closeMenu(); openSettings(); });
         els.menuBackdrop.addEventListener('click', closeAllSheets);
         els.menuSettingsBtn.addEventListener('click', function () { closeMenu(); openSettings(); });
         els.menuDisconnectBtn.addEventListener('click', function () { closeMenu(); disconnectSync(); });
@@ -1109,6 +1130,7 @@
         if (els.menuPopover.classList.contains('open')) closeMenu(); else openMenu();
       }
       function openSettings() {
+        closeMenu();
         populateSettingsUI();
         els.settingsSheet.classList.add('open');
         els.settingsSheet.setAttribute('aria-hidden', 'false');
