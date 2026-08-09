@@ -65,14 +65,45 @@
     .btn.success { background: linear-gradient(180deg, #22c55e, #16a34a); color:#fff; }
     .btn.secondary { background:#fff; color:var(--text); border:1px solid var(--line); }
     .list { display:grid; gap:10px; }
-    .item { position:relative; border-radius:22px; background:var(--panel-solid); border:1px solid var(--line); overflow:hidden; box-shadow:0 8px 24px rgba(15,23,42,.05); padding:14px 14px 14px 18px; }
+    .item { position:relative; border-radius:22px; background:var(--panel-solid); border:1px solid var(--line); overflow:hidden; box-shadow:0 8px 24px rgba(15,23,42,.05); padding:0; display:grid; grid-template-columns:34px minmax(0,1fr) 76px; min-height:160px; }
     .item::before { content:''; position:absolute; left:0; top:0; bottom:0; width:7px; background: var(--green); }
-    .cat-viande::before { background:#ef4444; }
-    .cat-poisson::before { background:#38bdf8; }
-    .cat-legumes::before { background:#22c55e; }
-    .cat-plats-cuisines::before { background:#a855f7; }
-    .cat-dessert::before { background:#f97316; }
-    .cat-produits-laitiers::before { background:#14b8a6; }
+    .cat-viande .item::before { background:#ef4444; }
+    .cat-poisson .item::before { background:#38bdf8; }
+    .cat-legumes .item::before { background:#22c55e; }
+    .cat-plats-cuisines .item::before { background:#a855f7; }
+    .cat-dessert .item::before { background:#f97316; }
+    .cat-produits-laitiers .item::before { background:#14b8a6; }
+    .item-body { min-width:0; display:flex; flex-direction:column; grid-column:2; padding:14px 12px 12px 12px; }
+    .item-rail {
+      position:relative;
+      grid-column:1;
+      grid-row:1 / -1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      pointer-events:none;
+      z-index:1;
+      border-radius:18px 0 0 18px;
+      overflow:hidden;
+    }
+    .rail-label {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg) translateY(-2px);
+      font-size:.74rem;
+      font-weight:900;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      color: rgba(255,255,255,.98);
+      text-shadow: 0 1px 2px rgba(0,0,0,.15);
+      opacity:.96;
+      line-height:1;
+    }
+    .cat-viande .item-rail { background:#ef4444; }
+    .cat-poisson .item-rail { background:#38bdf8; }
+    .cat-legumes .item-rail { background:#22c55e; }
+    .cat-plats-cuisines .item-rail { background:#a855f7; }
+    .cat-dessert .item-rail { background:#f97316; }
+    .cat-produits-laitiers .item-rail { background:#14b8a6; }
     .item-top { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
     .item-title { font-size:1.05rem; font-weight:900; margin:0; }
     .item-meta { margin-top:6px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
@@ -81,10 +112,11 @@
     .badge.fresh { background: rgba(34,197,94,.12); color:#15803d; }
     .badge.warn { background: rgba(245,158,11,.14); color:#b45309; }
     .badge.old { background: rgba(239,68,68,.12); color:#b91c1c; }
+    .badge svg { width:12px; height:12px; flex:0 0 auto; margin-top:1px; }
     .item-sub { margin-top:8px; color:var(--muted); font-size:.86rem; line-height:1.35; }
-    .item-actions { margin-top:12px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
-    .meta-actions { display:flex; gap:8px; }
-    .mini { width:40px; height:40px; border-radius:14px; border:1px solid var(--line); background:#fff; display:grid; place-items:center; }
+    .item-actions { margin-top:auto; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+    .meta-actions { display:grid; grid-template-rows:1fr 1fr; gap:10px; align-self:stretch; padding:12px 10px; border-left:1px solid var(--line); grid-column:3; grid-row:1 / -1; }
+    .mini { width:100%; height:100%; min-height:54px; border-radius:18px; border:0; background:#fff; display:grid; place-items:center; }
     .mini svg { width:18px; height:18px; }
     .qty-stepper { display:flex; align-items:center; gap:8px; }
     .qty-pill { min-width:38px; text-align:center; font-weight:900; }
@@ -96,8 +128,13 @@
 .cat-plats-cuisines .swatch, .cat-btn.cat-plats-cuisines .swatch { background:#a855f7; }
 .cat-dessert .swatch, .cat-btn.cat-dessert .swatch { background:#f97316; }
 .cat-produits-laitiers .swatch, .cat-btn.cat-produits-laitiers .swatch { background:#14b8a6; }
-.category-grid .cat-btn { justify-content:flex-start; text-align:left; align-items:flex-start; min-height:84px; padding:18px 16px; font-size:1rem; line-height:1.15; }
-.category-grid .cat-btn.active { outline-color: rgba(10,132,255,.26); }
+.category-grid .cat-btn { justify-content:flex-start; text-align:left; padding-left:12px; }
+.category-grid .cat-btn.active {
+  outline:3px solid rgba(10,132,255,.34);
+  outline-offset:-3px;
+  box-shadow:0 8px 20px rgba(10,132,255,.12);
+}
+.category-grid .cat-btn[aria-pressed="true"] { transform:translateY(-1px); }
 .bottom-tabs {
       position: fixed;
       left: 50%;
@@ -170,10 +207,10 @@
       .category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .item-actions { align-items:flex-start; }
       .menu { left:8px; right:8px; width:auto; }
-      .bottom-tabs { left:8px; right:8px; width:auto; }
+      .bottom-tabs { left:50%; right:auto; transform:translateX(-50%); width:calc(100vw - 16px); }
     }
 
-    /* v13 - mobile app layout */
+    /* v18 - mobile app layout */
     .app { max-width: 1180px; padding: calc(8px + var(--safe-top)) 12px calc(104px + var(--safe-bottom)); }
     .topbar { display:grid; grid-template-columns:48px minmax(0,1fr) 48px; align-items:center; padding:8px 4px 12px; background:rgba(243,246,251,.96); }
     .brand { text-align:center; min-width:0; }
@@ -189,10 +226,10 @@
     .section { margin-top:8px; padding:0; border:0; background:transparent; box-shadow:none; }
     .section > .section-head { padding:4px 2px 8px; }
     .list { gap:10px; }
-    .item { display:grid; grid-template-columns:minmax(0,1fr) 72px; padding:0 0 0 7px; border-radius:20px; min-height:156px; }
+    .item { display:grid; grid-template-columns:34px minmax(0,1fr) 76px; padding:0; border-radius:20px; min-height:160px; }
     .item::before { width:7px; }
-    .item-top { display:contents; }
-    .item-top > div:first-child { padding:16px 14px 4px 16px; min-width:0; }
+    .item-top { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+    .item-top > div:first-child { padding:0; min-width:0; }
     .item-title { font-size:1.05rem; }
     .item-meta { gap:7px; }
     .badge { padding:5px 9px; }
@@ -203,17 +240,17 @@
     .cat-plats-cuisines .badge.cat { background:#f3e8ff; color:#7e22ce; }
     .cat-dessert .badge.cat { background:#ffedd5; color:#c2410c; }
     .cat-produits-laitiers .badge.cat { background:#ccfbf1; color:#0f766e; }
-    .meta-actions { grid-column:2; grid-row:1 / span 3; height:100%; border-left:1px solid var(--line); padding:12px 10px; display:grid; grid-template-rows:1fr 1fr; gap:10px; align-items:stretch; }
+    .meta-actions { width:76px; height:100%; border-left:1px solid var(--line); padding:12px 10px; display:grid; grid-template-rows:1fr 1fr; gap:10px; align-items:stretch; }
     .meta-actions .mini { width:100%; height:100%; min-height:54px; border:0; color:#fff; border-radius:16px; }
     .meta-actions .mini svg { width:22px; height:22px; }
     .action-edit { background:linear-gradient(180deg,#168bff,#0878e8) !important; }
     .action-delete { background:linear-gradient(180deg,#ff3131,#e91620) !important; }
-    .item-sub { grid-column:1; padding:0 14px 4px 16px; margin:0; }
-    .item-actions { grid-column:1; padding:4px 14px 14px 16px; margin:0; }
+    .item-sub { padding:0; margin:0; }
+    .item-actions { padding:4px 0 0 0; margin:0; }
     .qty-stepper { gap:10px; }
     .qty-btn { width:44px; height:44px; }
     .qty-pill { min-width:34px; font-size:1rem; }
-    .bottom-tabs { bottom:calc(8px + var(--safe-bottom)); padding:8px 10px; gap:0; background:rgba(255,255,255,.97); border:1px solid var(--line); border-radius:24px; box-shadow:0 12px 32px rgba(15,23,42,.12); }
+    .bottom-tabs { bottom:calc(8px + var(--safe-bottom)); left:50%; right:auto; transform:translateX(-50%); width:min(calc(100vw - 16px), 1080px); padding:8px 10px; gap:0; background:rgba(255,255,255,.97); border:1px solid var(--line); border-radius:24px; box-shadow:0 12px 32px rgba(15,23,42,.12); }
     .bottom-tab { min-height:58px; border:0; box-shadow:none; background:transparent; border-radius:16px; display:flex; flex-direction:column; gap:3px; align-items:center; justify-content:center; font-size:.74rem; }
     .bottom-tab.active { color:var(--blue); outline:0; }
     .tab-icon { font-size:1.2rem; line-height:1; }
@@ -233,7 +270,7 @@
     @media (min-width: 1100px) { .list { grid-template-columns:repeat(2,minmax(0,1fr)); } }
     @media (max-width: 430px) {
       .app { padding-left:8px; padding-right:8px; }
-      .item { grid-template-columns:minmax(0,1fr) 64px; }
+      .item { grid-template-columns:28px minmax(0,1fr) 64px; }
       .item-top > div:first-child { padding-left:13px; padding-right:10px; }
       .item-sub, .item-actions { padding-left:13px; padding-right:10px; }
       .meta-actions { padding:10px 8px; }
@@ -322,7 +359,7 @@
     <div class="menu-title">Menu</div>
     <button class="menu-item" id="menuConnectBtn" type="button">↻ <span>Connexion</span></button>
     <button class="menu-item danger" id="menuDisconnectBtn" type="button">⎋ <span>Déconnexion</span></button>
-    <div class="menu-item version" id="menuVersionItem">Version <strong>v13</strong></div>
+    <div class="menu-item version" id="menuVersionItem">Version <strong>v18</strong></div>
   </div>
 
   <section class="sheet" id="settingsSheet">
@@ -374,6 +411,9 @@
       </div>
       <div class="sheet-body">
         <div class="form-grid">
+          <label class="full">Nom
+            <input id="itemName" placeholder="Poulet, soupe, dessert..." />
+          </label>
           <div class="full">
             <div class="section-label">Catégorie</div>
             <div class="category-grid" id="categoryGrid"></div>
@@ -390,9 +430,6 @@
           </div>
           <label class="full">Notes
             <textarea id="itemNotes" placeholder="Ex. déjà cuit, pour ce soir..."></textarea>
-          </label>
-          <label class="full">Nom
-            <input id="itemName" placeholder="Poulet, soupe, dessert..." />
           </label>
           <div class="full small">La date d’ajout est utilisée automatiquement pour le calcul. Durée fixe : 6 mois.</div>
         </div>
@@ -437,7 +474,7 @@
   (() => {
     'use strict';
 
-    const APP_VERSION = 'v13';
+    const APP_VERSION = 'v18';
     const STORAGE_KEY = 'freezer-items-v2';
     const SETTINGS_KEY = 'freezer-settings-v2';
     const DEVICE_KEY = 'freezer-device-id-v2';
@@ -526,7 +563,7 @@
       settings: loadSettings(),
       scope: 'all',
       searchCategory: 'all',
-      categoryFilter: 'all',
+      categoryFilters: [],
       syncing: false,
       db: null,
       refPath: '',
@@ -564,6 +601,7 @@
       adjustQty,
       selectCategory,
       setScope,
+      setCategoryFilter,
       closeAllSheets
     };
     window.app = app;
@@ -594,6 +632,12 @@
     function ageDays(item) { return daysSince(item.createdAt || item.frozenAt || todayISO()); }
     function ageBucket(item) { const age = ageDays(item); return age < 30 ? 'fresh' : age < 120 ? 'warn' : 'old'; }
     function statusText(item) { const age = ageDays(item); if (age >= SHELF_LIFE_DAYS) return 'Date dépassée'; if (age >= SOON_DAYS) return 'À consommer'; return (SHELF_LIFE_DAYS - age) + ' j restants'; }
+    function statusIcon(item) {
+      const age = ageBucket(item);
+      if (age === 'warn') return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h17a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>';
+      if (age === 'old') return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h17a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>';
+      return '';
+    }
     function uid() { return 'id-' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36); }
     function esc(v) { return String(v).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;'); }
     function defaultDeviceName() { return (navigator.userAgent.includes('iPad') ? 'iPad' : 'iPhone') + ' ' + Math.floor(Math.random() * 90 + 10); }
@@ -727,16 +771,32 @@
       }).join('');
     }
 
+    function getSelectedCategoryFilters() {
+      if (!Array.isArray(state.categoryFilters)) state.categoryFilters = [];
+      return CATEGORY_ORDER.filter(category => state.categoryFilters.includes(category));
+    }
+
     function renderCategoryButtons() {
-      const current = state.categoryFilter || 'all';
-      const items = [{ value: 'all', label: 'Toutes', cls: 'cat-all' }, ...CATEGORY_ORDER.map(c => ({ value: c, label: c, cls: (CATEGORY_META[c] && CATEGORY_META[c].cls) || '' }))];
+      const selected = new Set(getSelectedCategoryFilters());
+      const items = [
+        { value: 'all', label: 'Toutes', cls: 'cat-all' },
+        ...CATEGORY_ORDER.map(category => ({
+          value: category,
+          label: category,
+          cls: (CATEGORY_META[category] && CATEGORY_META[category].cls) || ''
+        }))
+      ];
       if (!els.categoryButtons) return;
       els.categoryButtons.innerHTML = items.map(({ value, label, cls }) => {
-        const active = current === value ? ' active' : '';
+        const isActive = value === 'all' ? selected.size === 0 : selected.has(value);
         const colorClass = value === 'all' ? '' : cls;
-        return `<button type="button" class="cat-btn ${colorClass}${active}" data-filter-cat="${esc(value)}"><span class="swatch"></span><span>${esc(label)}</span></button>`;
+        return `<button type="button" class="cat-btn ${colorClass}${isActive ? ' active' : ''}" data-filter-cat="${esc(value)}" aria-pressed="${isActive ? 'true' : 'false'}"><span class="swatch"></span><span>${esc(label)}</span></button>`;
       }).join('');
-      if (els.categoryLabel) els.categoryLabel.textContent = current === 'all' ? 'Toutes les catégories' : current;
+      if (els.categoryLabel) {
+        if (selected.size === 0) els.categoryLabel.textContent = 'Toutes les catégories';
+        else if (selected.size === 1) els.categoryLabel.textContent = Array.from(selected)[0];
+        else els.categoryLabel.textContent = selected.size + ' catégories sélectionnées';
+      }
     }
 
     function renderSearchCategoryGrid() {
@@ -775,10 +835,10 @@
     }
 
     function openSettings() {
-      console.log('[Freezer v13] openSettings()');
+      console.log('[Freezer v18] openSettings()');
       populateSettingsUI();
       openSheet(els.settingsSheet, els.roomId);
-      console.log('[Freezer v13] settingsSheet ouvert');
+      console.log('[Freezer v18] settingsSheet ouvert');
     }
     function closeSettings() { closeSheet(els.settingsSheet); }
 
@@ -843,8 +903,11 @@
       let items = state.items.slice();
       if (state.scope === 'soon') items = items.filter(it => { const a = ageDays(it); return a >= SOON_DAYS && a < SHELF_LIFE_DAYS; });
       if (state.scope === 'overdue') items = items.filter(it => ageDays(it) >= SHELF_LIFE_DAYS);
-      const categoryFilter = state.categoryFilter || 'all';
-      if (categoryFilter !== 'all') items = items.filter(it => it.category === categoryFilter);
+      const selectedCategories = getSelectedCategoryFilters();
+      if (selectedCategories.length > 0) {
+        const allowed = new Set(selectedCategories);
+        items = items.filter(item => allowed.has(item.category));
+      }
       return items.sort(sortItems);
     }
     function scopeTitle(scope) { return scope === 'soon' ? 'À consommer' : scope === 'overdue' ? 'Date dépassée' : 'Tous les articles'; }
@@ -854,43 +917,56 @@
       document.querySelectorAll('.bottom-tab[data-tab]').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === active));
     }
 
-    function setCategoryFilter(cat) {
-      state.categoryFilter = CATEGORY_ORDER.includes(cat) ? cat : 'all';
+    function setCategoryFilter(category) {
+      const selected = new Set(getSelectedCategoryFilters());
+      if (category === 'all') {
+        selected.clear();
+      } else if (CATEGORY_ORDER.includes(category)) {
+        if (selected.has(category)) selected.delete(category);
+        else selected.add(category);
+      }
+      state.categoryFilters = CATEGORY_ORDER.filter(value => selected.has(value));
       state.navTab = 'categories';
-      renderCategoryButtons();
+      debugLog('categoryFilters:changed', state.categoryFilters.slice());
       renderAll();
     }
 
     function renderItemCard(item) {
       const meta = CATEGORY_META[item.category] || { cls: '' };
       const ageCls = ageBucket(item);
+      const icon = statusIcon(item);
+      const statusContent = icon
+        ? `<span class="badge ${ageCls}">${icon}${esc(statusText(item))}</span>`
+        : `<span class="badge ${ageCls}">${esc(statusText(item))}</span>`;
       return `
         <article class="item ${meta.cls}">
-          <div class="item-top">
-            <div>
-              <div class="item-title">${esc(item.name)}</div>
-              <div class="item-meta">
-                <span class="badge cat">${esc(item.category)}</span>
-                <span class="badge ${ageCls}">${esc(statusText(item))}</span>
-                <span class="badge">${esc(prettyDate(item.createdAt || item.frozenAt))}</span>
+          <div class="item-rail"><span class="rail-label">${esc(item.category)}</span></div>
+          <div class="item-body">
+            <div class="item-top">
+              <div>
+                <div class="item-title">${esc(item.name)}</div>
+                <div class="item-meta">
+                  ${statusContent}
+                  <span class="badge">${esc(prettyDate(item.createdAt || item.frozenAt))}</span>
+                </div>
               </div>
             </div>
-            <div class="meta-actions">
-              <button class="mini action-edit" type="button" data-id="${esc(item.id)}" aria-label="Modifier">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-              </button>
-              <button class="mini action-delete" type="button" data-id="${esc(item.id)}" aria-label="Supprimer">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
-              </button>
+            <div class="item-sub">${esc(item.notes || 'Aucune note')}</div>
+            <div class="item-actions">
+              <div class="qty-stepper">
+                <button class="qty-btn action-qty-minus" type="button" data-id="${esc(item.id)}">−</button>
+                <div class="qty-pill">${item.quantity}</div>
+                <button class="qty-btn action-qty-plus" type="button" data-id="${esc(item.id)}">＋</button>
+              </div>
             </div>
           </div>
-          <div class="item-sub">${esc(item.notes || 'Aucune note')}</div>
-          <div class="item-actions">
-            <div class="qty-stepper">
-              <button class="qty-btn action-qty-minus" type="button" data-id="${esc(item.id)}">−</button>
-              <div class="qty-pill">${item.quantity}</div>
-              <button class="qty-btn action-qty-plus" type="button" data-id="${esc(item.id)}">＋</button>
-            </div>
+          <div class="meta-actions">
+            <button class="mini action-edit" type="button" data-id="${esc(item.id)}" aria-label="Modifier">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            </button>
+            <button class="mini action-delete" type="button" data-id="${esc(item.id)}" aria-label="Supprimer">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+            </button>
           </div>
         </article>
       `;
@@ -957,7 +1033,7 @@
       if (els.fabAddBtn) els.fabAddBtn.addEventListener('click', () => openItem(null));
       if (els.menuDisconnectBtn) {
         els.menuDisconnectBtn.addEventListener('click', () => {
-          console.log('[Freezer v13] click Déconnexion');
+          console.log('[Freezer v18] click Déconnexion');
           closeMenu();
           disconnectSync();
         });
@@ -1190,6 +1266,7 @@
     window.closeSearch = closeSearch;
     window.saveItem = saveItem;
     window.setScope = setScope;
+    window.setCategoryFilter = setCategoryFilter;
     window.closeAllSheets = closeAllSheets;
 
     function prettyDate(dateStr) {
@@ -1216,6 +1293,7 @@
       adjustQty,
       selectCategory,
       setScope,
+      setCategoryFilter,
       closeAllSheets
     };
 
