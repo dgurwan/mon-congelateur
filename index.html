@@ -61,14 +61,12 @@
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      flex-wrap: wrap;
     }
     .brand {
       display: flex;
       align-items: center;
       gap: 10px;
       min-width: 0;
-      flex: 1 1 230px;
     }
     .brand-mark {
       width: 42px;
@@ -91,10 +89,9 @@
     }
     .brand-text p {
       margin: 3px 0 0;
-      font-size: .78rem;
-      line-height: 1.15;
+      font-size: .82rem;
       color: var(--muted);
-      white-space: normal;
+      white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       max-width: 230px;
@@ -104,7 +101,6 @@
       align-items: center;
       gap: 8px;
       flex: 0 0 auto;
-      margin-left: auto;
     }
     .chip-status {
       display: inline-flex;
@@ -125,7 +121,6 @@
       border: 0;
       cursor: pointer;
       transition: transform .08s ease, opacity .2s ease, box-shadow .2s ease, background .2s ease;
-      touch-action: manipulation;
     }
     .icon-btn:active, .btn:active { transform: translateY(1px); }
     .mini-btn {
@@ -140,9 +135,9 @@
     .mini-btn svg { width: 20px; height: 20px; }
     .menu-wrap { position: relative; }
     .menu-popover {
-      position: absolute;
-      top: calc(100% + 10px);
-      right: 0;
+      position: fixed;
+      top: calc(66px + env(safe-area-inset-top));
+      right: 12px;
       width: min(240px, calc(100vw - 24px));
       padding: 10px;
       border-radius: 22px;
@@ -183,26 +178,7 @@
       display: none;
       z-index: 1100;
     }
-
-    @media (max-width: 430px) {
-      .topbar { padding: 10px 10px 12px; }
-      .topbar-row {
-        display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 10px 10px;
-        align-items: center;
-      }
-      .brand { grid-column: 1 / -1; width: 100%; }
-      .brand-text p { max-width: none; }
-      .actions-top {
-        grid-column: 1 / -1;
-        width: 100%;
-        justify-content: flex-end;
-      }
-      .chip-status { flex: 1 1 auto; min-width: 0; }
-      .menu-popover { right: 0; left: auto; width: min(240px, calc(100vw - 20px)); }
-    }
-    .shell { padding: 8px clamp(10px, 2.8vw, 24px) 22px; display: grid; gap: 12px; max-width: 1200px; margin: 0 auto; width: 100%; }
+    .shell { padding: 8px 10px 22px; display: grid; gap: 12px; }
     .hero {
       padding: 16px 16px 14px;
       border-radius: 28px;
@@ -227,9 +203,8 @@
     }
     .summary-grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: 1.5fr 1fr 1fr;
       gap: 10px;
-      width: 100%;
     }
     .summary-card {
       position: relative;
@@ -241,7 +216,6 @@
       box-shadow: 0 8px 24px rgba(15,23,42,.05);
       overflow: hidden;
       min-height: 110px;
-      width: 100%;
     }
     .summary-card.active {
       outline: 2px solid rgba(0,122,255,.22);
@@ -397,14 +371,11 @@
       transform: translateX(-50%);
       top: 12px;
       width: min(var(--app-width), calc(100vw - 16px));
-      max-height: calc(100dvh - 24px);
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      overscroll-behavior: contain;
+      max-height: calc(100vh - 24px);
+      overflow: auto;
       z-index: 1400;
       display: none;
       padding: 14px;
-      padding-bottom: calc(18px + env(safe-area-inset-bottom));
       border-radius: 28px;
       box-shadow: 0 26px 60px rgba(15,23,42,.18);
       background: #fff;
@@ -412,17 +383,11 @@
     }
     .sheet.open { display: block; }
     .sheet-header {
-      position: sticky;
-      top: 0;
-      z-index: 3;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
       margin-bottom: 12px;
-      padding: 2px 0 10px;
-      background: linear-gradient(180deg, #fff 82%, rgba(255,255,255,.82));
-      backdrop-filter: blur(10px);
     }
     .sheet-header h3 { margin: 0; font-size: 1.1rem; }
     .form-grid {
@@ -452,112 +417,11 @@
       border-color: rgba(0,122,255,.45);
       box-shadow: 0 0 0 4px rgba(0,122,255,.10);
     }
-    .field-label {
-      color: var(--muted);
-      font-size: .82rem;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-    .category-field {
-      grid-column: 1 / -1;
-    }
-    .category-picker {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
-      gap: 8px;
-    }
-    .cat-btn {
-      position: relative;
-      min-height: 56px;
-      padding: 12px 12px 12px 14px;
-      border-radius: 18px;
-      border: 1px solid rgba(17,24,39,.10);
-      background: #fff;
-      color: var(--text);
-      text-align: left;
-      font-weight: 900;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      box-shadow: 0 8px 20px rgba(15,23,42,.04);
-    }
-    .cat-btn .cat-swatch {
-      width: 14px;
-      height: 38px;
-      border-radius: 999px;
-      background: var(--cat-color, var(--blue));
-      flex: 0 0 auto;
-      box-shadow: 0 0 0 4px rgba(0,122,255,.08);
-    }
-    .cat-btn .cat-text {
-      display: grid;
-      gap: 2px;
-      line-height: 1.05;
-    }
-    .cat-btn .cat-text small {
-      color: var(--muted);
-      font-weight: 700;
-      font-size: .74rem;
-    }
-    .cat-btn.active {
-      outline: 2px solid rgba(0,122,255,.24);
-      background: linear-gradient(180deg, rgba(0,122,255,.08), rgba(0,122,255,.03));
-    }
     .sheet-actions, .pill-row, .search-meta {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
       margin-top: 12px;
-    }
-    .field-label {
-      font-size: .82rem;
-      font-weight: 800;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-    .category-picker {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-    }
-    .category-field, .qty-field { display: block; }
-    .sheet-stepper {
-      justify-content: space-between;
-      width: 100%;
-    }
-    .duration-badge {
-      padding: 12px 14px;
-      border-radius: 16px;
-      background: rgba(0,122,255,.08);
-      color: var(--blue);
-      font-weight: 800;
-      line-height: 1.35;
-    }
-    .item-liseret {
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 8px;
-      border-radius: 20px 0 0 20px;
-      background: var(--cat-color, var(--blue));
-    }
-    .item.item-dessert .chip-cat,
-    .item.item-viande .chip-cat,
-    .item.item-poisson .chip-cat,
-    .item.item-legumes .chip-cat,
-    .item.item-plats-cuisines .chip-cat,
-    .item.item-produits-laitiers .chip-cat { background: color-mix(in srgb, var(--cat-color) 14%, #fff); }
-    .item { position: relative; overflow: hidden; }
-    .item-top { padding-left: 12px; }
-    .sheet-actions {
-      position: sticky;
-      bottom: 0;
-      z-index: 4;
-      padding-top: 14px;
-      padding-bottom: max(2px, env(safe-area-inset-bottom));
-      margin-top: 18px;
-      background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #fff 20px);
     }
     .small-btn {
       padding: 10px 12px;
@@ -612,22 +476,11 @@
     .settings-head strong { font-size: .96rem; }
     .hidden { display: none !important; }
     @media (max-width: 420px) {
-      .summary-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-      .summary-card { min-height: auto; padding: 12px 10px 14px; }
-      .summary-label { font-size: .68rem; }
-      .summary-hint { font-size: .68rem; }
+      .summary-grid { grid-template-columns: 1fr; }
+      .summary-card { min-height: auto; }
       .form-grid { grid-template-columns: 1fr; }
-      .category-picker { grid-template-columns: 1fr 1fr; }
       .item-actions { flex-direction: column; align-items: flex-start; }
       .qty-stepper, .meta-actions { width: 100%; justify-content: flex-start; }
-      .brand-text h1 { font-size: 1.02rem; }
-      .chip-status { font-size: .78rem; }
-    }
-    @media (max-width: 360px) {
-      .summary-value { font-size: 1.55rem; }
-      .summary-grid { gap: 6px; }
-      .brand { flex-basis: 100%; }
-      .actions-top { width: 100%; justify-content: space-between; }
     }
   </style>
 </head>
@@ -645,22 +498,22 @@
         <div class="actions-top">
           <span class="chip-status"><span id="syncDot" class="dot"></span><span id="syncStatus">Hors ligne</span></span>
           <div class="menu-wrap">
-            <button class="icon-btn mini-btn" id="menuBtn" type="button" aria-label="Menu" aria-expanded="false">
+            <button class="icon-btn mini-btn" id="menuBtn" type="button" aria-label="Menu" onclick="toggleMenu()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg>
             </button>
             <div class="menu-popover" id="menuPopover" aria-hidden="true">
               <div class="menu-title">Menu</div>
-              <button class="menu-item" id="menuSettingsBtn" type="button">
+              <button class="menu-item" id="menuSettingsBtn" type="button" onclick="openSettings(); return false;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.05.06a2 2 0 0 1 0 2.83l-.44.44a2 2 0 0 1-2.83 0l-.06-.05a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V22a2 2 0 0 1-2 2h-.62a2 2 0 0 1-2-2v-.14a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.05a2 2 0 0 1-2.83 0l-.44-.44a2 2 0 0 1 0-2.83l.05-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H2a2 2 0 0 1-2-2v-.62a2 2 0 0 1 2-2h.14a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.05-.06a2 2 0 0 1 0-2.83l.44-.44a2 2 0 0 1 2.83 0l.06.05a1.7 1.7 0 0 0 1.87.34h0A1.7 1.7 0 0 0 10 2.14V2a2 2 0 0 1 2-2h.62a2 2 0 0 1 2 2v.14a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.05a2 2 0 0 1 2.83 0l.44.44a2 2 0 0 1 0 2.83l-.05.06a1.7 1.7 0 0 0-.34 1.87A1.7 1.7 0 0 0 22 10h.14a2 2 0 0 1 2 2v.62a2 2 0 0 1-2 2h-.14a1.7 1.7 0 0 0-1.55 1Z"/></svg>
                 Parametres
               </button>
-              <button class="menu-item danger" id="menuDisconnectBtn" type="button">
+              <button class="menu-item danger" id="menuDisconnectBtn" type="button" onclick="disconnectSync(); return false;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/><path d="M21 3v18"/></svg>
                 Deconnexion
               </button>
             </div>
           </div>
-          <button class="icon-btn mini-btn" id="homeBtn" type="button" aria-label="Dashboard">
+          <button class="icon-btn mini-btn" id="homeBtn" type="button" aria-label="Dashboard" onclick="goHome(); return false;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10.5V21h14V10.5"/><path d="M10 21v-6h4v6"/></svg>
           </button>
         </div>
@@ -674,7 +527,7 @@
       </section>
 
       <section class="summary-grid" aria-label="Resume du congelateur">
-        <button class="summary-card active" id="scopeAll" type="button" data-scope="all">
+        <button class="summary-card full active" id="scopeAll" type="button" data-scope="all">
           <div class="summary-label">Articles</div>
           <div class="summary-value" id="statItems">0</div>
           <div class="summary-hint">Tous les articles du congelateur</div>
@@ -687,19 +540,19 @@
           <div class="summary-accent"></div>
         </button>
         <button class="summary-card" id="scopeOverdue" type="button" data-scope="overdue">
-          <div class="summary-label">Date depassee</div>
+          <div class="summary-label">Perimes</div>
           <div class="summary-value" id="statOverdue">0</div>
-          <div class="summary-hint">Articles hors delai</div>
+          <div class="summary-hint">Filtre des articles perimes</div>
           <div class="summary-accent"></div>
         </button>
       </section>
 
       <section class="actions-row">
-        <button class="btn action-btn" id="addBtn" type="button">
+        <button class="btn action-btn" id="addBtn" type="button" onclick="openItemModal(); return false;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
           Ajouter
         </button>
-        <button class="btn action-btn secondary" id="searchBtn" type="button">
+        <button class="btn action-btn secondary" id="searchBtn" type="button" onclick="openSearch(); return false;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
           Rechercher
         </button>
@@ -720,7 +573,7 @@
   <section class="sheet" id="settingsSheet" aria-hidden="true">
     <div class="sheet-header">
       <h3>Parametres</h3>
-      <button class="icon-btn mini-btn" id="closeSettingsBtn" type="button" aria-label="Fermer">
+      <button class="icon-btn mini-btn" id="closeSettingsBtn" type="button" aria-label="Fermer" onclick="closeSettings(); return false;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg>
       </button>
     </div>
@@ -752,9 +605,9 @@
           </label>
         </div>
         <div class="pill-row">
-          <button class="btn small-btn primary" id="connectBtn" type="button">Connecter</button>
-          <button class="btn small-btn" id="disconnectBtn" type="button">Deconnecter</button>
-          <button class="btn small-btn" id="saveSettingsBtn" type="button">Sauver la config</button>
+          <button class="btn small-btn primary" id="connectBtn" type="button" onclick="connectSync(); return false;">Connecter</button>
+          <button class="btn small-btn" id="disconnectBtn" type="button" onclick="disconnectSync(); return false;">Deconnecter</button>
+          <button class="btn small-btn" id="saveSettingsBtn" type="button" onclick="saveSettingsFromUI(); return false;">Sauver la config</button>
           <button class="btn small-btn" id="exportBtn" type="button">Exporter</button>
           <button class="btn small-btn" id="importBtn" type="button">Importer</button>
           <button class="btn small-btn danger" id="resetBtn" type="button">Vider</button>
@@ -770,39 +623,38 @@
   <section class="sheet" id="itemSheet" aria-hidden="true">
     <div class="sheet-header">
       <h3 id="itemModalTitle">Ajouter un article</h3>
-      <button class="icon-btn mini-btn" id="closeItemBtn" type="button" aria-label="Fermer">
+      <button class="icon-btn mini-btn" id="closeItemBtn" type="button" aria-label="Fermer" onclick="closeItemModal(); return false;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg>
       </button>
     </div>
     <form id="itemForm">
       <input type="hidden" id="itemId" />
-      <input type="hidden" id="quantity" value="1" />
-      <input type="hidden" id="createdAt" />
       <div class="form-grid">
         <label class="full">Nom
           <input id="name" required placeholder="Poulet, soupe, legumes..." />
         </label>
-        <div class="category-field full">
-          <div class="field-label">Categorie</div>
-          <input type="hidden" id="category" value="Viande" />
-          <div class="category-picker" id="categoryPicker"></div>
-        </div>
-        <div class="qty-field full">
-          <div class="field-label">Quantite</div>
-          <div class="qty-stepper sheet-stepper">
-            <button class="circle-btn" type="button" id="qtyMinus" aria-label="Diminuer">−</button>
-            <strong id="qtyDisplay">1</strong>
-            <button class="circle-btn primary" type="button" id="qtyPlus" aria-label="Augmenter">+</button>
-          </div>
-        </div>
-        <div class="full duration-badge">Conservation automatique : 6 mois a partir de la date d'ajout.</div>
+        <label>Cat&eacute;gorie
+          <select id="category"></select>
+        </label>
+        <label>Quantite
+          <input id="quantity" type="number" min="1" step="1" value="1" />
+        </label>
+        <label>Unite
+          <input id="unit" placeholder="portion, sachet..." value="portion" />
+        </label>
+        <label>Date de congelation
+          <input id="frozenAt" type="date" />
+        </label>
+        <label>Duree (mois)
+          <input id="months" type="number" min="1" step="1" value="3" />
+        </label>
         <label class="full">Notes
           <textarea id="notes" placeholder="Ex. deja cuit, 2 portions restantes..."></textarea>
         </label>
       </div>
       <div class="sheet-actions">
         <button class="btn action-btn" type="submit">Enregistrer</button>
-        <button class="btn action-btn secondary" id="cancelItemBtn" type="button">Retour au dashboard</button>
+        <button class="btn action-btn secondary" id="cancelItemBtn" type="button" onclick="closeItemModal(); return false;">Retour au dashboard</button>
       </div>
     </form>
   </section>
@@ -810,7 +662,7 @@
   <section class="sheet" id="searchSheet" aria-hidden="true">
     <div class="sheet-header">
       <h3>Rechercher</h3>
-      <button class="icon-btn mini-btn" id="closeSearchBtn" type="button" aria-label="Fermer">
+      <button class="icon-btn mini-btn" id="closeSearchBtn" type="button" aria-label="Fermer" onclick="closeSearchModal(); return false;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg>
       </button>
     </div>
@@ -824,11 +676,11 @@
       <div class="subtle" id="searchCount" style="align-self:end; padding-bottom: 11px;">0 resultat</div>
     </div>
     <div class="search-meta">
-      <button class="btn small-btn" id="clearSearchBtn" type="button">Reinitialiser</button>
+      <button class="btn small-btn" id="clearSearchBtn" type="button" onclick="clearSearch(); return false;">Reinitialiser</button>
     </div>
     <div class="results" id="searchResults"></div>
     <div class="sheet-actions">
-      <button class="btn action-btn secondary" id="searchToDashboardBtn" type="button">Retour au dashboard</button>
+      <button class="btn action-btn secondary" id="searchToDashboardBtn" type="button" onclick="closeSearchModal(); return false;">Retour au dashboard</button>
     </div>
   </section>
 
@@ -842,22 +694,7 @@
       const SETTINGS_KEY = 'freezer-sync-settings-v2';
       const DEVICE_KEY = 'freezer-device-id-v1';
       const DEVICE_NAME_KEY = 'freezer-device-name-v2';
-      const CATEGORY_META = [
-        { value: 'Viande', label: 'Viande', color: '#ef4444', hint: 'steak, poulet...' },
-        { value: 'Poisson', label: 'Poisson', color: '#0ea5e9', hint: 'saumon, colin...' },
-        { value: 'Legumes', label: 'Legumes', color: '#22c55e', hint: 'brocoli, poivron...' },
-        { value: 'Plats cuisinés', label: 'Plats cuisinés', color: '#8b5cf6', hint: 'gratin, lasagne...' },
-        { value: 'Dessert', label: 'Dessert', color: '#f97316', hint: 'glace, mousse...' },
-        { value: 'Produits laitiers', label: 'Produits laitiers', color: '#14b8a6', hint: 'fromage, beurre...' }
-      ];
-      const CATEGORY_ORDER = CATEGORY_META.map(function (item) { return item.value; });
-      const CATEGORY_ALIASES = {
-        'Plats cuisin&eacute;s': 'Plats cuisinés',
-        'Plats cuisinés': 'Plats cuisinés',
-        'Fruits': 'Dessert',
-        'Autre': 'Dessert',
-        'Autres': 'Dessert'
-      };
+      const CATEGORY_ORDER = ['Viande', 'Poisson', 'Legumes', 'Plats cuisin&eacute;s', 'Fruits', 'Produits laitiers', 'Autre'];
       const DEFAULT_FIREBASE_CONFIG = {
         apiKey: 'AIzaSyDsNEGaBaq9JhTxSTvIeAQKbhRKNPecXgw',
         authDomain: 'myfreezer-b488a.firebaseapp.com',
@@ -913,13 +750,11 @@
         itemId: document.getElementById('itemId'),
         name: document.getElementById('name'),
         category: document.getElementById('category'),
-        categoryPicker: document.getElementById('categoryPicker'),
         quantity: document.getElementById('quantity'),
-        createdAt: document.getElementById('createdAt'),
+        unit: document.getElementById('unit'),
+        frozenAt: document.getElementById('frozenAt'),
+        months: document.getElementById('months'),
         notes: document.getElementById('notes'),
-        qtyMinus: document.getElementById('qtyMinus'),
-        qtyPlus: document.getElementById('qtyPlus'),
-        qtyDisplay: document.getElementById('qtyDisplay'),
         searchSheet: document.getElementById('searchSheet'),
         closeSearchBtn: document.getElementById('closeSearchBtn'),
         searchToDashboardBtn: document.getElementById('searchToDashboardBtn'),
@@ -951,7 +786,6 @@
       state.deviceName = state.settings.deviceName || localStorage.getItem(DEVICE_NAME_KEY) || defaultDeviceName();
       populateSelects();
       populateSettingsUI();
-      renderCategoryPicker(normalizeCategory(els.category.value || 'Viande'));
       renderAll();
       setStatus('Hors ligne', 'offline');
       setSubtitle();
@@ -995,13 +829,7 @@
           state.searchCategory = els.searchCategory.value || 'all';
           renderSearchResults();
         });
-        els.clearSearchBtn.addEventListener('click', function () {
-          els.searchQuery.value = '';
-          els.searchCategory.value = 'all';
-          state.searchQuery = '';
-          state.searchCategory = 'all';
-          renderSearchResults();
-        });
+        els.clearSearchBtn.addEventListener('click', clearSearch);
         document.addEventListener('keydown', function (e) {
           if (e.key === 'Escape') {
             closeMenu();
@@ -1018,14 +846,6 @@
             persistSettingsDraft();
           });
         });
-        if (els.categoryPicker) {
-          els.categoryPicker.addEventListener('click', function (e) {
-            var btn = e.target.closest('[data-category]');
-            if (!btn) return;
-            els.category.value = btn.getAttribute('data-category') || 'Viande';
-            renderCategoryPicker(els.category.value);
-          });
-        }
         els.roomId.addEventListener('change', persistSettingsDraft);
         els.deviceName.addEventListener('change', function () {
           state.deviceName = (els.deviceName.value || '').trim() || defaultDeviceName();
@@ -1086,27 +906,22 @@
         return d.toISOString().slice(0, 10);
       }
       function daysSince(dateStr) {
-        var d = String(dateStr || '').slice(0, 10);
-        if (!isDateISO(d)) return 9999;
-        return Math.floor((Date.now() - new Date(d + 'T12:00:00').getTime()) / 86400000);
+        if (!isDateISO(dateStr)) return 9999;
+        return Math.floor((Date.now() - new Date(dateStr + 'T12:00:00').getTime()) / 86400000);
+      }
+      function daysLeft(item) {
+        var exp = addMonthsISO(item.frozenAt, item.months);
+        if (!isDateISO(exp)) return Number.POSITIVE_INFINITY;
+        return Math.ceil((new Date(exp + 'T23:59:59') - new Date()) / 86400000);
       }
       function ageBucket(item) {
         var age = daysSince(item.createdAt || item.frozenAt || todayISO());
-        if (age < 30) return 'fresh';
-        if (age < 120) return 'warn';
+        if (age <= 30) return 'fresh';
+        if (age <= 90) return 'warn';
         return 'old';
       }
-      function isSoon(item) {
-        var age = daysSince(item.createdAt || item.frozenAt || todayISO());
-        return age >= 150 && age < 180;
-      }
-      function isOverdue(item) {
-        var age = daysSince(item.createdAt || item.frozenAt || todayISO());
-        return age >= 180;
-      }
-      function statusText(item) {
-        var dl = 180 - daysSince(item.createdAt || item.frozenAt || todayISO());
-        if (dl < 0) return 'Date depassee';
+      function statusText(dl) {
+        if (dl < 0) return 'Perime';
         if (dl <= 30) return dl + ' j restants';
         return dl + ' j restants';
       }
@@ -1121,16 +936,16 @@
 
       function normalizeItem(item) {
         if (!item || !item.name) return null;
-        var created = item.createdAt && String(item.createdAt).length ? String(item.createdAt) : (isDateISO(item.frozenAt) ? item.frozenAt + 'T12:00:00.000Z' : new Date().toISOString());
         return {
           id: item.id || uid(),
           name: String(item.name),
-          category: normalizeCategory(item.category),
+          category: CATEGORY_ORDER.indexOf(item.category) >= 0 ? item.category : 'Autre',
           quantity: Math.max(1, Number(item.quantity) || 1),
-          frozenAt: isDateISO(item.frozenAt) ? item.frozenAt : String(created).slice(0, 10),
-          months: 6,
+          unit: String(item.unit || 'portion'),
+          frozenAt: isDateISO(item.frozenAt) ? item.frozenAt : todayISO(),
+          months: Math.max(1, Number(item.months) || 3),
           notes: String(item.notes || ''),
-          createdAt: created,
+          createdAt: item.createdAt && String(item.createdAt).length ? item.createdAt : (isDateISO(item.frozenAt) ? item.frozenAt : new Date().toISOString()),
           updatedAt: item.updatedAt || new Date().toISOString(),
           updatedBy: item.updatedBy || '',
           updatedByName: item.updatedByName || ''
@@ -1175,23 +990,8 @@
 
       function populateSelects() {
         var categoryHtml = CATEGORY_ORDER.map(function (c) { return '<option value="' + esc(c) + '">' + c + '</option>'; }).join('');
+        els.category.innerHTML = categoryHtml;
         els.searchCategory.innerHTML = '<option value="all">Toutes categories</option>' + categoryHtml;
-        renderCategoryPicker(normalizeCategory(els.category.value || 'Viande'));
-      }
-
-      function renderCategoryPicker(selected) {
-        if (!els.categoryPicker) return;
-        var current = normalizeCategory(selected || 'Viande');
-        els.categoryPicker.innerHTML = CATEGORY_META.map(function (cat) {
-          var active = cat.value === current ? ' active' : '';
-          return '<button type="button" class="cat-btn' + active + '" data-category="' + esc(cat.value) + '" style="--cat-color:' + cat.color + '"><span class="cat-swatch"></span><span class="cat-text"><span>' + esc(cat.label) + '</span><small>' + esc(cat.hint) + '</small></span></button>';
-        }).join('');
-      }
-
-      function normalizeCategory(value) {
-        var v = String(value || '').trim();
-        if (CATEGORY_ALIASES[v]) return CATEGORY_ALIASES[v];
-        return CATEGORY_ORDER.indexOf(v) >= 0 ? v : 'Dessert';
       }
 
       function populateSettingsUI() {
@@ -1259,21 +1059,14 @@
       }
 
       function openMenu() {
-        closeSettings();
-        closeItemModal();
-        closeSearchModal();
         els.menuPopover.classList.add('open');
         els.menuPopover.setAttribute('aria-hidden', 'false');
-        els.menuBtn.setAttribute('aria-expanded', 'true');
         els.menuBackdrop.style.display = 'block';
       }
       function closeMenu() {
         els.menuPopover.classList.remove('open');
         els.menuPopover.setAttribute('aria-hidden', 'true');
-        els.menuBtn.setAttribute('aria-expanded', 'false');
-        if (!els.settingsSheet.classList.contains('open') && !els.itemSheet.classList.contains('open') && !els.searchSheet.classList.contains('open')) {
-          els.menuBackdrop.style.display = 'none';
-        }
+        els.menuBackdrop.style.display = 'none';
       }
       function toggleMenu() {
         if (els.menuPopover.classList.contains('open')) closeMenu(); else openMenu();
@@ -1297,10 +1090,11 @@
         els.itemModalTitle.textContent = item ? 'Modifier l\'article' : 'Ajouter un article';
         els.itemId.value = item ? item.id : '';
         els.name.value = item ? item.name : '';
-        els.category.value = normalizeCategory(item ? item.category : 'Viande');
-        renderCategoryPicker(els.category.value);
-        setQty(item ? item.quantity : 1);
-        els.createdAt.value = item ? (item.createdAt || item.frozenAt || todayISO()) : todayISO();
+        els.category.value = item && CATEGORY_ORDER.indexOf(item.category) >= 0 ? item.category : 'Autre';
+        els.quantity.value = item ? item.quantity : 1;
+        els.unit.value = item ? item.unit : 'portion';
+        els.frozenAt.value = item ? item.frozenAt : todayISO();
+        els.months.value = item ? item.months : 3;
         els.notes.value = item ? item.notes : '';
         els.itemSheet.classList.add('open');
         els.itemSheet.setAttribute('aria-hidden', 'false');
@@ -1331,6 +1125,19 @@
         }
         goHome();
       }
+
+      function clearSearch() {
+        els.searchQuery.value = '';
+        els.searchCategory.value = 'all';
+        state.searchQuery = '';
+        state.searchCategory = 'all';
+        renderSearchResults();
+      }
+
+      function selectCategory(value) {
+        var next = String(value || '').trim();
+        els.category.value = CATEGORY_ORDER.indexOf(next) >= 0 ? next : 'Autre';
+      }
       function closeAllSheets() {
         closeMenu();
         closeSettings();
@@ -1347,10 +1154,10 @@
         renderAll();
       }
       function setScope(scope) {
-        state.scope = (state.scope === scope) ? 'all' : scope;
-        els.scopeAll.classList.toggle('active', state.scope === 'all');
-        els.scopeSoon.classList.toggle('active', state.scope === 'soon');
-        els.scopeOverdue.classList.toggle('active', state.scope === 'overdue');
+        state.scope = scope;
+        els.scopeAll.classList.toggle('active', scope === 'all');
+        els.scopeSoon.classList.toggle('active', scope === 'soon');
+        els.scopeOverdue.classList.toggle('active', scope === 'overdue');
         renderAll();
       }
 
@@ -1358,16 +1165,16 @@
         ev.preventDefault();
         var name = (els.name.value || '').trim();
         if (!name) return;
-        var existing = els.itemId.value ? state.items.find(function (x) { return x.id === els.itemId.value; }) : null;
         var item = {
           id: els.itemId.value || uid(),
           name: name,
-          category: normalizeCategory(els.category.value || 'Viande'),
-          quantity: Math.max(1, Number(getQty()) || 1),
-          frozenAt: existing && existing.frozenAt ? existing.frozenAt : todayISO(),
-          months: 6,
+          category: els.category.value,
+          quantity: Math.max(1, Number(els.quantity.value) || 1),
+          unit: (els.unit.value || '').trim() || 'portion',
+          frozenAt: els.frozenAt.value || todayISO(),
+          months: Math.max(1, Number(els.months.value) || 3),
           notes: (els.notes.value || '').trim(),
-          createdAt: existing && existing.createdAt ? existing.createdAt : new Date().toISOString(),
+          createdAt: els.itemId.value ? (state.items.find(function (x) { return x.id === els.itemId.value; }) || {}).createdAt || new Date().toISOString() : new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           updatedBy: state.deviceId,
           updatedByName: state.deviceName
@@ -1383,16 +1190,6 @@
       function persistItems() {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
         if (!state.suppressPush) pushToFirebase();
-      }
-
-      function getQty() {
-        return Math.max(1, Number(els.quantity && els.quantity.value ? els.quantity.value : (els.qtyDisplay ? els.qtyDisplay.textContent : 1)) || 1);
-      }
-
-      function setQty(value) {
-        var next = Math.max(1, Number(value) || 1);
-        if (els.quantity) els.quantity.value = String(next);
-        if (els.qtyDisplay) els.qtyDisplay.textContent = String(next);
       }
 
       function deleteItem(id) {
@@ -1460,47 +1257,37 @@
 
       function getScopedItems() {
         var items = state.items.slice();
-        if (state.scope === 'soon') items = items.filter(function (it) { return isSoon(it); });
-        if (state.scope === 'overdue') items = items.filter(function (it) { return isOverdue(it); });
-        items.sort(function (a, b) {
-          var ad = daysSince(a.createdAt || a.frozenAt || todayISO());
-          var bd = daysSince(b.createdAt || b.frozenAt || todayISO());
-          return ad - bd || a.name.localeCompare(b.name, 'fr');
-        });
+        if (state.scope === 'soon') items = items.filter(function (it) { return daysLeft(it) >= 0 && daysLeft(it) <= 30; });
+        if (state.scope === 'overdue') items = items.filter(function (it) { return daysLeft(it) < 0; });
+        items.sort(function (a, b) { return daysLeft(a) - daysLeft(b) || a.name.localeCompare(b.name, 'fr'); });
         return items;
       }
 
       function scopeTitle(scope) {
         if (scope === 'soon') return 'A consommer';
-        if (scope === 'overdue') return 'Date depassee';
+        if (scope === 'overdue') return 'Perimes';
         return 'Tous les articles';
       }
 
-      function categoryColor(category) {
-        var meta = CATEGORY_META.find(function (c) { return c.value === normalizeCategory(category); });
-        return meta ? meta.color : '#64748b';
-      }
-
       function renderItemCard(item) {
+        var dl = daysLeft(item);
         var age = ageBucket(item);
-        var ageDays = daysSince(item.createdAt || item.frozenAt || todayISO());
-        var addedText = isDateISO(item.createdAt || item.frozenAt || '') ? prettyDate((item.createdAt || item.frozenAt || '').slice(0, 10)) : 'date inconnue';
-        var expire = isDateISO(addMonthsISO((item.createdAt || item.frozenAt || todayISO()).slice(0, 10), 6)) ? prettyDate(addMonthsISO((item.createdAt || item.frozenAt || todayISO()).slice(0, 10), 6)) : '-';
-        var cat = normalizeCategory(item.category);
+        var dateText = isDateISO(item.frozenAt) ? prettyDate(item.frozenAt) : 'date inconnue';
+        var expire = isDateISO(addMonthsISO(item.frozenAt, item.months)) ? prettyDate(addMonthsISO(item.frozenAt, item.months)) : '-';
+        var qtyLabel = esc(String(item.quantity)) + ' ' + esc(item.unit || 'portion') + (Number(item.quantity) > 1 ? 's' : '');
         return [
-          '<article class="item item-' + esc(cat.toLowerCase().replace(/[^a-z0-9]+/g, '-')) + '">',
-          '<div class="item-liseret" style="--cat-color:' + esc(categoryColor(cat)) + '"></div>',
+          '<article class="item">',
           '<div class="age-pill age-' + age + '"></div>',
           '<div class="item-top">',
           '<div class="item-title">',
           '<p class="item-name">' + esc(item.name) + '</p>',
-          '<div class="item-sub">Categorie : <strong>' + esc(cat) + '</strong><br>Ajoute le ' + esc(addedText) + ' • Consommer avant ' + esc(expire) + (item.notes ? '<br>' + esc(item.notes) : '') + '</div>',
+          '<div class="item-sub">Congel&eacute; le ' + esc(dateText) + ' &bull; a consommer idealement avant ' + esc(expire) + (item.notes ? '<br>' + esc(item.notes) : '') + '</div>',
           '</div>',
           '</div>',
           '<div class="chips">',
-          '<span class="chip chip-cat" style="--cat-color:' + esc(categoryColor(cat)) + '">' + esc(cat) + '</span>',
-          '<span class="chip">' + esc(String(item.quantity)) + 'x</span>',
-          '<span class="chip">' + esc(statusText(item)) + '</span>',
+          '<span class="chip">' + esc(item.category) + '</span>',
+          '<span class="chip">' + qtyLabel + '</span>',
+          '<span class="chip">' + esc(statusText(dl)) + '</span>',
           '</div>',
           '<div class="item-actions">',
           '<div class="qty-stepper">',
@@ -1535,8 +1322,8 @@
       function renderAll() {
         var counts = {
           all: state.items.length,
-          soon: state.items.filter(function (it) { return isSoon(it); }).length,
-          overdue: state.items.filter(function (it) { return isOverdue(it); }).length
+          soon: state.items.filter(function (it) { return daysLeft(it) >= 0 && daysLeft(it) <= 30; }).length,
+          overdue: state.items.filter(function (it) { return daysLeft(it) < 0; }).length
         };
         els.statItems.textContent = String(counts.all);
         els.statSoon.textContent = String(counts.soon);
@@ -1558,7 +1345,7 @@
         var items = state.items.slice();
         if (q) {
           items = items.filter(function (it) {
-            return [it.name, it.category, it.notes, it.updatedByName].join(' ').toLowerCase().indexOf(q) >= 0;
+            return [it.name, it.category, it.notes, it.unit, it.updatedByName].join(' ').toLowerCase().indexOf(q) >= 0;
           });
         }
         if (cat !== 'all') items = items.filter(function (it) { return it.category === cat; });
@@ -1580,7 +1367,7 @@
 
       function saveSettingsFromUI() {
         persistSettingsAndMaybeReconnect();
-        setStatus(state.syncing ? 'Config mise a jour' : 'Config enregistree', state.syncing ? 'online' : 'offline');
+        setStatus('Config enregistree', 'offline');
         window.alert('Configuration enregistree sur cet iPhone.');
       }
 
@@ -1669,20 +1456,6 @@
           state.db = firebase.database();
           state.refPath = 'freezerRooms/' + settings.roomId + '/items';
           var ref = state.db.ref(state.refPath);
-          var initialSnapshot = await ref.once('value');
-          var initialPayload = initialSnapshot.val() || {};
-          var remoteItems = Object.keys(initialPayload).map(function (key) { return normalizeItem(initialPayload[key]); }).filter(Boolean).sort(function (a, b) { return (b.updatedAt || '').localeCompare(a.updatedAt || ''); });
-          if (remoteItems.length) {
-            state.suppressPush = true;
-            state.items = remoteItems;
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
-            state.suppressPush = false;
-            renderAll();
-          } else if (state.items.length) {
-            var payload = {};
-            state.items.forEach(function (item) { payload[item.id] = normalizeItem(item); });
-            await ref.set(payload);
-          }
           state.listener = function (snapshot) {
             var payload = snapshot.val() || {};
             var nextItems = Object.keys(payload).map(function (key) { return normalizeItem(payload[key]); }).filter(Boolean).sort(function (a, b) { return (b.updatedAt || '').localeCompare(a.updatedAt || ''); });
@@ -1697,8 +1470,8 @@
             setStatus('Erreur de sync', 'error');
           });
           state.syncing = true;
-          setStatus('Connecte: ' + settings.roomId, 'online');
-          window.alert('Connexion Firebase etablie sur ' + settings.roomId + '.');
+          setStatus('Synchronise: ' + settings.roomId, 'online');
+          await pushToFirebase(true);
         } catch (err) {
           console.error(err);
           state.syncing = false;
@@ -1715,8 +1488,7 @@
         } catch (e) {}
         state.listener = null;
         state.syncing = false;
-        setStatus('Deconnecte', 'offline');
-        window.alert('Deconnecte de Firebase.');
+        setStatus('Hors ligne', 'offline');
       }
 
       function pushToFirebase(force) {
@@ -1757,14 +1529,16 @@
           ok(els.menuPopover.classList.contains('open'), 'menu opens');
           els.menuSettingsBtn.click();
           ok(els.settingsSheet.classList.contains('open'), 'settings opens');
-          ok(els.fbApiKey.value.trim().length > 0 && els.fbProjectId.value.trim().length > 0, 'firebase fields visible');
+          ok(els.fbApiKey.value.trim().length > 0, 'firebase fields visible');
           closeSettings();
           openItemModal();
           ok(els.itemSheet.classList.contains('open'), 'add modal opens');
-          ok(!!els.categoryPicker.querySelector('[data-category="Viande"]'), 'category picker visible');
-          els.categoryPicker.querySelector('[data-category="Viande"]').click();
           els.name.value = 'Test plat';
-          setQty(2);
+          els.category.value = 'Autre';
+          els.quantity.value = '2';
+          els.unit.value = 'portion';
+          els.frozenAt.value = todayISO();
+          els.months.value = '3';
           els.notes.value = 'selftest';
           els.itemForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
           ok(state.items.some(function (x) { return x.name === 'Test plat'; }), 'item saved');
@@ -1774,11 +1548,11 @@
           els.searchQuery.dispatchEvent(new Event('input', { bubbles: true }));
           ok(els.searchResults.textContent.indexOf('Test plat') >= 0, 'search renders item');
           closeSearchModal();
-          state.items.unshift(normalizeItem({ id: 'old-1', name: 'Vieux plat', category: 'Viande', quantity: 1, frozenAt: '2024-01-01', notes: '', createdAt: '2024-01-01T00:00:00Z', updatedAt: '2024-01-01T00:00:00Z' }));
+          state.items.unshift(normalizeItem({ id: 'old-1', name: 'Vieux plat', category: 'Autre', quantity: 1, unit: 'portion', frozenAt: '2024-01-01', months: 1, notes: '', createdAt: '2024-01-01T00:00:00Z', updatedAt: '2024-01-01T00:00:00Z' }));
           persistItems();
           setScope('overdue');
           ok(els.list.textContent.indexOf('Vieux plat') >= 0, 'overdue filter works');
-          state.items = state.items.filter(function (x) { return x.id !== 'old-1'; });
+          state.items = state.items.filter(function (x) { return x.id !== 'old-1'; x.id !== 'old-1'; });
           state.items = state.items.filter(function (x) { return x.name !== 'Test plat'; });
           persistItems();
           setScope('all');
@@ -1798,6 +1572,15 @@
       window.toggleMenu = toggleMenu;
       window.openSettings = openSettings;
       window.closeMenu = closeMenu;
+      window.openItemModal = openItemModal;
+      window.openSearch = openSearch;
+      window.closeSearchModal = closeSearchModal;
+      window.clearSearch = clearSearch;
+      window.selectCategory = selectCategory;
+      window.disconnectSync = disconnectSync;
+      window.connectSync = connectSync;
+      window.saveSettingsFromUI = saveSettingsFromUI;
+      window.goHome = goHome;
       window.__app = { state: state, runSelfTest: runSelfTest };
 
       function saveSettingsFromUI() {
