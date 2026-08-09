@@ -517,7 +517,7 @@
     <div class="menu-title">Menu</div>
     <button class="menu-item" id="menuConnectBtn" type="button">↻ <span>Connexion</span></button>
     <button class="menu-item danger" id="menuDisconnectBtn" type="button">⎋ <span>Déconnexion</span></button>
-    <div class="menu-item version" id="menuVersionItem">Version <strong>v20</strong></div>
+    <div class="menu-item version" id="menuVersionItem">Version <strong>v21</strong></div>
   </div>
 
   <section class="sheet" id="settingsSheet">
@@ -632,7 +632,7 @@
   (() => {
     'use strict';
 
-    const APP_VERSION = 'v20';
+    const APP_VERSION = 'v21';
     const STORAGE_KEY = 'freezer-items-v2';
     const SETTINGS_KEY = 'freezer-settings-v2';
     const DEVICE_KEY = 'freezer-device-id-v2';
@@ -788,7 +788,7 @@
     function isDateISO(v) { return /^\d{4}-\d{2}-\d{2}$/.test(String(v || '')); }
     function daysSince(dateStr) { if (!isDateISO(dateStr)) return 9999; return Math.floor((Date.now() - new Date(dateStr + 'T12:00:00').getTime()) / 86400000); }
     function ageDays(item) { return daysSince(item.createdAt || item.frozenAt || todayISO()); }
-    function ageBucket(item) { const age = ageDays(item); return age < 30 ? 'fresh' : age < 90 ? 'neutral' : age < SOON_DAYS ? 'warn' : 'old'; }
+    function ageBucket(item) { const age = ageDays(item); return age < SOON_DAYS ? 'neutral' : age < SHELF_LIFE_DAYS ? 'warn' : 'old'; }
     function statusText(item) { const age = ageDays(item); if (age >= SHELF_LIFE_DAYS) return 'Date dépassée'; if (age >= SOON_DAYS) return 'À consommer'; return (SHELF_LIFE_DAYS - age) + ' j restants'; }
     function statusIcon(item) {
       const age = ageBucket(item);
