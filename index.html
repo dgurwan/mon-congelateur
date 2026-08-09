@@ -136,7 +136,7 @@
         <div class="sub" id="statusLine">Hors ligne</div>
       </div>
       <div class="top-right">
-        <span class="version-badge" id="versionBadge">v2</span>
+        <span class="version-badge" id="versionBadge">v4</span>
         <button class="icon-btn" id="menuBtn" type="button" aria-label="Menu">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg>
         </button>
@@ -307,7 +307,7 @@
   (() => {
     'use strict';
 
-    const APP_VERSION = 'v3';
+    const APP_VERSION = 'v4';
     const STORAGE_KEY = 'freezer-items-v2';
     const SETTINGS_KEY = 'freezer-settings-v2';
     const DEVICE_KEY = 'freezer-device-id-v2';
@@ -336,6 +336,8 @@
       versionBadge: document.getElementById('versionBadge'),
       menuBtn: document.getElementById('menuBtn'),
       menuPopover: document.getElementById('menuPopover'),
+      menuSettingsBtn: document.getElementById('menuSettingsBtn'),
+      menuDisconnectBtn: document.getElementById('menuDisconnectBtn'),
       backdrop: document.getElementById('backdrop'),
       filterAll: document.getElementById('filterAll'),
       filterSoon: document.getElementById('filterSoon'),
@@ -606,7 +608,12 @@
       if (![els.settingsSheet, els.itemSheet, els.searchSheet].some(s => s.classList.contains('open'))) els.backdrop.classList.remove('show');
     }
 
-    function openSettings() { populateSettingsUI(); openSheet(els.settingsSheet, els.roomId); }
+    function openSettings() {
+      console.log('[Freezer v4] openSettings()');
+      populateSettingsUI();
+      openSheet(els.settingsSheet, els.roomId);
+      console.log('[Freezer v4] settingsSheet ouvert');
+    }
     function closeSettings() { closeSheet(els.settingsSheet); }
 
     function openItem(item) {
@@ -763,6 +770,20 @@
 
     function bindEvents() {
       els.menuBtn.addEventListener('click', toggleMenu);
+      if (els.menuSettingsBtn) {
+        els.menuSettingsBtn.addEventListener('click', () => {
+          console.log('[Freezer v4] click Paramètres');
+          closeMenu();
+          openSettings();
+        });
+      }
+      if (els.menuDisconnectBtn) {
+        els.menuDisconnectBtn.addEventListener('click', () => {
+          console.log('[Freezer v4] click Déconnexion');
+          closeMenu();
+          disconnectSync();
+        });
+      }
       els.backdrop.addEventListener('click', closeAllSheets);
       els.filterAll.addEventListener('click', () => setScope('all'));
       els.filterSoon.addEventListener('click', () => setScope('soon'));
