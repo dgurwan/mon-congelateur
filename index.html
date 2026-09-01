@@ -60,7 +60,6 @@
     .chip[data-scope="soon"], .cat-btn.cat-soon { background:#fffaf0; }
     .chip[data-scope="overdue"], .cat-btn.cat-overdue { background:#fff1f1; }
     .chip[data-scope="all"], .cat-btn.cat-all { background:#f7fbff; }
-    .actions-row { display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:12px; }
     .btn { border:0; border-radius:18px; min-height:52px; padding:12px 16px; font-weight:900; font-size:1rem; box-shadow: var(--shadow); display:flex; align-items:center; justify-content:center; gap:8px; }
     .btn.success { background: linear-gradient(180deg, #22c55e, #16a34a); color:#fff; }
     .btn.secondary { background:#fff; color:var(--text); border:1px solid var(--line); }
@@ -73,6 +72,8 @@
     .cat-plats-cuisines .item::before { background:#a855f7; }
     .cat-dessert .item::before { background:#f97316; }
     .cat-produits-laitiers .item::before { background:#14b8a6; }
+    .cat-accompagnement .item::before { background:#6366f1; }
+    .cat-autres .item::before { background:#64748b; }
     .item-body { min-width:0; display:flex; flex-direction:column; grid-column:2; padding:14px 12px 12px 12px; }
     .item-rail {
       position:relative;
@@ -104,6 +105,8 @@
     .cat-plats-cuisines .item-rail { background:#a855f7; }
     .cat-dessert .item-rail { background:#f97316; }
     .cat-produits-laitiers .item-rail { background:#14b8a6; }
+    .cat-accompagnement .item-rail { background:#6366f1; }
+    .cat-autres .item-rail { background:#64748b; }
     .item-top { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
     .item-title { font-size:1.05rem; font-weight:900; margin:0; }
     .item-meta { margin-top:6px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
@@ -112,6 +115,7 @@
     .badge.fresh { background: rgba(34,197,94,.12); color:#15803d; }
     .badge.neutral { background: rgba(100,116,139,.12); color:#475569; }
     .badge.warn { background: rgba(245,158,11,.14); color:#b45309; }
+    .badge.alert { background: rgba(239,68,68,.16); color:#b91c1c; font-weight:900; }
     .badge.old { background: rgba(239,68,68,.12); color:#b91c1c; }
     .badge svg { width:12px; height:12px; flex:0 0 auto; margin-top:1px; }
     .item-sub { margin-top:8px; color:var(--muted); font-size:.86rem; line-height:1.35; }
@@ -129,9 +133,9 @@
 .cat-plats-cuisines .swatch, .cat-btn.cat-plats-cuisines .swatch { background:#a855f7; }
 .cat-dessert .swatch, .cat-btn.cat-dessert .swatch { background:#f97316; }
 .cat-produits-laitiers .swatch, .cat-btn.cat-produits-laitiers .swatch { background:#14b8a6; }
+.cat-accompagnement .swatch, .cat-btn.cat-accompagnement .swatch { background:#6366f1; }
+.cat-autres .swatch, .cat-btn.cat-autres .swatch { background:#64748b; }
 .category-grid .cat-btn { justify-content:flex-start; text-align:left; padding-left:12px; }
-    .item-category-grid .cat-btn { flex-direction:column; justify-content:center; align-items:center; text-align:center; min-height:94px; padding:14px 12px; gap:8px; }
-    .item-category-grid .cat-btn .category-icon { font-size:1.55rem; line-height:1; }
 .category-grid .cat-btn.active {
   outline:3px solid rgba(10,132,255,.34);
   outline-offset:-3px;
@@ -186,99 +190,59 @@
     input, textarea { width:100%; border:1px solid rgba(15,23,42,.14); background:#fff; border-radius:16px; padding:12px 12px; color:var(--text); outline:none; font-size:16px; }
     input:focus, textarea:focus { border-color: rgba(10,132,255,.45); box-shadow: 0 0 0 4px rgba(10,132,255,.10); }
     textarea { min-height:96px; resize:vertical; }
-    .section-label { color:var(--text); font-size:1.02rem; font-weight:900; margin-bottom:6px; letter-spacing:-.02em; }
-    .section-label.with-icon { display:flex; align-items:center; gap:8px; }
-    .section-helper { color:var(--muted); font-size:.88rem; line-height:1.35; margin-bottom:12px; }
-    .field-footer { display:flex; justify-content:flex-end; align-items:center; margin-top:6px; color:var(--muted); font-size:.8rem; font-weight:800; }
-    .qty-control {
-      border:1px solid rgba(15,23,42,.10);
-      background: linear-gradient(180deg, #fff, #f8fbff);
-      border-radius:26px;
-      padding:14px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.65);
-    }
-    .qty-helper { color:var(--muted); font-size:.88rem; line-height:1.35; margin:0 0 12px; }
-    .qty-rail { display:grid; grid-template-columns: minmax(96px, 1.15fr) minmax(132px, 1fr) minmax(96px, 1.15fr); gap:10px; align-items:stretch; }
-    .qty-btn {
-      width:100%;
-      min-height:92px;
-      border-radius:24px;
-      border:1px solid rgba(10,132,255,.22);
-      background: linear-gradient(180deg, #2d8cff, #0a84ff);
-      color:#fff;
-      display:grid;
-      place-items:center;
-      font-size:2.2rem;
-      font-weight:900;
-      box-shadow: 0 12px 26px rgba(10,132,255,.18);
-    }
-    .qty-btn:active { transform: translateY(1px); }
-    .qty-btn.add { background: linear-gradient(180deg, #2d8cff, #0a84ff); color:#fff; border-color: rgba(10,132,255,.22); }
-    .qty-center {
-      border:1px solid rgba(10,132,255,.14);
-      border-radius:24px;
-      background: linear-gradient(180deg, rgba(10,132,255,.05), rgba(10,132,255,.02));
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      gap:2px;
-      min-height:92px;
-      padding:10px 12px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
-    }
-    .qty-value { font-size:3rem; font-weight:900; line-height:1; letter-spacing:-.04em; margin:0; color:#0f172a; }
-    .qty-unit { font-size:.96rem; line-height:1; font-weight:900; color:#94a3b8; letter-spacing:.04em; text-transform:uppercase; }
-    .duration-grid { display:grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap:10px; margin-top:12px; }
-    .duration-btn {
-      min-height:58px;
-      border-radius:18px;
-      border:1px solid rgba(15,23,42,.12);
-      background:#fff;
-      color:var(--text);
-      font-size:.95rem;
-      font-weight:900;
-      padding:12px 10px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      box-shadow: 0 8px 18px rgba(15,23,42,.05);
-    }
-    .duration-btn.active {
-      background: rgba(10,132,255,.08);
-      border-color: rgba(10,132,255,.46);
-      color: var(--blue);
-      box-shadow: 0 10px 22px rgba(10,132,255,.12);
-    }
-    .duration-btn .cal { font-size:1rem; }
-    .estimate-card {
-      margin-top:12px;
-      border:1px solid rgba(10,132,255,.16);
-      border-radius:22px;
-      background: linear-gradient(180deg, #f7fbff, #fff);
-      padding:14px;
-      display:flex;
-      align-items:center;
-      gap:12px;
-      box-shadow: 0 10px 24px rgba(10,132,255,.06);
-    }
-    .estimate-icon {
-      width:48px;
-      height:48px;
-      border-radius:16px;
-      background: rgba(10,132,255,.10);
-      color: var(--blue);
-      display:grid;
-      place-items:center;
-      flex:0 0 auto;
-      font-size:1.35rem;
-    }
-    .estimate-kicker { color:var(--muted); font-size:.84rem; font-weight:800; margin:0 0 3px; }
-    .estimate-date { color:var(--text); font-size:1.1rem; font-weight:900; line-height:1.15; }
-    .section-label-inline { display:flex; align-items:center; gap:8px; }
-    .help-dot { width:20px; height:20px; border-radius:50%; border:1px solid rgba(15,23,42,.15); color:var(--muted); display:grid; place-items:center; font-size:.72rem; font-weight:900; }
+    .section-label { color:var(--muted); font-size:.82rem; font-weight:800; margin-bottom:8px; }
+    .qty-control { border:1px solid var(--line); background:#fff; border-radius:18px; padding:12px; text-align:center; }
+    .qty-value { font-size:1.5rem; font-weight:900; margin-bottom:10px; }
+    .qty-row { display:flex; gap:10px; }
+    .qty-row .qty-btn { flex:1 1 0; height:48px; font-size:1.4rem; background:#fff; }
+    .qty-row .qty-btn.add { background: linear-gradient(180deg, #22c55e, #16a34a); color:#fff; border-color: transparent; }
     .search-top { margin-top:10px; }
+    .search-section { margin-top:8px; }
+    .inventory-search {
+      position:relative;
+      display:flex;
+      align-items:center;
+      min-height:52px;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:18px;
+      box-shadow:0 8px 24px rgba(15,23,42,.06);
+    }
+    .inventory-search:focus-within {
+      border-color:rgba(10,132,255,.45);
+      box-shadow:0 0 0 4px rgba(10,132,255,.10);
+    }
+    .inventory-search-icon {
+      position:absolute;
+      left:14px;
+      width:20px;
+      height:20px;
+      color:var(--muted);
+      pointer-events:none;
+    }
+    .inventory-search input {
+      width:100%;
+      min-height:52px;
+      padding:12px 48px 12px 44px;
+      border:0;
+      border-radius:18px;
+      background:transparent;
+      box-shadow:none;
+    }
+    .inventory-search input:focus { border:0; box-shadow:none; }
+    .inventory-search input::-webkit-search-cancel-button { display:none; }
+    .search-clear-btn {
+      position:absolute;
+      right:7px;
+      width:38px;
+      height:38px;
+      border:0;
+      border-radius:12px;
+      background:rgba(100,116,139,.10);
+      color:var(--muted);
+      font-weight:900;
+    }
+    .search-clear-btn[hidden] { display:none; }
 
     .cat-btn.cat-viande { background:#fff5f5; }
     .cat-btn.cat-poisson { background:#eff8ff; }
@@ -286,25 +250,22 @@
     .cat-btn.cat-plats-cuisines { background:#faf5ff; }
     .cat-btn.cat-dessert { background:#fff7ed; }
     .cat-btn.cat-produits-laitiers { background:#f0fdfa; }
+    .cat-btn.cat-accompagnement { background:#eef2ff; }
+    .cat-btn.cat-autres { background:#f8fafc; }
     .cat-btn .swatch { background: var(--blue); }
     .toast { position:fixed; left:50%; transform: translateX(-50%); bottom:16px; z-index:4000; min-width:min(360px, calc(100vw - 20px)); background: rgba(15,23,42,.94); color:#fff; border-radius:16px; padding:12px 14px; text-align:center; box-shadow:0 18px 40px rgba(0,0,0,.2); display:none; }
     .toast.show { display:block; }
     .empty { padding:16px; text-align:center; color:var(--muted); border:1px dashed rgba(15,23,42,.14); border-radius:18px; background:#fff; }
     @media (max-width: 720px) {
       .app { padding-left:8px; padding-right:8px; }
-      .summary-grid, .filters, .form-grid, .actions-row { grid-template-columns: 1fr; }
+      .summary-grid, .filters, .form-grid { grid-template-columns: 1fr; }
       .category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .item-actions { align-items:flex-start; }
-      .qty-rail { grid-template-columns: minmax(84px, 1fr) minmax(96px, .82fr) minmax(84px, 1fr); gap:8px; }
-      .qty-btn { min-height:80px; font-size:1.9rem; }
-      .qty-center { min-height:80px; }
-      .qty-value { font-size:2.5rem; }
-      .duration-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .menu { left:8px; right:8px; width:auto; }
       .bottom-tabs { left:50%; right:auto; transform:translateX(-50%); width:calc(100vw - 16px); }
     }
 
-    /* v27 - mobile app layout */
+    /* v25 - mobile app layout */
     .app { max-width: 1180px; padding: calc(8px + var(--safe-top)) 12px calc(104px + var(--safe-bottom)); }
     .topbar { display:grid; grid-template-columns:48px minmax(0,1fr) 48px; align-items:center; padding:8px 4px 12px; background:rgba(243,246,251,.96); }
     .brand { text-align:center; min-width:0; }
@@ -314,7 +275,7 @@
     .status-dot.online { background:var(--green); }
     .status-dot.pending { background:var(--orange); }
     .top-menu-btn, .top-settings-btn { box-shadow:none; background:transparent; border-color:transparent; }
-    .summary-grid, .section:has(#scopeChips), .actions-row { display:none; }
+    .summary-grid, #scopeSection { display:none; }
     #categorySection { display:none; }
     body.categories-view #categorySection { display:block; }
     .section { margin-top:8px; padding:0; border:0; background:transparent; box-shadow:none; }
@@ -328,12 +289,14 @@
     .item-meta { gap:7px; }
     .badge { padding:5px 9px; }
     .badge.cat { color:#475569; }
-    .cat-viande .badge.cat { background:#fee2e2; color:#b91c1c; }
-    .cat-poisson .badge.cat { background:#e0f2fe; color:#0369a1; }
-    .cat-legumes .badge.cat { background:#dcfce7; color:#15803d; }
-    .cat-plats-cuisines .badge.cat { background:#f3e8ff; color:#7e22ce; }
-    .cat-dessert .badge.cat { background:#ffedd5; color:#c2410c; }
-    .cat-produits-laitiers .badge.cat { background:#ccfbf1; color:#0f766e; }
+    .badge.cat.cat-viande { background:#fee2e2; color:#b91c1c; }
+    .badge.cat.cat-poisson { background:#e0f2fe; color:#0369a1; }
+    .badge.cat.cat-legumes { background:#dcfce7; color:#15803d; }
+    .badge.cat.cat-plats-cuisines { background:#f3e8ff; color:#7e22ce; }
+    .badge.cat.cat-dessert { background:#ffedd5; color:#c2410c; }
+    .badge.cat.cat-produits-laitiers { background:#ccfbf1; color:#0f766e; }
+    .badge.cat.cat-accompagnement { background:#e0e7ff; color:#4338ca; }
+    .badge.cat.cat-autres { background:#e2e8f0; color:#475569; }
     .meta-actions { width:76px; height:100%; border-left:1px solid var(--line); padding:12px 10px; display:grid; grid-template-rows:1fr 1fr; gap:10px; align-items:stretch; }
     .meta-actions .mini { width:100%; height:100%; min-height:54px; border:0; color:#fff; border-radius:16px; }
     .meta-actions .mini svg { width:22px; height:22px; }
@@ -369,16 +332,10 @@
       .item-sub, .item-actions { padding-left:13px; padding-right:10px; }
       .meta-actions { padding:10px 8px; }
       .badge { font-size:.7rem; padding:5px 7px; }
-      .qty-rail { grid-template-columns: 1fr .9fr 1fr; }
-      .qty-btn { min-height:72px; border-radius:20px; }
-      .qty-center { min-height:72px; border-radius:20px; }
-      .qty-value { font-size:2.1rem; }
-      .duration-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap:8px; }
-      .duration-btn { min-height:54px; border-radius:16px; font-size:.9rem; }
     }
   
 
-    /* v27 — carte article claire : catégorie / contenu / actions */
+    /* v25 — carte article claire : catégories / contenu / actions */
     .item {
       position: relative !important;
       display: grid !important;
@@ -438,6 +395,14 @@
       line-height: 1.2 !important;
       overflow-wrap: anywhere !important;
     }
+    .item-categories {
+      width: 100% !important;
+      margin-top: 8px !important;
+      display: flex !important;
+      flex-wrap: wrap !important;
+      gap: 6px !important;
+    }
+    .item-categories .badge { padding: 4px 8px !important; font-size: .68rem !important; }
     .item-status { margin-top: 8px !important; }
     .item-status .badge { padding: 5px 9px !important; }
     .item-date {
@@ -533,145 +498,6 @@
       .qty-btn { width: 42px !important; height: 42px !important; flex-basis: 42px !important; }
     }
 
-
-
-    /* Quantité — trois zones strictement égales, boutons bleus */
-    #itemSheet .qty-control {
-      width:100% !important;
-      padding:0 !important;
-      border:0 !important;
-      border-radius:24px !important;
-      background:transparent !important;
-      box-shadow:none !important;
-      overflow:visible !important;
-    }
-
-    #itemSheet .qty-rail {
-      width:100% !important;
-      display:grid !important;
-      grid-template-columns:repeat(3, minmax(0, 1fr)) !important;
-      grid-template-rows:minmax(104px, auto) !important;
-      gap:0 !important;
-      align-items:stretch !important;
-      overflow:hidden !important;
-      border:1px solid rgba(10,132,255,.22) !important;
-      border-radius:24px !important;
-      background:#fff !important;
-      box-shadow:0 12px 26px rgba(15,23,42,.08) !important;
-    }
-
-    #itemSheet .qty-rail > * {
-      min-width:0 !important;
-      width:100% !important;
-      height:100% !important;
-      margin:0 !important;
-    }
-
-    #itemSheet .qty-rail #qtyMinus,
-    #itemSheet .qty-rail #qtyPlus {
-      min-width:0 !important;
-      max-width:none !important;
-      min-height:104px !important;
-      height:100% !important;
-      padding:0 !important;
-      border:0 !important;
-      border-radius:0 !important;
-      background:linear-gradient(180deg, #238cff 0%, #0a84ff 58%, #0878e8 100%) !important;
-      color:#fff !important;
-      display:grid !important;
-      place-items:center !important;
-      flex:none !important;
-      font-size:clamp(2.4rem, 8vw, 3rem) !important;
-      font-weight:500 !important;
-      line-height:1 !important;
-      box-shadow:none !important;
-      touch-action:manipulation;
-      -webkit-tap-highlight-color:transparent;
-    }
-
-    #itemSheet .qty-rail #qtyMinus {
-      grid-column:1 !important;
-      grid-row:1 !important;
-    }
-
-    #itemSheet .qty-rail .qty-center {
-      grid-column:2 !important;
-      grid-row:1 !important;
-      min-width:0 !important;
-      min-height:104px !important;
-      padding:10px 8px !important;
-      border:0 !important;
-      border-left:1px solid rgba(10,132,255,.16) !important;
-      border-right:1px solid rgba(10,132,255,.16) !important;
-      border-radius:0 !important;
-      background:#fff !important;
-      box-shadow:none !important;
-      display:flex !important;
-      flex-direction:column !important;
-      align-items:center !important;
-      justify-content:center !important;
-      gap:3px !important;
-    }
-
-    #itemSheet .qty-rail #qtyPlus {
-      grid-column:3 !important;
-      grid-row:1 !important;
-    }
-
-    #itemSheet .qty-value {
-      margin:0 !important;
-      color:var(--text) !important;
-      font-size:clamp(2.4rem, 8vw, 3rem) !important;
-      font-weight:900 !important;
-      line-height:.95 !important;
-      letter-spacing:-.04em !important;
-    }
-
-    #itemSheet .qty-unit {
-      color:var(--muted) !important;
-      font-size:.82rem !important;
-      font-weight:900 !important;
-      line-height:1 !important;
-      letter-spacing:.05em !important;
-      text-transform:uppercase !important;
-    }
-
-    #itemSheet .qty-rail #qtyMinus:hover,
-    #itemSheet .qty-rail #qtyPlus:hover {
-      filter:brightness(1.04);
-    }
-
-    #itemSheet .qty-rail #qtyMinus:active,
-    #itemSheet .qty-rail #qtyPlus:active {
-      transform:none !important;
-      filter:brightness(.94);
-    }
-
-    @media (max-width:720px) {
-      #itemSheet .qty-rail {
-        grid-template-columns:repeat(3, minmax(0, 1fr)) !important;
-        grid-template-rows:minmax(88px, auto) !important;
-      }
-      #itemSheet .qty-rail #qtyMinus,
-      #itemSheet .qty-rail #qtyPlus,
-      #itemSheet .qty-rail .qty-center {
-        min-height:88px !important;
-      }
-    }
-
-    @media (max-width:430px) {
-      #itemSheet .qty-rail {
-        grid-template-columns:repeat(3, minmax(0, 1fr)) !important;
-        grid-template-rows:minmax(80px, auto) !important;
-        border-radius:20px !important;
-      }
-      #itemSheet .qty-rail #qtyMinus,
-      #itemSheet .qty-rail #qtyPlus,
-      #itemSheet .qty-rail .qty-center {
-        min-height:80px !important;
-      }
-    }
-
   </style>
 </head>
 <body>
@@ -707,7 +533,7 @@
       </button>
     </section>
 
-    <section class="section">
+    <section class="section" id="scopeSection">
       <div class="section-head">
         <h2>Filtres</h2>
         <div class="small" id="listLabel">Tous les articles</div>
@@ -718,12 +544,6 @@
         <button class="chip" type="button" data-scope="overdue">Date dépassée</button>
       </div>
     </section>
-
-    <section class="actions-row">
-      <button class="btn success" id="addBtn" type="button">＋ Ajouter</button>
-      <button class="btn secondary" id="searchBtn" type="button">⌕ Rechercher</button>
-    </section>
-
     <section class="section" id="categorySection">
       <div class="section-head">
         <h2>Catégories</h2>
@@ -740,10 +560,18 @@
       <button class="bottom-tab" type="button" data-tab="categories"><span class="tab-icon">☷</span><span>Catégories</span></button>
     </nav>
 
+    <section class="section search-section" aria-label="Recherche dans l’inventaire">
+      <div class="inventory-search">
+        <svg class="inventory-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="inventorySearch" type="search" inputmode="search" autocomplete="off" placeholder="Rechercher par nom ou note…" aria-label="Rechercher un article par son nom ou ses notes" />
+        <button class="search-clear-btn" id="clearInventorySearchBtn" type="button" aria-label="Effacer la recherche" hidden>✕</button>
+      </div>
+    </section>
+
     <section class="section">
       <div class="section-head">
         <h3 id="listTitle">Tous les articles</h3>
-        <div class="small" id="listCount">0 article</div>
+        <div class="small" id="listCount" aria-live="polite">0 article</div>
       </div>
       <div class="list" id="list"></div>
     </section>
@@ -755,7 +583,7 @@
     <div class="menu-title">Menu</div>
     <button class="menu-item" id="menuConnectBtn" type="button">↻ <span>Connexion</span></button>
     <button class="menu-item danger" id="menuDisconnectBtn" type="button">⎋ <span>Déconnexion</span></button>
-    <div class="menu-item version" id="menuVersionItem">Version <strong>v27</strong></div>
+    <div class="menu-item version">Version <strong>v25</strong></div>
   </div>
 
   <section class="sheet" id="settingsSheet">
@@ -806,53 +634,28 @@
         <button class="icon-btn" id="closeItemBtn" type="button" aria-label="Fermer">✕</button>
       </div>
       <div class="sheet-body">
-        <div class="form-grid item-form-grid">
+        <div class="form-grid">
+          <label class="full">Nom
+            <input id="itemName" placeholder="Poulet, soupe, dessert..." />
+          </label>
           <div class="full">
-            <div class="section-label">Catégorie</div>
-            <div class="category-grid item-category-grid" id="categoryGrid"></div>
+            <div class="section-label">Catégories — une ou plusieurs</div>
+            <div class="category-grid" id="categoryGrid"></div>
           </div>
-
           <div class="full">
             <div class="section-label">Quantité</div>
-            <div class="section-helper">Utilise les boutons pour ajuster rapidement la quantité.</div>
             <div class="qty-control">
-              <div class="qty-rail">
-                <button class="qty-btn qty-minus" type="button" id="qtyMinus" aria-label="Diminuer la quantité">−</button>
-                <div class="qty-center" aria-live="polite">
-                  <div class="qty-value" id="qtyValue">1</div>
-                  <div class="qty-unit">UNITÉS</div>
-                </div>
-                <button class="qty-btn add qty-plus" type="button" id="qtyPlus" aria-label="Augmenter la quantité">＋</button>
+              <div class="qty-value" id="qtyValue">1</div>
+              <div class="qty-row">
+                <button class="qty-btn" type="button" id="qtyMinus">−</button>
+                <button class="qty-btn add" type="button" id="qtyPlus">＋</button>
               </div>
             </div>
           </div>
-
-          <label class="full">Nom de l'article
-            <input id="itemName" placeholder="Ex. Petits pois, Brocolis, Épinards..." />
+          <label class="full">Notes
+            <textarea id="itemNotes" placeholder="Ex. déjà cuit, pour ce soir..."></textarea>
           </label>
-
-          <label class="full notes-field">Notes (facultatif)
-            <textarea id="itemNotes" maxlength="150" placeholder="Ajouter une note..."></textarea>
-            <div class="field-footer"><span id="notesCounter">0/150</span></div>
-          </label>
-
-          <div class="full">
-            <div class="section-label section-label-inline">Date limite <span class="help-dot" title="Choisis une durée de conservation">i</span></div>
-            <div class="section-helper">Choisis une durée de conservation à partir d’aujourd’hui.</div>
-            <div class="duration-grid" id="durationGrid">
-              <button class="duration-btn" type="button" data-shelf-life="7"><span class="cal">📅</span><span>1 semaine</span></button>
-              <button class="duration-btn" type="button" data-shelf-life="30"><span class="cal">📅</span><span>1 mois</span></button>
-              <button class="duration-btn" type="button" data-shelf-life="90"><span class="cal">📅</span><span>3 mois</span></button>
-              <button class="duration-btn" type="button" data-shelf-life="180"><span class="cal">📅</span><span>6 mois</span></button>
-            </div>
-            <div class="estimate-card">
-              <div class="estimate-icon">📅</div>
-              <div>
-                <div class="estimate-kicker">Date limite estimée</div>
-                <div class="estimate-date" id="estimatedDate">—</div>
-              </div>
-            </div>
-          </div>
+          <div class="full small">La date d’ajout est utilisée automatiquement pour le calcul. Durée fixe : 6 mois.</div>
         </div>
       </div>
       <div class="sheet-actions">
@@ -861,33 +664,6 @@
     </div>
   </section>
 
-  <section class="sheet" id="searchSheet">  <section class="sheet" id="searchSheet">
-    <div class="sheet-inner">
-      <div class="sheet-header">
-        <h3>Rechercher</h3>
-        <button class="icon-btn" id="closeSearchBtn" type="button" aria-label="Fermer">✕</button>
-      </div>
-      <div class="sheet-body">
-        <div class="form-grid">
-          <label class="full">Recherche
-            <input id="searchQuery" placeholder="Nom, catégorie, notes..." />
-          </label>
-          <div class="full">
-            <div class="section-label">Catégorie</div>
-            <div class="category-grid" id="searchCategoryGrid"></div>
-          </div>
-          <div class="small full" id="searchCount">0 résultat</div>
-        </div>
-        <div class="search-top">
-          <button class="btn secondary" id="clearSearchBtn" type="button">Réinitialiser</button>
-        </div>
-        <div class="list" id="searchResults" style="margin-top:10px;"></div>
-      </div>
-      <div class="sheet-actions">
-        <button class="btn secondary" id="searchToDashboardBtn" type="button">Retour au dashboard</button>
-      </div>
-    </div>
-  </section>
 
   <div class="toast" id="toast"></div>
 
@@ -895,23 +671,24 @@
   (() => {
     'use strict';
 
-    const APP_VERSION = 'v27';
+    const APP_VERSION = 'v25';
     const STORAGE_KEY = 'freezer-items-v2';
     const SETTINGS_KEY = 'freezer-settings-v2';
     const DEVICE_KEY = 'freezer-device-id-v2';
     const DEVICE_NAME_KEY = 'freezer-device-name-v2';
     const SHELF_LIFE_DAYS = 180;
     const SOON_DAYS = 150;
-    const WARNING_DAYS = 30;
-    const SHELF_LIFE_OPTIONS = [7, 30, 90, 180];
-    const CATEGORY_ORDER = ['Viande', 'Poisson', 'Légumes', 'Plats cuisinés', 'Dessert', 'Produits laitiers'];
+    const ALERT_DAYS = 15;
+    const CATEGORY_ORDER = ['Viande', 'Poisson', 'Légumes', 'Plats cuisinés', 'Dessert', 'Produits laitiers', 'Accompagnement', 'Autres'];
     const CATEGORY_META = {
-      'Viande': { cls: 'cat-viande', icon: '🥩' },
-      'Poisson': { cls: 'cat-poisson', icon: '🐟' },
-      'Légumes': { cls: 'cat-legumes', icon: '🥦' },
-      'Plats cuisinés': { cls: 'cat-plats-cuisines', icon: '🍲' },
-      'Dessert': { cls: 'cat-dessert', icon: '🍰' },
-      'Produits laitiers': { cls: 'cat-produits-laitiers', icon: '🥛' }
+      'Viande': { cls: 'cat-viande' },
+      'Poisson': { cls: 'cat-poisson' },
+      'Légumes': { cls: 'cat-legumes' },
+      'Plats cuisinés': { cls: 'cat-plats-cuisines' },
+      'Dessert': { cls: 'cat-dessert' },
+      'Produits laitiers': { cls: 'cat-produits-laitiers' },
+      'Accompagnement': { cls: 'cat-accompagnement' },
+      'Autres': { cls: 'cat-autres' }
     };
     const DEFAULT_FIREBASE_CONFIG = {
       apiKey: 'AIzaSyDsNEGaBaq9JhTxSTvIeAQKbhRKNPecXgw',
@@ -928,6 +705,7 @@
       fabAddBtn: document.getElementById('fabAddBtn'),
       statusDot: document.getElementById('statusDot'),
       menuPopover: document.getElementById('menuPopover'),
+      menuConnectBtn: document.getElementById('menuConnectBtn'),
       menuDisconnectBtn: document.getElementById('menuDisconnectBtn'),
       backdrop: document.getElementById('backdrop'),
       filterAll: document.getElementById('filterAll'),
@@ -945,8 +723,6 @@
       categoryLabel: document.getElementById('categoryLabel'),
       categoryButtons: document.getElementById('categoryButtons'),
       bottomTabs: document.getElementById('bottomTabs'),
-      addBtn: document.getElementById('addBtn'),
-      searchBtn: document.getElementById('searchBtn'),
       settingsSheet: document.getElementById('settingsSheet'),
       closeSettingsBtn: document.getElementById('closeSettingsBtn'),
       roomId: document.getElementById('roomId'),
@@ -965,22 +741,13 @@
       closeItemBtn: document.getElementById('closeItemBtn'),
       itemName: document.getElementById('itemName'),
       itemNotes: document.getElementById('itemNotes'),
-      notesCounter: document.getElementById('notesCounter'),
-      estimatedDate: document.getElementById('estimatedDate'),
       categoryGrid: document.getElementById('categoryGrid'),
       qtyValue: document.getElementById('qtyValue'),
       qtyMinus: document.getElementById('qtyMinus'),
       qtyPlus: document.getElementById('qtyPlus'),
-      durationGrid: document.getElementById('durationGrid'),
       saveItemBtn: document.getElementById('saveItemBtn'),
-      searchSheet: document.getElementById('searchSheet'),
-      closeSearchBtn: document.getElementById('closeSearchBtn'),
-      searchToDashboardBtn: document.getElementById('searchToDashboardBtn'),
-      searchQuery: document.getElementById('searchQuery'),
-      searchCategoryGrid: document.getElementById('searchCategoryGrid'),
-      searchCount: document.getElementById('searchCount'),
-      clearSearchBtn: document.getElementById('clearSearchBtn'),
-      searchResults: document.getElementById('searchResults'),
+      inventorySearch: document.getElementById('inventorySearch'),
+      clearInventorySearchBtn: document.getElementById('clearInventorySearchBtn'),
       toast: document.getElementById('toast')
     };
 
@@ -988,7 +755,7 @@
       items: loadItems(),
       settings: loadSettings(),
       scope: 'all',
-      searchCategory: 'all',
+      searchQuery: '',
       categoryFilters: [],
       syncing: false,
       db: null,
@@ -997,17 +764,15 @@
       firebaseLoadPromise: null,
       deviceId: getOrCreateDeviceId(),
       deviceName: '',
-      modal: { mode: 'add', id: '', category: CATEGORY_ORDER[0], qty: 1, shelfLifeDays: 180, baseDate: todayISO() }
+      modal: { id: '', categories: [CATEGORY_ORDER[0]], qty: 1 }
     };
 
     state.deviceName = state.settings.deviceName || localStorage.getItem(DEVICE_NAME_KEY) || defaultDeviceName();
 
     populateSettingsUI();
     renderCategoryGrid();
-    renderSearchCategoryGrid();
     renderCategoryButtons();
     renderAll();
-    renderNotesCounter();
     setStatus('Hors ligne');
     bindEvents();
 
@@ -1022,17 +787,14 @@
       saveSettings,
       openItem,
       closeItem,
-      openSearch,
-      closeSearch,
       saveItem,
       adjustQty,
-      selectCategory,
+      toggleItemCategory,
       setScope,
       setCategoryFilter,
       closeAllSheets
     };
     window.app = app;
-    Object.assign(window, app);
 
     if (shouldAutoConnect()) connectSync();
 
@@ -1055,36 +817,51 @@
 
     function todayISO() { return new Date().toISOString().slice(0, 10); }
     function isDateISO(v) { return /^\d{4}-\d{2}-\d{2}$/.test(String(v || '')); }
+    function toDateISO(value, fallback = todayISO()) {
+      const raw = String(value || '');
+      if (isDateISO(raw)) return raw;
+      const datePart = raw.slice(0, 10);
+      return isDateISO(datePart) ? datePart : fallback;
+    }
+    function uniqueCategories(values) {
+      const source = Array.isArray(values)
+        ? values
+        : values && typeof values === 'object'
+          ? Object.values(values)
+          : [values];
+      return source.reduce((result, value) => {
+        const category = String(value || '').trim();
+        if (category && !result.includes(category)) result.push(category);
+        return result;
+      }, []);
+    }
+    function getItemCategories(item) {
+      const categories = uniqueCategories(item && item.categories);
+      const legacyCategory = String(item && item.category || '').trim();
+      if (legacyCategory && !categories.includes(legacyCategory)) categories.push(legacyCategory);
+      return categories.length ? categories : [CATEGORY_ORDER[0]];
+    }
+    function categoryClass(category) {
+      return (CATEGORY_META[category] || CATEGORY_META.Autres).cls;
+    }
     function daysSince(dateStr) { if (!isDateISO(dateStr)) return 9999; return Math.floor((Date.now() - new Date(dateStr + 'T12:00:00').getTime()) / 86400000); }
-    function addDaysISO(dateStr, days) {
-      const base = isDateISO(dateStr) ? new Date(dateStr + 'T12:00:00') : new Date();
-      base.setDate(base.getDate() + Number(days || 0));
-      return base;
+    function ageDays(item) { return daysSince(toDateISO(item.createdAt || item.frozenAt)); }
+    function remainingDays(item) {
+      return SHELF_LIFE_DAYS - ageDays(item);
     }
-    function formatFrDate(date) {
-      return date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
-    }
-    function getShelfLifeDays(item) {
-      const direct = Number(item && item.shelfLifeDays);
-      if (Number.isFinite(direct) && direct > 0) return direct;
-      const months = Number(item && item.months);
-      if (Number.isFinite(months) && months > 0) return months * 30;
-      return SHELF_LIFE_DAYS;
-    }
-    function remainingDays(item) { return getShelfLifeDays(item) - ageDays(item); }
-    function warnThreshold(item) { return Math.max(1, Math.min(WARNING_DAYS, Math.floor(getShelfLifeDays(item) * 0.2))); }
-    function ageDays(item) { return daysSince(item.createdAt || item.frozenAt || todayISO()); }
     function ageBucket(item) {
-      const remaining = remainingDays(item);
+      const age = ageDays(item);
+      const remaining = SHELF_LIFE_DAYS - age;
       if (remaining <= 0) return 'old';
-      if (remaining <= warnThreshold(item)) return 'warn';
-      if (remaining <= Math.max(warnThreshold(item) * 3, Math.floor(getShelfLifeDays(item) * 0.5))) return 'neutral';
-      return 'fresh';
+      if (remaining < ALERT_DAYS) return 'alert';
+      if (age >= SOON_DAYS) return 'warn';
+      return age < 30 ? 'fresh' : age < 90 ? 'neutral' : 'warn';
     }
     function statusText(item) {
       const remaining = remainingDays(item);
       if (remaining <= 0) return 'Date dépassée';
-      if (remaining <= warnThreshold(item)) return 'À consommer';
+      if (remaining < ALERT_DAYS) return '🚨 ' + remaining + ' j restant' + (remaining > 1 ? 's' : '');
+      if (remaining <= SHELF_LIFE_DAYS - SOON_DAYS) return 'À consommer';
       return remaining + ' j restants';
     }
     function statusIcon(item) {
@@ -1104,7 +881,7 @@
     }
 
     function syncSheetState() {
-      const open = [els.settingsSheet, els.itemSheet, els.searchSheet].some(s => s.classList.contains('open'));
+      const open = [els.settingsSheet, els.itemSheet].some(s => s.classList.contains('open'));
       document.body.classList.toggle('sheet-open', open);
       return open;
     }
@@ -1145,21 +922,28 @@
 
     function normalizeItem(item) {
       if (!item || !item.name) return null;
-      const created = item.createdAt || item.frozenAt || new Date().toISOString();
+      const categories = getItemCategories(item);
+      const createdAt = String(item.createdAt || item.frozenAt || todayISO());
+      const frozenAt = String(item.frozenAt || toDateISO(createdAt));
       return {
+        ...item,
         id: item.id || uid(),
         name: String(item.name),
-        category: CATEGORY_ORDER.includes(item.category) ? item.category : CATEGORY_ORDER[0],
+        category: categories[0],
+        categories,
         quantity: Math.max(1, Number(item.quantity) || 1),
-        createdAt: isDateISO(created) ? created : new Date().toISOString(),
-        frozenAt: isDateISO(item.frozenAt) ? item.frozenAt : (isDateISO(created) ? created.slice(0, 10) : todayISO()),
-        shelfLifeDays: Number.isFinite(Number(item.shelfLifeDays)) && Number(item.shelfLifeDays) > 0 ? Number(item.shelfLifeDays) : (Number.isFinite(Number(item.months)) && Number(item.months) > 0 ? Number(item.months) * 30 : SHELF_LIFE_DAYS),
-        months: Number.isFinite(Number(item.months)) && Number(item.months) > 0 ? Number(item.months) : 6,
+        createdAt,
+        frozenAt,
+        months: Math.max(1, Number(item.months) || 6),
         notes: String(item.notes || ''),
         updatedAt: item.updatedAt || new Date().toISOString(),
         updatedBy: item.updatedBy || '',
         updatedByName: item.updatedByName || ''
       };
+    }
+
+    function persistItems() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
     }
 
     function sanitizeRoomId(v) {
@@ -1219,11 +1003,10 @@
     }
 
     function renderCategoryGrid() {
-      const current = state.modal.category || CATEGORY_ORDER[0];
-      els.categoryGrid.innerHTML = CATEGORY_ORDER.map(c => {
-        const meta = CATEGORY_META[c] || { cls: '', icon: '•' };
-        const active = current === c ? ' active' : '';
-        return `<button type="button" class="cat-btn item-cat-btn ${meta.cls}${active}" data-cat="${esc(c)}"><span class="category-icon">${esc(meta.icon || '•')}</span><span>${esc(c)}</span></button>`;
+      const selected = new Set(uniqueCategories(state.modal.categories));
+      els.categoryGrid.innerHTML = CATEGORY_ORDER.map(category => {
+        const active = selected.has(category);
+        return `<button type="button" class="cat-btn ${categoryClass(category)}${active ? ' active' : ''}" data-cat="${esc(category)}" aria-pressed="${active ? 'true' : 'false'}"><span class="swatch"></span><span>${esc(category)}</span></button>`;
       }).join('');
     }
 
@@ -1255,13 +1038,6 @@
       }
     }
 
-    function renderSearchCategoryGrid() {
-      const current = state.searchCategory || 'all';
-      els.searchCategoryGrid.innerHTML = [{ value: 'all', label: 'Toutes', cls: 'cat-all' }, ...CATEGORY_ORDER.map(c => ({ value: c, label: c, cls: (CATEGORY_META[c] && CATEGORY_META[c].cls) || '' }))].map(({ value, label, cls }) => {
-        const active = current === value ? ' active' : '';
-        return `<button type="button" class="cat-btn ${cls}${active}" data-search-cat="${esc(value)}"><span class="swatch"></span><span>${esc(label)}</span></button>`;
-      }).join('');
-    }
 
     function openMenu() {
       els.menuPopover.classList.add('open');
@@ -1269,7 +1045,7 @@
     }
     function closeMenu() {
       els.menuPopover.classList.remove('open');
-      if (![els.settingsSheet, els.itemSheet, els.searchSheet].some(s => s.classList.contains('open'))) els.backdrop.classList.remove('show');
+      if (![els.settingsSheet, els.itemSheet].some(s => s.classList.contains('open'))) els.backdrop.classList.remove('show');
     }
     function toggleMenu() {
       if (els.menuPopover.classList.contains('open')) closeMenu(); else openMenu();
@@ -1291,112 +1067,104 @@
     }
 
     function openSettings() {
-      console.log('[Freezer v27] openSettings()');
+      debugLog('openSettings:start');
       populateSettingsUI();
       openSheet(els.settingsSheet, els.roomId);
-      console.log('[Freezer v27] settingsSheet ouvert');
+      debugLog('openSettings:opened');
     }
     function closeSettings() { closeSheet(els.settingsSheet); }
 
     function openItem(item) {
-      state.modal.mode = item ? 'edit' : 'add';
       state.modal.id = item ? item.id : '';
-      state.modal.category = item ? item.category : CATEGORY_ORDER[0];
+      state.modal.categories = item ? getItemCategories(item) : [CATEGORY_ORDER[0]];
       state.modal.qty = item ? item.quantity : 1;
-      state.modal.shelfLifeDays = getShelfLifeDays(item || {});
-      state.modal.baseDate = item && (item.createdAt || item.frozenAt) ? (item.createdAt || item.frozenAt).slice(0, 10) : todayISO();
       els.itemTitle.textContent = item ? 'Modifier l’article' : 'Ajouter un article';
       els.itemName.value = item ? item.name : '';
       els.itemNotes.value = item ? item.notes : '';
+      els.qtyValue.textContent = String(state.modal.qty);
       renderCategoryGrid();
-      refreshModalMeta();
       openSheet(els.itemSheet, els.itemName);
-      setTimeout(renderNotesCounter, 0);
     }
     function closeItem() { closeSheet(els.itemSheet); }
-    function adjustQty(delta) { state.modal.qty = Math.max(1, (state.modal.qty || 1) + delta); refreshModalMeta(); }
-    function selectCategory(cat) { if (CATEGORY_ORDER.includes(cat)) { state.modal.category = cat; renderCategoryGrid(); } }
-
-    function renderNotesCounter() {
-      if (!els.notesCounter) return;
-      const value = String(els.itemNotes.value || '');
-      els.notesCounter.textContent = value.length + '/150';
+    function adjustQty(delta) { state.modal.qty = Math.max(1, (state.modal.qty || 1) + delta); els.qtyValue.textContent = String(state.modal.qty); }
+    function toggleItemCategory(category) {
+      if (!CATEGORY_ORDER.includes(category)) return;
+      const categories = uniqueCategories(state.modal.categories);
+      if (categories.includes(category)) {
+        if (categories.length === 1) { toast('Sélectionne au moins une catégorie'); return; }
+        state.modal.categories = categories.filter(value => value !== category);
+      } else {
+        state.modal.categories = [...categories, category];
+      }
+      renderCategoryGrid();
     }
 
-    function renderDurationButtons() {
-      if (!els.durationGrid) return;
-      els.durationGrid.querySelectorAll('[data-shelf-life]').forEach(btn => {
-        const selected = Number(btn.dataset.shelfLife) === Number(state.modal.shelfLifeDays || SHELF_LIFE_DAYS);
-        btn.classList.toggle('active', selected);
-        btn.setAttribute('aria-pressed', selected ? 'true' : 'false');
-      });
-    }
-
-    function updateEstimatedDate() {
-      if (!els.estimatedDate) return;
-      const base = state.modal.baseDate || todayISO();
-      const due = addDaysISO(base, state.modal.shelfLifeDays || SHELF_LIFE_DAYS);
-      els.estimatedDate.textContent = formatFrDate(due);
-    }
-
-    function refreshModalMeta() {
-      if (els.qtyValue) els.qtyValue.textContent = String(state.modal.qty || 1);
-      renderNotesCounter();
-      renderDurationButtons();
-      updateEstimatedDate();
-    }
-
-
-    function openSearch() {
-      state.searchCategory = 'all';
-      els.searchQuery.value = '';
-      renderSearchCategoryGrid();
-      renderSearchResults();
-      openSheet(els.searchSheet, els.searchQuery);
-    }
-    function closeSearch() { closeSheet(els.searchSheet); }
 
     function renderAll() {
       const counts = {
         all: state.items.length,
-        soon: state.items.filter(it => { const r = remainingDays(it); return r > 0 && r <= warnThreshold(it); }).length,
-        overdue: state.items.filter(it => remainingDays(it) <= 0).length
+        soon: state.items.filter(it => { const a = ageDays(it); return a >= SOON_DAYS && a < SHELF_LIFE_DAYS; }).length,
+        overdue: state.items.filter(it => ageDays(it) >= SHELF_LIFE_DAYS).length
       };
       els.countAll.textContent = String(counts.all);
       els.countSoon.textContent = String(counts.soon);
       els.countOverdue.textContent = String(counts.overdue);
       els.listTitle.textContent = scopeTitle(state.scope);
-      const scoped = getScopedItems();
-      els.listCount.textContent = scoped.length + ' article' + (scoped.length > 1 ? 's' : '');
+      const visibleItems = getVisibleItems();
+      const query = String(state.searchQuery || '').trim();
+      els.listCount.textContent = visibleItems.length + ' article' + (visibleItems.length > 1 ? 's' : '');
       els.listLabel.textContent = scopeTitle(state.scope);
+      els.clearInventorySearchBtn.hidden = !String(state.searchQuery || '').trim();
       renderCategoryButtons();
       updateBottomTabs();
-      els.list.innerHTML = scoped.length ? scoped.map(renderItemCard).join('') : '<div class="empty">Aucun article dans cette vue. Appuie sur <strong>Ajouter</strong>.</div>';
+      els.list.innerHTML = visibleItems.length
+        ? visibleItems.map(renderItemCard).join('')
+        : `<div class="empty">${emptyListMessage(query)}</div>`;
       bindItemActions(els.list);
-      renderSearchResults();
     }
 
-    function renderSearchResults() {
-      let items = state.items.slice();
-      const q = String(els.searchQuery.value || '').trim().toLowerCase();
-      if (q) items = items.filter(it => [it.name, it.category, it.notes].join(' ').toLowerCase().includes(q));
-      if (state.searchCategory !== 'all') items = items.filter(it => it.category === state.searchCategory);
-      items.sort(sortItems);
-      els.searchCount.textContent = items.length + ' résultat' + (items.length > 1 ? 's' : '');
-      els.searchResults.innerHTML = items.length ? items.map(renderItemCard).join('') : '<div class="empty">Aucun résultat.</div>';
-      bindItemActions(els.searchResults);
+    function emptyListMessage(query) {
+      if (query) return `Aucun article ne correspond à « ${esc(query)} ».`;
+      if (!state.items.length) return 'Aucun article dans le congélateur. Appuie sur <strong>Ajouter</strong>.';
+      return 'Aucun article dans cette vue.';
     }
 
-    function sortItems(a, b) { return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(); }
-    function getScopedItems() {
+    function normalizeSearchText(value) {
+      return String(value || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLocaleLowerCase('fr')
+        .trim();
+    }
+
+    function sortItems(a, b) {
+      const byName = String(a?.name || '').trim().localeCompare(
+        String(b?.name || '').trim(),
+        'fr',
+        { sensitivity: 'base', numeric: true }
+      );
+      return byName || String(a?.id || '').localeCompare(String(b?.id || ''));
+    }
+    function matchesSearch(item, query) {
+      if (!query) return true;
+      return [item.name, item.notes]
+        .some(value => normalizeSearchText(value).includes(query));
+    }
+
+    function getVisibleItems() {
       let items = state.items.slice();
-      if (state.scope === 'soon') items = items.filter(it => { const r = remainingDays(it); return r > 0 && r <= warnThreshold(it); });
-      if (state.scope === 'overdue') items = items.filter(it => remainingDays(it) <= 0);
+      if (state.scope === 'soon') items = items.filter(it => { const a = ageDays(it); return a >= SOON_DAYS && a < SHELF_LIFE_DAYS; });
+      if (state.scope === 'overdue') items = items.filter(it => ageDays(it) >= SHELF_LIFE_DAYS);
+
       const selectedCategories = getSelectedCategoryFilters();
       if (selectedCategories.length > 0) {
         const allowed = new Set(selectedCategories);
-        items = items.filter(item => allowed.has(item.category));
+        items = items.filter(item => getItemCategories(item).some(category => allowed.has(category)));
       }
+
+      const query = normalizeSearchText(state.searchQuery);
+      if (query) items = items.filter(item => matchesSearch(item, query));
+
       return items.sort(sortItems);
     }
     function scopeTitle(scope) { return scope === 'soon' ? 'À consommer' : scope === 'overdue' ? 'Date dépassée' : 'Tous les articles'; }
@@ -1421,17 +1189,20 @@
     }
 
     function renderItemCard(item) {
-      const meta = CATEGORY_META[item.category] || { cls: '' };
+      const categories = getItemCategories(item);
+      const primaryCategory = categories[0];
       const ageCls = ageBucket(item);
       const icon = statusIcon(item);
+      const categoryBadges = categories.map(category => `<span class="badge cat ${categoryClass(category)}">${esc(category)}</span>`).join('');
       const statusContent = icon
         ? `<span class="badge ${ageCls}">${icon}${esc(statusText(item))}</span>`
         : `<span class="badge ${ageCls}">${esc(statusText(item))}</span>`;
       return `
-        <article class="item ${meta.cls}">
-          <div class="item-rail" aria-hidden="true"><span class="rail-label">${esc(item.category)}</span></div>
+        <article class="item ${categoryClass(primaryCategory)}">
+          <div class="item-rail" aria-hidden="true"><span class="rail-label">${esc(primaryCategory)}</span></div>
           <div class="item-body">
             <div class="item-title">${esc(item.name)}</div>
+            <div class="item-categories">${categoryBadges}</div>
             <div class="item-status">${statusContent}</div>
             <div class="item-date">${esc(prettyDate(item.createdAt || item.frozenAt))}</div>
             <div class="item-sub">${esc(item.notes || 'Aucune note')}</div>
@@ -1468,9 +1239,9 @@
       if (!item) return;
       if (!confirm('Supprimer cet article ?')) return;
       state.items = state.items.filter(it => it.id !== id);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
+      persistItems();
       renderAll();
-      pushToFirebase(true);
+      deleteItemFromFirebase(id, true);
       toast('Article supprimé');
     }
     function changeItemQty(id, delta) {
@@ -1478,35 +1249,37 @@
       if (!item) return;
       item.quantity = Math.max(1, Number(item.quantity || 1) + delta);
       item.updatedAt = new Date().toISOString();
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
+      persistItems();
       renderAll();
-      pushToFirebase(true);
+      saveItemToFirebase(item, true);
     }
 
     function saveItem() {
       const name = String(els.itemName.value || '').trim();
       if (!name) { toast('Nom requis'); return; }
       const existing = state.modal.id ? state.items.find(it => it.id === state.modal.id) : null;
-      const shelfLifeDays = Number(state.modal.shelfLifeDays) > 0 ? Number(state.modal.shelfLifeDays) : SHELF_LIFE_DAYS;
-      const item = {
+      const categories = uniqueCategories(state.modal.categories);
+      if (!categories.length) { toast('Sélectionne au moins une catégorie'); return; }
+      const item = normalizeItem({
+        ...(existing || {}),
         id: state.modal.id || uid(),
         name,
-        category: state.modal.category || CATEGORY_ORDER[0],
+        category: categories[0],
+        categories,
         quantity: Math.max(1, Number(state.modal.qty) || 1),
-        createdAt: existing?.createdAt || state.modal.baseDate || todayISO(),
-        frozenAt: existing?.frozenAt || (state.modal.baseDate || todayISO()),
-        shelfLifeDays,
-        months: Math.round(shelfLifeDays / 30),
+        createdAt: existing?.createdAt || todayISO(),
+        frozenAt: existing?.frozenAt || todayISO(),
+        months: existing?.months || 6,
         notes: String(els.itemNotes.value || '').trim(),
         updatedAt: new Date().toISOString(),
         updatedBy: state.deviceId,
         updatedByName: state.deviceName
-      };
+      });
       const idx = state.items.findIndex(it => it.id === item.id);
-      if (idx >= 0) state.items[idx] = normalizeItem(item); else state.items.unshift(normalizeItem(item));
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
+      if (idx >= 0) state.items[idx] = item; else state.items.unshift(item);
+      persistItems();
       renderAll();
-      pushToFirebase(true);
+      saveItemToFirebase(item, true);
       closeItem();
       toast(idx >= 0 ? 'Article mis à jour' : 'Article ajouté');
     }
@@ -1518,7 +1291,7 @@
       if (els.fabAddBtn) els.fabAddBtn.addEventListener('click', () => openItem(null));
       if (els.menuDisconnectBtn) {
         els.menuDisconnectBtn.addEventListener('click', () => {
-          console.log('[Freezer v27] click Déconnexion');
+          debugLog('disconnect:menu click');
           closeMenu();
           disconnectSync();
         });
@@ -1532,39 +1305,27 @@
         const next = chip.dataset.scope === state.scope ? 'all' : chip.dataset.scope;
         setScope(next);
       });
-      els.addBtn.addEventListener('click', () => openItem(null));
-      els.searchBtn.addEventListener('click', () => openSearch());
       els.closeSettingsBtn.addEventListener('click', closeSettings);
       els.closeItemBtn.addEventListener('click', closeItem);
-      els.closeSearchBtn.addEventListener('click', closeSearch);
       els.saveSettingsBtn.addEventListener('click', saveSettings);
       els.connectBtn.addEventListener('click', connectSync);
       els.disconnectBtn.addEventListener('click', disconnectSync);
       els.qtyMinus.addEventListener('click', () => adjustQty(-1));
       els.qtyPlus.addEventListener('click', () => adjustQty(1));
       els.saveItemBtn.addEventListener('click', saveItem);
-      if (els.itemNotes) els.itemNotes.addEventListener('input', renderNotesCounter);
-      if (els.durationGrid) {
-        els.durationGrid.addEventListener('click', e => {
-          const btn = e.target.closest('[data-shelf-life]');
-          if (!btn) return;
-          state.modal.shelfLifeDays = Number(btn.dataset.shelfLife) || SHELF_LIFE_DAYS;
-          renderDurationButtons();
-          updateEstimatedDate();
-        });
-      }
-      els.clearSearchBtn.addEventListener('click', () => { els.searchQuery.value = ''; state.searchCategory = 'all'; renderSearchCategoryGrid(); renderSearchResults(); });
-      els.searchQuery.addEventListener('input', renderSearchResults);
-      els.searchCategoryGrid.addEventListener('click', e => {
-        const btn = e.target.closest('[data-search-cat]'); if (!btn) return;
-        const next = btn.dataset.searchCat === state.searchCategory ? 'all' : btn.dataset.searchCat;
-        state.searchCategory = next;
-        renderSearchCategoryGrid();
-        renderSearchResults();
+      els.inventorySearch.addEventListener('input', () => {
+        state.searchQuery = els.inventorySearch.value;
+        renderAll();
+      });
+      els.clearInventorySearchBtn.addEventListener('click', () => {
+        state.searchQuery = '';
+        els.inventorySearch.value = '';
+        renderAll();
+        els.inventorySearch.focus();
       });
       els.categoryGrid.addEventListener('click', e => {
         const btn = e.target.closest('[data-cat]'); if (!btn) return;
-        selectCategory(btn.dataset.cat);
+        toggleItemCategory(btn.dataset.cat);
       });
       els.categoryButtons.addEventListener('click', e => {
         const btn = e.target.closest('[data-filter-cat]'); if (!btn) return;
@@ -1576,7 +1337,7 @@
         state.navTab = tab;
         if (tab === 'inventory') { document.body.classList.remove('categories-view'); state.scope = 'all'; renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
         else if (tab === 'soon') { document.body.classList.remove('categories-view'); state.scope = 'soon'; renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        else if (tab === 'categories') { document.body.classList.add('categories-view'); renderAll(); document.getElementById('categorySection')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        else if (tab === 'categories') { document.body.classList.add('categories-view'); renderAll(); els.categorySection.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
       });
       document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAllSheets(); });
     }
@@ -1591,7 +1352,7 @@
       renderAll();
     }
 
-    function closeAllSheets() { closeMenu(); closeSettings(); closeItem(); closeSearch(); }
+    function closeAllSheets() { closeMenu(); closeSettings(); closeItem(); }
 
     function loadScript(src) {
       return new Promise((resolve, reject) => {
@@ -1671,11 +1432,11 @@
           const payload = Array.isArray(raw) ? raw : (raw && typeof raw === 'object' && raw.items && typeof raw.items === 'object' && !Array.isArray(raw.items) ? raw.items : raw || {});
           const keys = payload && typeof payload === 'object' ? Object.keys(payload) : [];
           debugLog('connectSync:snapshot ' + source, { exists, keys: keys.length });
-          const remote = keys.map(k => normalizeItem(payload[k])).filter(Boolean).sort(sortItems);
-          debugLog('connectSync:remote items parsed', remote.map(it => ({ id: it.id, name: it.name, category: it.category, qty: it.quantity })));
+          const remote = keys.map(key => normalizeItem({ ...payload[key], id: payload[key]?.id || key })).filter(Boolean).sort(sortItems);
+          debugLog('connectSync:remote items parsed', remote.map(it => ({ id: it.id, name: it.name, categories: it.categories, qty: it.quantity })));
           if (remote.length) {
             state.items = remote;
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
+            persistItems();
             debugLog('connectSync:local state replaced from remote', state.items.length);
           } else {
             debugLog('connectSync:remote empty, keeping current local view', state.items.length);
@@ -1711,29 +1472,33 @@
       state.syncing = false;
       state.db = null;
       state.refPath = '';
-      state.items = [];
-      try { localStorage.removeItem(STORAGE_KEY); } catch (err) { console.error(err); }
       renderAll();
       setStatus('Hors ligne');
-      debugLog('disconnectSync:local items cleared');
-      toast('Déconnecté de Firebase');
+      debugLog('disconnectSync:local items kept', state.items.length);
+      toast('Déconnecté — données conservées sur cet appareil');
     }
 
-    function pushToFirebase(force) {
-      debugLog('pushToFirebase:called', { syncing: state.syncing, hasDb: !!state.db, path: state.refPath, itemCount: state.items.length, force: !!force });
-      if (!state.syncing || !state.db || !state.refPath) {
-        debugLog('pushToFirebase:skipped');
-        return Promise.resolve();
-      }
-      const payload = {};
-      state.items.forEach(item => { payload[item.id] = normalizeItem(item); });
-      debugLog('pushToFirebase:payload keys', Object.keys(payload));
-      return state.db.ref(state.refPath).set(payload).then(() => {
-        debugLog('pushToFirebase:success');
+    function saveItemToFirebase(item, force) {
+      if (!state.syncing || !state.db || !state.refPath || !item) return Promise.resolve();
+      const normalized = normalizeItem(item);
+      return state.db.ref(state.refPath + '/' + normalized.id).set(normalized).then(() => {
+        debugLog('saveItemToFirebase:success', normalized.id);
         if (force) setStatus('Synchronisé : ' + state.settings.roomId);
       }).catch(err => {
         console.error(err);
-        debugLog('pushToFirebase:error', err);
+        debugLog('saveItemToFirebase:error', err);
+        setStatus('Sync en erreur');
+      });
+    }
+
+    function deleteItemFromFirebase(id, force) {
+      if (!state.syncing || !state.db || !state.refPath || !id) return Promise.resolve();
+      return state.db.ref(state.refPath + '/' + id).remove().then(() => {
+        debugLog('deleteItemFromFirebase:success', id);
+        if (force) setStatus('Synchronisé : ' + state.settings.roomId);
+      }).catch(err => {
+        console.error(err);
+        debugLog('deleteItemFromFirebase:error', err);
         setStatus('Sync en erreur');
       });
     }
@@ -1749,48 +1514,12 @@
       toast('Configuration enregistrée sur cet iPhone');
     }
 
-    // Global hooks for safety and debugging
-    window.toggleMenu = toggleMenu;
-    window.openSettings = openSettings;
-    window.closeSettings = closeSettings;
-    window.connectSync = connectSync;
-    window.disconnectSync = disconnectSync;
-    window.openItem = openItem;
-    window.closeItem = closeItem;
-    window.openSearch = openSearch;
-    window.closeSearch = closeSearch;
-    window.saveItem = saveItem;
-    window.setScope = setScope;
-    window.setCategoryFilter = setCategoryFilter;
-    window.closeAllSheets = closeAllSheets;
-
     function prettyDate(dateStr) {
-      if (!isDateISO(dateStr)) return 'date inconnue';
-      const d = new Date(dateStr + 'T12:00:00');
+      const isoDate = toDateISO(dateStr, '');
+      if (!isoDate) return 'date inconnue';
+      const d = new Date(isoDate + 'T12:00:00');
       return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
     }
-
-    // expose current app api after functions exist
-    window.app = {
-      toggleMenu,
-      openMenu,
-      closeMenu,
-      openSettings,
-      closeSettings,
-      connectSync,
-      disconnectSync,
-      saveSettings,
-      openItem,
-      closeItem,
-      openSearch,
-      closeSearch,
-      saveItem,
-      adjustQty,
-      selectCategory,
-      setScope,
-      setCategoryFilter,
-      closeAllSheets
-    };
 
     function setDebugReady() {
       els.menuBtn.setAttribute('data-ready', '1');
