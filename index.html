@@ -196,6 +196,22 @@
     .qty-row { display:flex; gap:10px; }
     .qty-row .qty-btn { flex:1 1 0; height:48px; font-size:1.4rem; background:#fff; }
     .qty-row .qty-btn.add { background: linear-gradient(180deg, #22c55e, #16a34a); color:#fff; border-color: transparent; }
+    .duration-grid { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:10px; }
+    .duration-btn {
+      min-height:54px; border:1px solid var(--line); border-radius:16px; background:#fff;
+      color:var(--text); padding:10px 8px; font-weight:900;
+    }
+    .duration-btn.active {
+      border-color:rgba(10,132,255,.48); background:rgba(10,132,255,.08); color:var(--blue);
+      box-shadow:0 0 0 3px rgba(10,132,255,.10);
+    }
+    .estimate-card {
+      margin-top:10px; display:flex; align-items:center; gap:10px; padding:12px;
+      border:1px solid rgba(10,132,255,.16); border-radius:16px; background:#f7fbff;
+    }
+    .estimate-icon { font-size:1.25rem; }
+    .estimate-label { color:var(--muted); font-size:.78rem; font-weight:800; }
+    .estimate-date { margin-top:2px; color:var(--text); font-size:1rem; font-weight:900; }
     .search-top { margin-top:10px; }
     .search-section { margin-top:8px; }
     .inventory-search {
@@ -260,12 +276,13 @@
       .app { padding-left:8px; padding-right:8px; }
       .summary-grid, .filters, .form-grid { grid-template-columns: 1fr; }
       .category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .duration-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .item-actions { align-items:flex-start; }
       .menu { left:8px; right:8px; width:auto; }
       .bottom-tabs { left:50%; right:auto; transform:translateX(-50%); width:calc(100vw - 16px); }
     }
 
-    /* v25 - mobile app layout */
+    /* v26 - mobile app layout */
     .app { max-width: 1180px; padding: calc(8px + var(--safe-top)) 12px calc(104px + var(--safe-bottom)); }
     .topbar { display:grid; grid-template-columns:48px minmax(0,1fr) 48px; align-items:center; padding:8px 4px 12px; background:rgba(243,246,251,.96); }
     .brand { text-align:center; min-width:0; }
@@ -335,7 +352,7 @@
     }
   
 
-    /* v25 — carte article claire : catégories / contenu / actions */
+    /* v26 — carte article claire : catégories / contenu / actions */
     .item {
       position: relative !important;
       display: grid !important;
@@ -524,12 +541,12 @@
       <button class="summary-card" id="filterSoon" type="button">
         <div class="summary-label">À consommer</div>
         <div class="summary-value" id="countSoon">0</div>
-        <div class="summary-hint">Entre 5 et 6 mois</div>
+        <div class="summary-hint">Échéance sous 30 jours</div>
       </button>
       <button class="summary-card" id="filterOverdue" type="button">
         <div class="summary-label">Date dépassée</div>
         <div class="summary-value" id="countOverdue">0</div>
-        <div class="summary-hint">Plus de 6 mois</div>
+        <div class="summary-hint">Échéance atteinte</div>
       </button>
     </section>
 
@@ -583,7 +600,7 @@
     <div class="menu-title">Menu</div>
     <button class="menu-item" id="menuConnectBtn" type="button">↻ <span>Connexion</span></button>
     <button class="menu-item danger" id="menuDisconnectBtn" type="button">⎋ <span>Déconnexion</span></button>
-    <div class="menu-item version">Version <strong>v25</strong></div>
+    <div class="menu-item version">Version <strong>v26</strong></div>
   </div>
 
   <section class="sheet" id="settingsSheet">
@@ -655,7 +672,22 @@
           <label class="full">Notes
             <textarea id="itemNotes" placeholder="Ex. déjà cuit, pour ce soir..."></textarea>
           </label>
-          <div class="full small">La date d’ajout est utilisée automatiquement pour le calcul. Durée fixe : 6 mois.</div>
+          <div class="full">
+            <div class="section-label">Durée de conservation</div>
+            <div class="duration-grid" id="durationGrid" role="group" aria-label="Durée de conservation">
+              <button class="duration-btn" type="button" data-shelf-life="7" aria-pressed="false">📅 1 semaine</button>
+              <button class="duration-btn" type="button" data-shelf-life="30" aria-pressed="false">📅 1 mois</button>
+              <button class="duration-btn" type="button" data-shelf-life="90" aria-pressed="false">📅 3 mois</button>
+              <button class="duration-btn" type="button" data-shelf-life="180" aria-pressed="false">📅 6 mois</button>
+            </div>
+            <div class="estimate-card" aria-live="polite">
+              <span class="estimate-icon" aria-hidden="true">📅</span>
+              <div>
+                <div class="estimate-label">Date limite estimée</div>
+                <div class="estimate-date" id="estimatedDate">—</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div class="sheet-actions">
@@ -671,13 +703,14 @@
   (() => {
     'use strict';
 
-    const APP_VERSION = 'v25';
+    const APP_VERSION = 'v26';
     const STORAGE_KEY = 'freezer-items-v2';
     const SETTINGS_KEY = 'freezer-settings-v2';
     const DEVICE_KEY = 'freezer-device-id-v2';
     const DEVICE_NAME_KEY = 'freezer-device-name-v2';
-    const SHELF_LIFE_DAYS = 180;
-    const SOON_DAYS = 150;
+    const DEFAULT_SHELF_LIFE_DAYS = 180;
+    const SHELF_LIFE_OPTIONS = [7, 30, 90, 180];
+    const SOON_THRESHOLD_DAYS = 30;
     const ALERT_DAYS = 15;
     const CATEGORY_ORDER = ['Viande', 'Poisson', 'Légumes', 'Plats cuisinés', 'Dessert', 'Produits laitiers', 'Accompagnement', 'Autres'];
     const CATEGORY_META = {
@@ -745,6 +778,8 @@
       qtyValue: document.getElementById('qtyValue'),
       qtyMinus: document.getElementById('qtyMinus'),
       qtyPlus: document.getElementById('qtyPlus'),
+      durationGrid: document.getElementById('durationGrid'),
+      estimatedDate: document.getElementById('estimatedDate'),
       saveItemBtn: document.getElementById('saveItemBtn'),
       inventorySearch: document.getElementById('inventorySearch'),
       clearInventorySearchBtn: document.getElementById('clearInventorySearchBtn'),
@@ -764,7 +799,7 @@
       firebaseLoadPromise: null,
       deviceId: getOrCreateDeviceId(),
       deviceName: '',
-      modal: { id: '', categories: [CATEGORY_ORDER[0]], qty: 1 }
+      modal: { id: '', categories: [CATEGORY_ORDER[0]], qty: 1, shelfLifeDays: DEFAULT_SHELF_LIFE_DAYS, baseDate: todayISO() }
     };
 
     state.deviceName = state.settings.deviceName || localStorage.getItem(DEVICE_NAME_KEY) || defaultDeviceName();
@@ -815,13 +850,22 @@
       }
     }
 
-    function todayISO() { return new Date().toISOString().slice(0, 10); }
+    function todayISO() {
+      const now = new Date();
+      const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+      return local.toISOString().slice(0, 10);
+    }
     function isDateISO(v) { return /^\d{4}-\d{2}-\d{2}$/.test(String(v || '')); }
     function toDateISO(value, fallback = todayISO()) {
       const raw = String(value || '');
       if (isDateISO(raw)) return raw;
       const datePart = raw.slice(0, 10);
       return isDateISO(datePart) ? datePart : fallback;
+    }
+    function addDaysISO(dateStr, days) {
+      const [year, month, day] = toDateISO(dateStr).split('-').map(Number);
+      const date = new Date(Date.UTC(year, month - 1, day + Number(days || 0)));
+      return date.toISOString().slice(0, 10);
     }
     function uniqueCategories(values) {
       const source = Array.isArray(values)
@@ -844,24 +888,40 @@
     function categoryClass(category) {
       return (CATEGORY_META[category] || CATEGORY_META.Autres).cls;
     }
-    function daysSince(dateStr) { if (!isDateISO(dateStr)) return 9999; return Math.floor((Date.now() - new Date(dateStr + 'T12:00:00').getTime()) / 86400000); }
-    function ageDays(item) { return daysSince(toDateISO(item.createdAt || item.frozenAt)); }
-    function remainingDays(item) {
-      return SHELF_LIFE_DAYS - ageDays(item);
+    function dayNumber(dateStr) {
+      const [year, month, day] = dateStr.split('-').map(Number);
+      return Math.floor(Date.UTC(year, month - 1, day) / 86400000);
     }
+    function daysSince(dateStr) {
+      const date = toDateISO(dateStr, '');
+      return date ? dayNumber(todayISO()) - dayNumber(date) : 9999;
+    }
+    function ageDays(item) { return daysSince(item.createdAt || item.frozenAt); }
+    function getShelfLifeDays(item) {
+      const direct = Number(item && item.shelfLifeDays);
+      if (Number.isFinite(direct) && direct > 0) return Math.round(direct);
+      const months = Number(item && item.months);
+      if (Number.isFinite(months) && months > 0) return Math.round(months * 30);
+      return DEFAULT_SHELF_LIFE_DAYS;
+    }
+    function remainingDays(item) { return getShelfLifeDays(item) - ageDays(item); }
+    function isSoon(item) {
+      const remaining = remainingDays(item);
+      return remaining > 0 && remaining <= SOON_THRESHOLD_DAYS;
+    }
+    function isOverdue(item) { return remainingDays(item) <= 0; }
     function ageBucket(item) {
-      const age = ageDays(item);
-      const remaining = SHELF_LIFE_DAYS - age;
+      const remaining = remainingDays(item);
       if (remaining <= 0) return 'old';
       if (remaining < ALERT_DAYS) return 'alert';
-      if (age >= SOON_DAYS) return 'warn';
-      return age < 30 ? 'fresh' : age < 90 ? 'neutral' : 'warn';
+      if (remaining <= SOON_THRESHOLD_DAYS) return 'warn';
+      return remaining > getShelfLifeDays(item) / 2 ? 'fresh' : 'neutral';
     }
     function statusText(item) {
       const remaining = remainingDays(item);
       if (remaining <= 0) return 'Date dépassée';
       if (remaining < ALERT_DAYS) return '🚨 ' + remaining + ' j restant' + (remaining > 1 ? 's' : '');
-      if (remaining <= SHELF_LIFE_DAYS - SOON_DAYS) return 'À consommer';
+      if (remaining <= SOON_THRESHOLD_DAYS) return 'À consommer';
       return remaining + ' j restants';
     }
     function statusIcon(item) {
@@ -925,7 +985,8 @@
       const categories = getItemCategories(item);
       const createdAt = String(item.createdAt || item.frozenAt || todayISO());
       const frozenAt = String(item.frozenAt || toDateISO(createdAt));
-      return {
+      const shelfLifeDays = getShelfLifeDays(item);
+      const normalized = {
         ...item,
         id: item.id || uid(),
         name: String(item.name),
@@ -934,12 +995,16 @@
         quantity: Math.max(1, Number(item.quantity) || 1),
         createdAt,
         frozenAt,
-        months: Math.max(1, Number(item.months) || 6),
+        shelfLifeDays,
         notes: String(item.notes || ''),
         updatedAt: item.updatedAt || new Date().toISOString(),
         updatedBy: item.updatedBy || '',
         updatedByName: item.updatedByName || ''
       };
+      if (item.months === undefined || item.months === null || item.months === '') {
+        normalized.months = shelfLifeDays / 30;
+      }
+      return normalized;
     }
 
     function persistItems() {
@@ -1078,15 +1143,37 @@
       state.modal.id = item ? item.id : '';
       state.modal.categories = item ? getItemCategories(item) : [CATEGORY_ORDER[0]];
       state.modal.qty = item ? item.quantity : 1;
+      state.modal.shelfLifeDays = getShelfLifeDays(item || {});
+      state.modal.baseDate = toDateISO(item && (item.createdAt || item.frozenAt) || todayISO());
       els.itemTitle.textContent = item ? 'Modifier l’article' : 'Ajouter un article';
       els.itemName.value = item ? item.name : '';
       els.itemNotes.value = item ? item.notes : '';
       els.qtyValue.textContent = String(state.modal.qty);
       renderCategoryGrid();
+      renderDurationButtons();
+      updateEstimatedDate();
       openSheet(els.itemSheet, els.itemName);
     }
     function closeItem() { closeSheet(els.itemSheet); }
     function adjustQty(delta) { state.modal.qty = Math.max(1, (state.modal.qty || 1) + delta); els.qtyValue.textContent = String(state.modal.qty); }
+    function renderDurationButtons() {
+      els.durationGrid.querySelectorAll('[data-shelf-life]').forEach(button => {
+        const active = Number(button.dataset.shelfLife) === state.modal.shelfLifeDays;
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+    }
+    function updateEstimatedDate() {
+      const dueDate = addDaysISO(state.modal.baseDate, state.modal.shelfLifeDays);
+      els.estimatedDate.textContent = prettyDate(dueDate);
+    }
+    function selectShelfLife(days) {
+      const value = Number(days);
+      if (!SHELF_LIFE_OPTIONS.includes(value)) return;
+      state.modal.shelfLifeDays = value;
+      renderDurationButtons();
+      updateEstimatedDate();
+    }
     function toggleItemCategory(category) {
       if (!CATEGORY_ORDER.includes(category)) return;
       const categories = uniqueCategories(state.modal.categories);
@@ -1103,8 +1190,8 @@
     function renderAll() {
       const counts = {
         all: state.items.length,
-        soon: state.items.filter(it => { const a = ageDays(it); return a >= SOON_DAYS && a < SHELF_LIFE_DAYS; }).length,
-        overdue: state.items.filter(it => ageDays(it) >= SHELF_LIFE_DAYS).length
+        soon: state.items.filter(isSoon).length,
+        overdue: state.items.filter(isOverdue).length
       };
       els.countAll.textContent = String(counts.all);
       els.countSoon.textContent = String(counts.soon);
@@ -1153,8 +1240,8 @@
 
     function getVisibleItems() {
       let items = state.items.slice();
-      if (state.scope === 'soon') items = items.filter(it => { const a = ageDays(it); return a >= SOON_DAYS && a < SHELF_LIFE_DAYS; });
-      if (state.scope === 'overdue') items = items.filter(it => ageDays(it) >= SHELF_LIFE_DAYS);
+      if (state.scope === 'soon') items = items.filter(isSoon);
+      if (state.scope === 'overdue') items = items.filter(isOverdue);
 
       const selectedCategories = getSelectedCategoryFilters();
       if (selectedCategories.length > 0) {
@@ -1260,6 +1347,11 @@
       const existing = state.modal.id ? state.items.find(it => it.id === state.modal.id) : null;
       const categories = uniqueCategories(state.modal.categories);
       if (!categories.length) { toast('Sélectionne au moins une catégorie'); return; }
+      const shelfLifeDays = Number(state.modal.shelfLifeDays) || DEFAULT_SHELF_LIFE_DAYS;
+      const durationUnchanged = existing && getShelfLifeDays(existing) === shelfLifeDays;
+      const legacyMonths = durationUnchanged && Object.prototype.hasOwnProperty.call(existing, 'months')
+        ? existing.months
+        : shelfLifeDays / 30;
       const item = normalizeItem({
         ...(existing || {}),
         id: state.modal.id || uid(),
@@ -1267,9 +1359,10 @@
         category: categories[0],
         categories,
         quantity: Math.max(1, Number(state.modal.qty) || 1),
-        createdAt: existing?.createdAt || todayISO(),
-        frozenAt: existing?.frozenAt || todayISO(),
-        months: existing?.months || 6,
+        createdAt: existing?.createdAt || state.modal.baseDate || todayISO(),
+        frozenAt: existing?.frozenAt || state.modal.baseDate || todayISO(),
+        shelfLifeDays,
+        months: legacyMonths,
         notes: String(els.itemNotes.value || '').trim(),
         updatedAt: new Date().toISOString(),
         updatedBy: state.deviceId,
@@ -1312,6 +1405,10 @@
       els.disconnectBtn.addEventListener('click', disconnectSync);
       els.qtyMinus.addEventListener('click', () => adjustQty(-1));
       els.qtyPlus.addEventListener('click', () => adjustQty(1));
+      els.durationGrid.addEventListener('click', event => {
+        const button = event.target.closest('[data-shelf-life]');
+        if (button) selectShelfLife(button.dataset.shelfLife);
+      });
       els.saveItemBtn.addEventListener('click', saveItem);
       els.inventorySearch.addEventListener('input', () => {
         state.searchQuery = els.inventorySearch.value;
